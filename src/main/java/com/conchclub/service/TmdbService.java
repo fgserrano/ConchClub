@@ -1,0 +1,43 @@
+package com.conchclub.service;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.util.Collections;
+import java.util.Map;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class TmdbService {
+
+    private final RestTemplate restTemplate;
+
+    @Value("${tmdb.api.key}")
+    private String apiKey;
+
+    private static final String BASE_URL = "https://api.themoviedb.org/3";
+
+    public Map<String, Object> searchMovie(String query) {
+        if (query == null || query.isBlank()) {
+            return Collections.emptyMap();
+        }
+
+        String url = UriComponentsBuilder.fromHttpUrl(BASE_URL + "/search/movie")
+                .queryParam("api_key", apiKey)
+                .queryParam("query", query)
+                .queryParam("include_adult", false)
+                .toUriString();
+
+        try {
+            return restTemplate.getForObject(url, Map.class);
+        } catch (Exception e) {
+            log.error("Failed to search TMDB for query [{}]: {}", query, e.getMessage());
+            return Collections.emptyMap();
+        }
+    }
+}

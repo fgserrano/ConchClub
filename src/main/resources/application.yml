@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: conchclub
+  config:
+    import: optional:classpath:application-local.yml
+  datasource:
+    url: jdbc:h2:mem:conchclubdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password: password
+
+  h2:
+    console:
+      enabled: true
+
+server:
+  port: 8080
+
+# Default configuration (can be overridden in application-local.yml)
+jwt:
+  secret: change_this_secret_to_something_very_long_and_secure_for_production_use_only
+  expiration:
+    ms: 86400000
