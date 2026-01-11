@@ -8,6 +8,9 @@ spring:
     driverClassName: org.h2.Driver
     username: sa
     password: password
+  sql:
+    init:
+      mode: always
 
   h2:
     console:
@@ -16,8 +19,14 @@ spring:
 server:
   port: 8080
 
+  error:
+    include-message: always
+    include-stacktrace: always
+
 # Default configuration (can be overridden in application-local.yml)
 jwt:
   secret: change_this_secret_to_something_very_long_and_secure_for_production_use_only
   expiration:
     ms: 86400000
+
+

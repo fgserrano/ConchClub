@@ -33,19 +33,18 @@ The project has been migrated to Gradle.
 
 ### Step 1: User Registration
 1.  Navigate to `http://localhost:5173/register`.
-2.  Create a user (e.g., username `admin`, password `password`, invite code `ANY`).
+2.  Create a user (e.g., username `testuser`, password `password`, invite code `ANY`).
 3.  You will be redirected to Login. Log in with your new credentials.
 4.  You should see the "No Active Season" screen initially.
 
 ### Step 2: Admin Rights (Critical)
-By default, new users are **MEMBERS**. To test the Admin Panel (`/admin`):
-1.  You must manually update your user role in the H2 Database.
-2.  Go to `http://localhost:8080/h2-console` (JDBC URL: `jdbc:h2:mem:conchclubdb`, User: `sa`, Pass: `password`).
-3.  Run:
-    ```sql
-    UPDATE users SET role = 'ADMIN' WHERE username = 'admin';
-    ```
-4.  Log out and Log back in on the frontend to refresh your token claims.
+To test the Admin Panel (`/admin`), use the pre-configured admin user:
+1.  Log out if you are currently logged in.
+2.  Log in with:
+    *   Username: `admin`
+    *   Password: `password`
+3.  This user is automatically created with the `ADMIN` role by `data.sql`.
+4.  Navigate to the Admin Panel.
 
 ### Step 3: Create a Season (Admin)
 1.  Navigate to the Admin Panel (via UI link if present, or `/admin`).

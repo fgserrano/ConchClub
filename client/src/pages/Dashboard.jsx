@@ -8,7 +8,6 @@ export default function Dashboard() {
     const [tickets, setTickets] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // Search State
     const [query, setQuery] = useState('');
     const [results, setResults] = useState([]);
     const [searching, setSearching] = useState(false);
@@ -20,10 +19,10 @@ export default function Dashboard() {
 
     const fetchData = async () => {
         try {
-            const seasonRes = await api.get('/club/season/active');
+            const seasonRes = await api.get('/season/active');
             setSeason(seasonRes.data);
             if (seasonRes.data) {
-                const ticketRes = await api.get('/club/tickets');
+                const ticketRes = await api.get('/season/tickets');
                 setTickets(ticketRes.data);
             }
         } catch (e) {
@@ -38,7 +37,7 @@ export default function Dashboard() {
         if (!query.trim()) return;
         setSearching(true);
         try {
-            const res = await api.get(`/club/search?query=${query}`);
+            const res = await api.get(`/submission/search?query=${query}`);
             setResults(res.data.results || []);
         } catch (e) {
             console.error(e);
@@ -48,10 +47,9 @@ export default function Dashboard() {
     };
 
     const handleSubmitMovie = async (movie) => {
-        if (!confirm(`Submit "${movie.title}" as your choice?`)) return;
 
         try {
-            await api.post('/club/submit', {
+            await api.post('/submission/submit', {
                 tmdbId: movie.id.toString(),
                 title: movie.title,
                 posterPath: movie.poster_path,
@@ -69,10 +67,12 @@ export default function Dashboard() {
     const myTicket = tickets.find(t => t.user?.username === username);
     const winner = tickets.find(t => t.selected);
 
-    if (loading) return <div className="text-center mt-20 text-slate-500 flex flex-col items-center">
-        <div className="w-8 h-8 rounded-full border-2 border-purple-500 border-t-transparent animate-spin mb-4" />
-        Loading magic...
-    </div>;
+    if (loading) {
+        return <div className="text-center mt-20 text-slate-500 flex flex-col items-center">
+            <div className="w-8 h-8 rounded-full border-2 border-purple-500 border-t-transparent animate-spin mb-4" />
+            Loading magic...
+        </div>;
+    }
 
     if (!season) {
         return (
@@ -86,7 +86,6 @@ export default function Dashboard() {
 
     return (
         <div className="space-y-12 animate-in fade-in duration-700">
-            {/* HERO SECTION */}
             <section className="relative rounded-3xl overflow-hidden bg-slate-900/50 border border-slate-800 p-8 md:p-12 text-center">
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-900/10 to-blue-900/10" />
                 <div className="relative z-10">
@@ -102,7 +101,7 @@ export default function Dashboard() {
                 </div>
             </section>
 
-            {/* WINNER REVEAL */}
+
             {winner && (
                 <section className="relative transform hover:scale-[1.01] transition-transform duration-500">
                     <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-amber-600/20 blur-2xl -z-10" />
@@ -129,7 +128,6 @@ export default function Dashboard() {
                 </section>
             )}
 
-            {/* SUBMISSION AREA */}
             {!season.locked && !myTicket && (
                 <div className="max-w-2xl mx-auto">
                     <form onSubmit={handleSearch} className="relative group mb-8">
@@ -167,7 +165,6 @@ export default function Dashboard() {
                 </div>
             )}
 
-            {/* SUBMISSION SUCCESS MSG */}
             {myTicket && !season.locked && (
                 <div className="text-center p-8 border border-green-500/20 bg-green-500/5 rounded-2xl mb-8">
                     <p className="text-green-400 mb-2">My Submission</p>
@@ -175,7 +172,6 @@ export default function Dashboard() {
                 </div>
             )}
 
-            {/* TICKET POOL */}
             <section>
                 <h3 className="text-xl font-bold text-slate-300 mb-6 flex items-center gap-2">
                     <Calendar className="w-5 h-5 text-purple-500" />

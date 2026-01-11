@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 
 import java.util.Collections;
 import java.util.Map;
@@ -34,7 +36,9 @@ public class TmdbService {
                 .toUriString();
 
         try {
-            return restTemplate.getForObject(url, Map.class);
+            return restTemplate
+                    .exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<Map<String, Object>>() {
+                    }).getBody();
         } catch (Exception e) {
             log.error("Failed to search TMDB for query [{}]: {}", query, e.getMessage());
             return Collections.emptyMap();

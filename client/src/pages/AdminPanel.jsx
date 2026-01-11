@@ -8,11 +8,9 @@ export default function AdminPanel() {
     const [response, setResponse] = useState('');
 
     const createSeason = async (e) => {
-        e.preventDefault();
-        if (!confirm("Create new season? This will deactivate the current one.")) return;
         try {
             setLoading(true);
-            await api.post('/club/season', seasonName); // sending string directly as body?
+            await api.post('/admin/season', { name: seasonName });
             setResponse("Season Created!");
             setSeasonName('');
         } catch (e) {
@@ -32,7 +30,7 @@ export default function AdminPanel() {
     const revealWinner = async () => {
         if (!confirm("REVEAL THE WINNER??")) return;
         try {
-            const res = await api.post('/club/reveal');
+            const res = await api.post('/admin/reveal');
             setResponse(`WINNER: ${res.data.title}`);
         } catch (e) {
             setResponse("Error: " + e.response?.data);
