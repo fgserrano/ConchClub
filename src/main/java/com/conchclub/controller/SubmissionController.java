@@ -57,6 +57,7 @@ public class SubmissionController {
         ticket.setPosterPath(request.posterPath);
         ticket.setOverview(request.overview);
         ticket.setReleaseDate(request.releaseDate);
+        ticket.setRuntime(tmdbService.getMovieRuntime(request.tmdbId));
         ticket.setSelected(false);
 
         return ResponseEntity.ok(ticketRepository.save(ticket));

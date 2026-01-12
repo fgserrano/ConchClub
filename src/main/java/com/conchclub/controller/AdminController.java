@@ -1,5 +1,7 @@
 package com.conchclub.controller;
 
+import com.conchclub.dto.TicketDto;
+import com.conchclub.dto.UserDto;
 import com.conchclub.model.Season;
 import com.conchclub.model.Ticket;
 import com.conchclub.model.User;
@@ -24,6 +26,17 @@ public class AdminController {
     private final TicketRepository ticketRepository;
     private final UserRepository userRepository;
     private final GoogleSheetsService googleSheetsService;
+
+    @GetMapping("/tickets")
+    public ResponseEntity<List<TicketDto>> getTickets() {
+        return seasonRepository.findByActiveTrue()
+                .map(activeSeason -> {
+                    List<Ticket> tickets = ticketRepository.findBySeasonId(activeSeason.getId());
+                    List<TicketDto> dtos = tickets.stream().map(this::mapToTicketDto).toList();
+                    return ResponseEntity.ok(dtos);
+                })
+                .orElse(ResponseEntity.ok(Collections.emptyList()));
+    }
 
     @PostMapping("/season")
     public ResponseEntity<?> createSeason(@RequestBody CreateSeasonRequest request) {
@@ -91,5 +104,21 @@ public class AdminController {
     }
 
     public record CreateSeasonRequest(String name) {
+    }
+
+    private TicketDto mapToTicketDto(Ticket t) {
+        UserDto user = new UserDto(t.getUsername());
+        Integer runtime = t.getRuntime();
+        Integer rounded = (runtime == null) ? null : (int) (Math.round(runtime / 10.0) * 10);
+        return new TicketDto(
+                t.getId(),
+                user,
+                rounded,
+                t.isSelected(),
+                t.getTmdbId(),
+                t.getTitle(),
+                t.getPosterPath(),
+                t.getOverview(),
+                t.getReleaseDate());
     }
 }

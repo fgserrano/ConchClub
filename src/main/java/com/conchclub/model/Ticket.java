@@ -10,15 +10,15 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table("tickets")
+@Table("TICKETS")
 public class Ticket {
     @Id
     private Long id;
 
-    @Column("user_id")
+    @Column("USER_ID")
     private Long userId;
 
-    @Column("season_id")
+    @Column("SEASON_ID")
     private Long seasonId;
 
     // TMDB Data
@@ -27,6 +27,10 @@ public class Ticket {
     private String posterPath;
     private String overview;
     private String releaseDate;
+    private Integer runtime;
 
     private boolean selected; // If this ticket was the "Winner"
+
+    @org.springframework.data.annotation.Transient
+    private String username;
 }

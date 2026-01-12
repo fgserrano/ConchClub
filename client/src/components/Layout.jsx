@@ -1,10 +1,11 @@
 import React from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { LogOut, Film } from 'lucide-react';
+import tmdbLogo from '../assets/tmdb-logo.svg';
 
 export default function Layout() {
     const navigate = useNavigate();
-    const username = localStorage.getItem('username') || 'Member';
+    const username = localStorage.getItem('username');
 
     const handleLogout = () => {
         localStorage.removeItem('token');
@@ -14,7 +15,7 @@ export default function Layout() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-900 text-slate-100 font-sans selection:bg-purple-500/30">
+        <div className="min-h-screen bg-slate-900 text-slate-100 font-sans selection:bg-purple-500/30 flex flex-col">
             <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-800 via-slate-900 to-black pointer-events-none -z-10" />
 
             <nav className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
@@ -33,9 +34,18 @@ export default function Layout() {
                 </div>
             </nav>
 
-            <main className="max-w-7xl mx-auto px-4 py-8">
+            <main className="max-w-7xl mx-auto px-4 py-8 flex-grow w-full">
                 <Outlet />
             </main>
+
+            <footer className="border-t border-slate-800 bg-slate-900/30 py-6">
+                <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-center gap-4">
+                    <img src={tmdbLogo} alt="TMDB Logo" className="h-8 opacity-80" />
+                    <p className="text-xs text-slate-500 max-w-md text-center md:text-left">
+                        This product uses the TMDB API but is not endorsed or certified by TMDB.
+                    </p>
+                </div>
+            </footer>
         </div>
     );
 }

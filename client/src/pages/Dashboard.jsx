@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Search, Plus, Calendar, Film, Lock, Trophy } from 'lucide-react';
+import MovieCard from '../components/MovieCard';
 import api from '../lib/api';
 import { cn } from '../lib/utils';
 
 export default function Dashboard() {
     const [season, setSeason] = useState(null);
     const [tickets, setTickets] = useState([]);
+    const [myTicket, setMyTicket] = useState(null);
     const [loading, setLoading] = useState(true);
 
     const [query, setQuery] = useState('');
@@ -22,8 +24,22 @@ export default function Dashboard() {
             const seasonRes = await api.get('/season/active');
             setSeason(seasonRes.data);
             if (seasonRes.data) {
-                const ticketRes = await api.get('/season/tickets');
-                setTickets(ticketRes.data);
+                const [ticketRes, myTicketRes] = await Promise.all([
+                    api.get('/season/tickets'),
+                    api.get('/season/tickets/me').catch(() => ({ data: null }))
+                ]);
+
+                let allTickets = ticketRes.data;
+                const myFullTicket = myTicketRes.data;
+
+                if (myFullTicket) {
+                    setMyTicket(myFullTicket);
+                    allTickets = allTickets.map(t => t.id === myFullTicket.id ? myFullTicket : t);
+                } else {
+                    setMyTicket(null);
+                }
+
+                setTickets(allTickets);
             }
         } catch (e) {
             console.log("No active season or error", e);
@@ -64,7 +80,6 @@ export default function Dashboard() {
         }
     };
 
-    const myTicket = tickets.find(t => t.user?.username === username);
     const winner = tickets.find(t => t.selected);
 
     if (loading) {
@@ -74,35 +89,29 @@ export default function Dashboard() {
         </div>;
     }
 
-    if (!season) {
-        return (
-            <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
-                <Film className="w-16 h-16 text-slate-700 mb-4" />
-                <h2 className="text-2xl font-bold text-slate-300">No Active Season</h2>
-                <p className="text-slate-500">Wait for an admin to start a new movie club season.</p>
-            </div>
-        );
-    }
+
 
     return (
         <div className="space-y-12 animate-in fade-in duration-700">
             <section className="relative rounded-3xl overflow-hidden bg-slate-900/50 border border-slate-800 p-8 md:p-12 text-center">
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-900/10 to-blue-900/10" />
                 <div className="relative z-10">
-                    <span className={cn("inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold tracking-wider mb-4",
-                        season.locked ? "bg-red-500/10 text-red-400 border border-red-500/20" : "bg-green-500/10 text-green-400 border border-green-500/20")}>
-                        {season.locked ? <Lock className="w-3 h-3" /> : <Plus className="w-3 h-3" />}
-                        {season.locked ? "SUBMISSIONS LOCKED" : "OPEN FOR SUBMISSIONS"}
-                    </span>
+                    {season && (
+                        <span className={cn("inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold tracking-wider mb-4",
+                            season.locked ? "bg-red-500/10 text-red-400 border border-red-500/20" : "bg-green-500/10 text-green-400 border border-green-500/20")}>
+                            {season.locked ? <Lock className="w-3 h-3" /> : <Plus className="w-3 h-3" />}
+                            {season.locked ? "SUBMISSIONS LOCKED" : "OPEN FOR SUBMISSIONS"}
+                        </span>
+                    )}
                     <h1 className="text-4xl md:text-6xl font-black text-white mb-2 tracking-tight">
-                        {season.name}
+                        {season?.name || "Conch Club"}
                     </h1>
                     <p className="text-slate-400">Total Submissions: {tickets.length}</p>
                 </div>
             </section>
 
 
-            {winner && (
+            {winner && winner.title && (
                 <section className="relative transform hover:scale-[1.01] transition-transform duration-500">
                     <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-amber-600/20 blur-2xl -z-10" />
                     <div className="bg-black/40 border border-yellow-500/30 rounded-3xl p-8 flex flex-col md:flex-row gap-8 items-center">
@@ -128,7 +137,14 @@ export default function Dashboard() {
                 </section>
             )}
 
-            {!season.locked && !myTicket && (
+            {!season && (
+                <div className="flex flex-col items-center justify-center py-12 text-slate-500 bg-slate-900/30 rounded-3xl border border-slate-800/50 mb-8">
+                    <Film className="w-12 h-12 mb-4 opacity-50" />
+                    <p className="text-lg font-medium">No season is currently active</p>
+                </div>
+            )}
+
+            {season && !season.locked && !myTicket && (
                 <div className="max-w-2xl mx-auto">
                     <form onSubmit={handleSearch} className="relative group mb-8">
                         <input
@@ -165,10 +181,16 @@ export default function Dashboard() {
                 </div>
             )}
 
-            {myTicket && !season.locked && (
-                <div className="text-center p-8 border border-green-500/20 bg-green-500/5 rounded-2xl mb-8">
-                    <p className="text-green-400 mb-2">My Submission</p>
-                    <h3 className="text-xl font-bold text-white">{myTicket.title}</h3>
+            {myTicket && season && !season.locked && (
+                <div className="flex items-center justify-center p-8 border border-green-500/20 bg-green-500/5 rounded-2xl mb-8 gap-8">
+                    {myTicket.posterPath && (
+                        <img src={`https://image.tmdb.org/t/p/w200${myTicket.posterPath}`} alt={myTicket.title} className="w-24 rounded-lg shadow-lg" />
+                    )}
+                    <div className="text-center md:text-left">
+                        <p className="text-green-400 text-sm font-bold tracking-widest uppercase mb-2">My Submission</p>
+                        <h3 className="text-2xl font-black text-white mb-2">{myTicket.title}</h3>
+                        <p className="text-slate-400">Runtime: {myTicket.runtimeToNearestTenMin || myTicket.runtime}m</p>
+                    </div>
                 </div>
             )}
 
@@ -179,23 +201,11 @@ export default function Dashboard() {
                 </h3>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
-                    {tickets.map((ticket, i) => (
-                        <div key={ticket.id} className={cn("group relative", ticket.user.username === username && "ring-2 ring-purple-500 rounded-xl p-1")}>
-                            <div className="aspect-[2/3] bg-slate-800 rounded-xl overflow-hidden relative shadow-lg group-hover:shadow-purple-900/20 transition-all group-hover:-translate-y-2">
-                                {ticket.posterPath ? (
-                                    <img src={`https://image.tmdb.org/t/p/w500${ticket.posterPath}`} alt={ticket.title} className="w-full h-full object-cover" />
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-slate-700">
-                                        <Film className="w-12 h-12" />
-                                    </div>
-                                )}
-                                <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
-                                <div className="absolute bottom-0 left-0 right-0 p-4">
-                                    <p className="text-white font-bold leading-tight truncate">{ticket.title}</p>
-                                    <p className="text-xs text-slate-300 mt-1">by {ticket.user.username}</p>
-                                </div>
-                            </div>
-                        </div>
+                    {tickets.map((ticket) => (
+                        <MovieCard
+                            key={ticket.id}
+                            ticket={ticket}
+                        />
                     ))}
                 </div>
                 {tickets.length === 0 && (

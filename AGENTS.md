@@ -15,3 +15,10 @@
 ### Explicit Types
 -   **Rule**: Do not use the `var` keyword. Always use the exact types.
 
+### Context-Specific Endpoints, DTOS & Abstractions
+-   **Rule**: Follow common clean code paradigms by ensuring everything has a "single responsibility". Do not create "Swiss Army Knife" endpoints or over-generalized DTOs.
+-   **Null Handling**: Be extra explicit about minimizing the use of nulls. Never rely on making fields null/nullable if at all possible. Always opt for `Optional` when applicable.
+-   **Solution**:
+    -   Create specific DTOs for each context (e.g., `MysteryTicketDto` vs `TicketDto`).
+    -   Create separate endpoints for different perspectives (e.g., `/api/admin/tickets` vs `/api/season/tickets` vs `/api/season/tickets/me`).
+-   **Reasoning**: Prevents accidental data leaks (security) and avoids the confusion of handling objects where half the fields might be null depending on who is asking.

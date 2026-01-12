@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS tickets (
     poster_path VARCHAR(255),
     overview VARCHAR(5000),
     release_date VARCHAR(50),
+    runtime INTEGER,
     selected BOOLEAN NOT NULL DEFAULT FALSE,
     CONSTRAINT fk_ticket_user FOREIGN KEY (user_id) REFERENCES users(id),
     CONSTRAINT fk_ticket_season FOREIGN KEY (season_id) REFERENCES seasons(id)

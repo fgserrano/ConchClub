@@ -1,6 +1,10 @@
 package com.conchclub.controller;
 
-import com.conchclub.model.Season;
+import com.conchclub.dto.MysteryTicketDto;
+import com.conchclub.dto.TicketDto;
+import com.conchclub.dto.UserDto;
+import com.conchclub.model.Ticket;
+
 import com.conchclub.repository.SeasonRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -10,6 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collections;
+import java.util.List;
+import java.security.Principal;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/season")
@@ -27,11 +34,50 @@ public class SeasonController {
     }
 
     @GetMapping("/tickets")
-    public ResponseEntity<?> getTickets() {
-        Season activeSeason = seasonRepository.findByActiveTrue().orElse(null);
-        if (activeSeason == null)
-            return ResponseEntity.ok(Collections.emptyList());
+    public ResponseEntity<List<MysteryTicketDto>> getTickets() {
+        return seasonRepository.findByActiveTrue()
+                .map(activeSeason -> {
+                    List<Ticket> tickets = ticketService.getTickets(activeSeason.getId());
+                    List<MysteryTicketDto> dtos = tickets.stream().map(t -> {
+                        UserDto user = new UserDto(t.getUsername());
+                        Integer runtime = t.getRuntime();
+                        Integer rounded = (runtime == null) ? null : (int) (Math.round(runtime / 10.0) * 10);
+                        return new MysteryTicketDto(t.getId(), user, rounded, t.isSelected());
+                    }).toList();
+                    return ResponseEntity.ok(dtos);
+                })
+                .orElse(ResponseEntity.ok(Collections.emptyList()));
+    }
 
-        return ResponseEntity.ok(ticketService.getTickets(activeSeason.getId()));
+    @GetMapping("/tickets/me")
+    public ResponseEntity<?> getMyTicket(Principal principal) {
+        return Optional.ofNullable(principal)
+                .flatMap(p -> seasonRepository.findByActiveTrue())
+                .map(season -> {
+                    List<Ticket> tickets = ticketService.getTickets(season.getId());
+                    return tickets.stream()
+                            .filter(t -> t.getUsername() != null && t.getUsername().equals(principal.getName()))
+                            .findFirst()
+                            .map(this::mapToTicketDto)
+                            .map(ResponseEntity::ok)
+                            .orElse(ResponseEntity.noContent().build());
+                })
+                .orElse(ResponseEntity.ok().build());
+    }
+
+    private TicketDto mapToTicketDto(Ticket t) {
+        UserDto user = new UserDto(t.getUsername());
+        Integer runtime = t.getRuntime();
+        Integer rounded = (runtime == null) ? null : (int) (Math.round(runtime / 10.0) * 10);
+        return new TicketDto(
+                t.getId(),
+                user,
+                rounded,
+                t.isSelected(),
+                t.getTmdbId(),
+                t.getTitle(),
+                t.getPosterPath(),
+                t.getOverview(),
+                t.getReleaseDate());
     }
 }

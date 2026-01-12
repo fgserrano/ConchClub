@@ -44,4 +44,23 @@ public class TmdbService {
             return Collections.emptyMap();
         }
     }
+
+    public Integer getMovieRuntime(String tmdbId) {
+        String url = UriComponentsBuilder.fromHttpUrl(BASE_URL + "/movie/" + tmdbId)
+                .queryParam("api_key", apiKey)
+                .toUriString();
+
+        try {
+            Map<String, Object> body = restTemplate
+                    .exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<Map<String, Object>>() {
+                    }).getBody();
+
+            if (body != null && body.get("runtime") instanceof Number) {
+                return ((Number) body.get("runtime")).intValue();
+            }
+        } catch (Exception e) {
+            log.error("Failed to fetch runtime for movie {}: {}", tmdbId, e.getMessage());
+        }
+        return 0;
+    }
 }

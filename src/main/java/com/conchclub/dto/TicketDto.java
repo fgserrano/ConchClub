@@ -3,11 +3,11 @@ package com.conchclub.dto;
 public record TicketDto(
         Long id,
         UserDto user,
-        Long seasonId,
+        Integer runtimeToNearestTenMin,
+        boolean selected,
         String tmdbId,
         String title,
         String posterPath,
         String overview,
-        String releaseDate,
-        boolean selected) {
+        String releaseDate) {
 }
