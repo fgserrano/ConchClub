@@ -1,11 +1,12 @@
 import React from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
-import { LogOut, Film } from 'lucide-react';
+import { Outlet, useNavigate, Link } from 'react-router-dom';
+import { LogOut, Film, Shield } from 'lucide-react';
 import tmdbLogo from '../assets/tmdb-logo.svg';
 
 export default function Layout() {
     const navigate = useNavigate();
     const username = localStorage.getItem('username');
+    const role = localStorage.getItem('role');
 
     const handleLogout = () => {
         localStorage.removeItem('token');
@@ -26,6 +27,12 @@ export default function Layout() {
                     </div>
 
                     <div className="flex items-center gap-6">
+                        {role === 'ADMIN' && (
+                            <Link to="/admin" className="flex items-center gap-2 text-slate-400 hover:text-purple-400 transition-colors">
+                                <Shield className="w-4 h-4" />
+                                <span className="text-sm font-medium">Admin</span>
+                            </Link>
+                        )}
                         <span className="text-sm text-slate-400">Welcome, <span className="text-slate-200 font-medium">{username}</span></span>
                         <button onClick={handleLogout} className="p-2 hover:bg-slate-800 rounded-full transition-colors text-slate-400 hover:text-white">
                             <LogOut className="w-5 h-5" />

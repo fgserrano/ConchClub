@@ -42,7 +42,10 @@ public class SeasonController {
                         UserDto user = new UserDto(t.getUsername());
                         Integer runtime = t.getRuntime();
                         Integer rounded = (runtime == null) ? null : (int) (Math.round(runtime / 10.0) * 10);
-                        return new MysteryTicketDto(t.getId(), user, rounded, t.isSelected());
+                        String year = (t.getReleaseDate() != null && t.getReleaseDate().contains("-"))
+                                ? t.getReleaseDate().split("-")[0]
+                                : t.getReleaseDate();
+                        return new MysteryTicketDto(t.getId(), user, rounded, year, t.isSelected());
                     }).toList();
                     return ResponseEntity.ok(dtos);
                 })

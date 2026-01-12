@@ -5,6 +5,7 @@ import api from '../lib/api';
 import { cn } from '../lib/utils';
 
 export default function Dashboard() {
+
     const [season, setSeason] = useState(null);
     const [tickets, setTickets] = useState([]);
     const [myTicket, setMyTicket] = useState(null);

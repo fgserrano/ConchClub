@@ -60,10 +60,15 @@ export default function MovieCard({ ticket }) {
                             <div className="text-slate-600 italic text-sm">Runtime unknown</div>
                         )}
 
-                        {year && (
+                        <div className="space-y-1">
+                            <p className="text-[10px] text-blue-400 font-bold uppercase tracking-widest">Submitted By</p>
+                            <p className="text-lg font-bold text-white tracking-tight">{ticket.user?.username || "Unknown"}</p>
+                        </div>
+
+                        {(ticket.releaseYear || year) && (
                             <div className="space-y-1">
-                                <p className="text-[10px] text-blue-400 font-bold uppercase tracking-widest">Released</p>
-                                <p className="text-3xl font-black text-white tracking-tight">{year}</p>
+                                <p className="text-[10px] text-emerald-400 font-bold uppercase tracking-widest">Released</p>
+                                <p className="text-3xl font-black text-white tracking-tight">{ticket.releaseYear || year}</p>
                             </div>
                         )}
                     </div>

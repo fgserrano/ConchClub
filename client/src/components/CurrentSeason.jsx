@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Calendar } from 'lucide-react';
 import api from '../lib/api';
-import MovieCard from './MovieCard';
+import MovieRow from './MovieRow';
+
 
 export default function CurrentSeason() {
     const [tickets, setTickets] = useState([]);
@@ -13,7 +14,7 @@ export default function CurrentSeason() {
 
     const fetchTickets = async () => {
         try {
-            const res = await api.get('/season/tickets');
+            const res = await api.get('/admin/tickets');
             setTickets(res.data);
         } catch (e) {
             console.error("Failed to fetch tickets", e);
@@ -33,9 +34,9 @@ export default function CurrentSeason() {
                 Current Season Submissions ({tickets.length})
             </h2>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            <div className="flex flex-col gap-4">
                 {tickets.map((ticket) => (
-                    <MovieCard key={ticket.id} ticket={ticket} />
+                    <MovieRow key={ticket.id} ticket={ticket} />
                 ))}
             </div>
 
