@@ -16,8 +16,16 @@ export default function RegisterPage() {
         const formData = new FormData(e.currentTarget);
         const data = Object.fromEntries(formData.entries());
 
+        if (data.password !== data.confirmPassword) {
+            setError('Passwords do not match');
+            setLoading(false);
+            return;
+        }
+
+        const { confirmPassword, ...registrationData } = data;
+
         try {
-            await api.post('/auth/register', data);
+            await api.post('/auth/register', registrationData);
             navigate('/login');
         } catch (err) {
             setError(err.response?.data || 'Registration failed');
@@ -61,6 +69,19 @@ export default function RegisterPage() {
                                 name="password"
                                 type="password"
                                 placeholder="Create Password"
+                                required
+                                className="w-full bg-black/40 border border-slate-800 text-slate-200 rounded-xl px-10 py-3 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all placeholder:text-slate-600"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="group">
+                        <div className="relative">
+                            <Lock className="absolute left-3 top-3 w-5 h-5 text-slate-500 group-focus-within:text-blue-400 transition-colors" />
+                            <input
+                                name="confirmPassword"
+                                type="password"
+                                placeholder="Confirm Password"
                                 required
                                 className="w-full bg-black/40 border border-slate-800 text-slate-200 rounded-xl px-10 py-3 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all placeholder:text-slate-600"
                             />
