@@ -29,4 +29,6 @@ jwt:
   expiration:
     ms: 86400000
 
-
+google:
+  credentials:
+    path: ${GOOGLE_CREDENTIALS_PATH:credentials.json}  
