@@ -63,6 +63,40 @@ public class SubmissionController {
         return ResponseEntity.ok(ticketRepository.save(ticket));
     }
 
+    @PutMapping("/update")
+    public ResponseEntity<?> updateSubmission(@RequestHeader("Authorization") String token,
+            @RequestBody TicketRequest request) {
+        String username = jwtUtils.extractUsername(token.substring(7));
+        User user = userRepository.findByUsername(username).orElseThrow();
+
+        Season activeSeason = seasonRepository.findByActiveTrue()
+                .orElseThrow(() -> new RuntimeException("No active season"));
+
+        if (activeSeason.isLocked()) {
+            return ResponseEntity.badRequest().body("Season is locked");
+        }
+
+        Ticket ticket = ticketRepository.findBySeasonIdAndUserId(activeSeason.getId(), user.getId())
+                .orElseThrow(() -> new RuntimeException("Submission not found"));
+
+        // specific check: if changing movie, ensure new movie isn't taken by SOMEONE
+        // ELSE
+        if (!ticket.getTmdbId().equals(request.tmdbId)) {
+            if (ticketRepository.existsBySeasonIdAndTmdbId(activeSeason.getId(), request.tmdbId)) {
+                return ResponseEntity.badRequest().body("This movie has already been submitted!");
+            }
+        }
+
+        ticket.setTmdbId(request.tmdbId);
+        ticket.setTitle(request.title);
+        ticket.setPosterPath(request.posterPath);
+        ticket.setOverview(request.overview);
+        ticket.setReleaseDate(request.releaseDate);
+        ticket.setRuntime(tmdbService.getMovieRuntime(request.tmdbId));
+
+        return ResponseEntity.ok(ticketRepository.save(ticket));
+    }
+
     public record TicketRequest(String tmdbId, String title, String posterPath, String overview, String releaseDate) {
     }
 }

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Search, Plus, Calendar, Film, Lock, Trophy } from 'lucide-react';
+import { Search, Plus, Calendar, Film, Lock, Trophy, Edit, X } from 'lucide-react';
 import MovieCard from '../components/MovieCard';
 import api from '../lib/api';
 import { cn } from '../lib/utils';
@@ -49,6 +49,8 @@ export default function Dashboard() {
         }
     };
 
+    const [isEditing, setIsEditing] = useState(false);
+
     const handleSearch = async (e) => {
         e.preventDefault();
         if (!query.trim()) return;
@@ -66,13 +68,21 @@ export default function Dashboard() {
     const handleSubmitMovie = async (movie) => {
 
         try {
-            await api.post('/submission/submit', {
+            const payload = {
                 tmdbId: movie.id.toString(),
                 title: movie.title,
                 posterPath: movie.poster_path,
                 overview: movie.overview,
                 releaseDate: movie.release_date
-            });
+            };
+
+            if (isEditing) {
+                await api.put('/submission/update', payload);
+                setIsEditing(false); // Exit edit mode
+            } else {
+                await api.post('/submission/submit', payload);
+            }
+
             setQuery('');
             setResults([]);
             fetchData(); // Refresh to see your ticket
@@ -145,7 +155,7 @@ export default function Dashboard() {
                 </div>
             )}
 
-            {season && !season.locked && !myTicket && (
+            {season && !season.locked && (!myTicket || isEditing) && (
                 <div className="max-w-2xl mx-auto">
                     <form onSubmit={handleSearch} className="relative group mb-8">
                         <input
@@ -157,7 +167,17 @@ export default function Dashboard() {
                             autoFocus
                         />
                         <Search className="absolute left-5 top-5 w-5 h-5 text-slate-500 group-focus-within:text-purple-400" />
-                        {searching && <div className="absolute right-5 top-5 w-5 h-5 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />}
+                        {searching ? (
+                            <div className="absolute right-5 top-5 w-5 h-5 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
+                        ) : isEditing ? (
+                            <button
+                                type="button"
+                                onClick={() => setIsEditing(false)}
+                                className="absolute right-5 top-5 text-slate-500 hover:text-white transition-colors"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        ) : null}
                     </form>
 
                     <div className="grid gap-4">
@@ -182,18 +202,33 @@ export default function Dashboard() {
                 </div>
             )}
 
-            {myTicket && season && !season.locked && (
-                <div className="flex items-center justify-center p-8 border border-green-500/20 bg-green-500/5 rounded-2xl mb-8 gap-8">
-                    {myTicket.posterPath && (
-                        <img src={`https://image.tmdb.org/t/p/w200${myTicket.posterPath}`} alt={myTicket.title} className="w-24 rounded-lg shadow-lg" />
-                    )}
-                    <div className="text-center md:text-left">
-                        <p className="text-green-400 text-sm font-bold tracking-widest uppercase mb-2">My Submission</p>
-                        <h3 className="text-2xl font-black text-white mb-2">{myTicket.title}</h3>
-                        <p className="text-slate-400">Runtime: {myTicket.runtimeToNearestTenMin || myTicket.runtime}m</p>
+            {myTicket && season && !season.locked && !isEditing && (
+                <div className="relative flex items-center justify-center p-8 border border-green-500/20 bg-green-500/5 rounded-2xl mb-8 gap-8">
+                    <div className="flex items-center gap-8">
+                        {myTicket.posterPath && (
+                            <img src={`https://image.tmdb.org/t/p/w200${myTicket.posterPath}`} alt={myTicket.title} className="w-24 rounded-lg shadow-lg" />
+                        )}
+                        <div className="text-center md:text-left">
+                            <p className="text-green-400 text-sm font-bold tracking-widest uppercase mb-2">My Submission</p>
+                            <h3 className="text-2xl font-black text-white mb-2">{myTicket.title}</h3>
+                            <p className="text-slate-400">Runtime: {myTicket.runtimeToNearestTenMin || myTicket.runtime}m</p>
+                        </div>
                     </div>
+                    <button
+                        title="edit"
+                        onClick={() => {
+                            setIsEditing(true);
+                            setQuery('');
+                            setResults([]);
+                        }}
+                        className="absolute right-8 p-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-full transition-colors border border-transparent hover:border-slate-700"
+                    >
+                        <Edit className="w-5 h-5" />
+                    </button>
                 </div>
             )}
+
+            {/* Cancel editing button removed, moved to search bar X icon */}
 
             <section>
                 <h3 className="text-xl font-bold text-slate-300 mb-6 flex items-center gap-2">

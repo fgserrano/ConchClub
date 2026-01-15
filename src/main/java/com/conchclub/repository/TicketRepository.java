@@ -7,6 +7,8 @@ import org.springframework.data.jdbc.repository.query.Query;
 
 import java.util.List;
 
+import java.util.Optional;
+
 @Repository
 public interface TicketRepository extends ListCrudRepository<Ticket, Long> {
     @Query(value = "SELECT t.*, u.username FROM TICKETS t JOIN USERS u ON t.USER_ID = u.ID WHERE t.SEASON_ID = :seasonId", rowMapperClass = TicketRowMapper.class)
@@ -15,4 +17,6 @@ public interface TicketRepository extends ListCrudRepository<Ticket, Long> {
     boolean existsBySeasonIdAndUserId(Long seasonId, Long userId);
 
     boolean existsBySeasonIdAndTmdbId(Long seasonId, String tmdbId);
+
+    Optional<Ticket> findBySeasonIdAndUserId(Long seasonId, Long userId);
 }
