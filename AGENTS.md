@@ -22,3 +22,7 @@
     -   Create specific DTOs for each context (e.g., `MysteryTicketDto` vs `TicketDto`).
     -   Create separate endpoints for different perspectives (e.g., `/api/admin/tickets` vs `/api/season/tickets` vs `/api/season/tickets/me`).
 -   **Reasoning**: Prevents accidental data leaks (security) and avoids the confusion of handling objects where half the fields might be null depending on who is asking.
+
+### Component Composition
+-   **Rule**: Always prefer smaller named components that fit within containers as the composition structure.
+-   **Reasoning**: Improves readability and maintainability by using semantic component names instead of deeply nested tags and complex conditional logic within a single large component.

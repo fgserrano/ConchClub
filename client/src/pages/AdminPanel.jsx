@@ -14,13 +14,12 @@ export default function AdminPanel() {
             const res = await api.get('/season/active');
             setSeason(res.data);
         } catch (e) {
-            // No active season
         }
     };
 
     useEffect(() => {
         fetchSeason();
-    }, [response]); // Refresh when actions happen
+    }, [response]);
 
     return (
         <div className="max-w-xl mx-auto space-y-8">
@@ -37,7 +36,7 @@ export default function AdminPanel() {
 
             <NewSeasonForm onStatusChange={setResponse} />
             <CurrentSeason />
-            <SeasonActions seasonId={season?.id} onStatusChange={setResponse} />
+            <SeasonActions seasonId={season?.id} isLocked={season?.locked} onStatusChange={setResponse} />
         </div>
     );
 }

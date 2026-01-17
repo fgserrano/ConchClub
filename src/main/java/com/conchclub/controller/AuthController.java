@@ -5,8 +5,6 @@ import com.conchclub.model.User;
 import com.conchclub.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +20,7 @@ public class AuthController {
     private final AuthService authService;
     private final JwtUtils jwtUtils;
     private final PasswordEncoder passwordEncoder;
-    private final com.conchclub.repository.UserRepository userRepository; // Direct repo access for login verify simply
+    private final com.conchclub.repository.UserRepository userRepository;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
@@ -36,8 +34,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        // Authenticate user manually effectively since we didn't wire up AuthManager
-        // bean to circular dep avoid
+
         User user = userRepository.findByUsername(request.username())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 

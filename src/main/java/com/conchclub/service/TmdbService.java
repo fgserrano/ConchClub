@@ -1,7 +1,8 @@
 package com.conchclub.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -14,8 +15,9 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class TmdbService {
+
+    private static final Logger logger = LoggerFactory.getLogger(TmdbService.class);
 
     private final RestTemplate restTemplate;
 
@@ -40,7 +42,7 @@ public class TmdbService {
                     .exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<Map<String, Object>>() {
                     }).getBody();
         } catch (Exception e) {
-            log.error("Failed to search TMDB for query [{}]: {}", query, e.getMessage());
+            logger.error("Failed to search TMDB for query [{}]: {}", query, e.getMessage());
             return Collections.emptyMap();
         }
     }
@@ -59,7 +61,7 @@ public class TmdbService {
                 return ((Number) body.get("runtime")).intValue();
             }
         } catch (Exception e) {
-            log.error("Failed to fetch runtime for movie {}: {}", tmdbId, e.getMessage());
+            logger.error("Failed to fetch runtime for movie {}: {}", tmdbId, e.getMessage());
         }
         return 0;
     }

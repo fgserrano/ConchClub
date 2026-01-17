@@ -4,7 +4,6 @@ const api = axios.create({
     baseURL: `http://${window.location.hostname}:8080/api`,
 });
 
-// Add a request interceptor to add the auth token to requests
 api.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('token');

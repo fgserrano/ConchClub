@@ -21,7 +21,6 @@ public class Ticket {
     @Column("SEASON_ID")
     private Long seasonId;
 
-    // TMDB Data
     private String tmdbId;
     private String title;
     private String posterPath;
@@ -29,7 +28,7 @@ public class Ticket {
     private String releaseDate;
     private Integer runtime;
 
-    private boolean selected; // If this ticket was the "Winner"
+    private boolean selected;
 
     @org.springframework.data.annotation.Transient
     private String username;

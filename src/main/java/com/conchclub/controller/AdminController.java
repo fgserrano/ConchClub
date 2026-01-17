@@ -10,6 +10,8 @@ import com.conchclub.repository.TicketRepository;
 import com.conchclub.repository.UserRepository;
 import com.conchclub.service.GoogleSheetsService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +23,8 @@ import java.util.List;
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
 public class AdminController {
+
+    private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
 
     private final SeasonRepository seasonRepository;
     private final TicketRepository ticketRepository;
@@ -62,6 +66,14 @@ public class AdminController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
+    @PostMapping("/season/{id}/unlock")
+    public ResponseEntity<?> unlockSeason(@PathVariable Long id) {
+        return seasonRepository.findById(id).map(season -> {
+            season.setLocked(false);
+            return ResponseEntity.ok(seasonRepository.save(season));
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
     @PostMapping("/reveal")
     public ResponseEntity<?> revealWinner(@RequestHeader("Authorization") String token) {
 
@@ -74,20 +86,16 @@ public class AdminController {
             return ResponseEntity.badRequest().body("No tickets to reveal!");
         }
 
-        // Random Selection
         Collections.shuffle(tickets);
         Ticket winner = tickets.get(0);
         winner.setSelected(true);
         ticketRepository.save(winner);
 
-        // Sync to Google Sheets
         try {
             String winnerUsername = userRepository.findById(winner.getUserId())
                     .map(User::getUsername)
                     .orElse("Unknown");
 
-            // Header
-            // User | Movie | Year | Selected
             List<Object> row = List.of(
                     winnerUsername,
                     winner.getTitle(),
@@ -96,8 +104,8 @@ public class AdminController {
 
             googleSheetsService.writeRow("Sheet1!A:D", row);
         } catch (Exception e) {
-            // Log error but don't fail request
-            System.err.println("Failed to sync to sheets: " + e.getMessage());
+
+            logger.error("Failed to sync to sheets: {}", e.getMessage());
         }
 
         return ResponseEntity.ok(winner);

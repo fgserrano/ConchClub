@@ -78,14 +78,14 @@ export default function Dashboard() {
 
             if (isEditing) {
                 await api.put('/submission/update', payload);
-                setIsEditing(false); // Exit edit mode
+                setIsEditing(false);
             } else {
                 await api.post('/submission/submit', payload);
             }
 
             setQuery('');
             setResults([]);
-            fetchData(); // Refresh to see your ticket
+            fetchData();
         } catch (e) {
             alert(e.response?.data || "Submission failed");
         }
@@ -228,7 +228,7 @@ export default function Dashboard() {
                 </div>
             )}
 
-            {/* Cancel editing button removed, moved to search bar X icon */}
+
 
             <section>
                 <h3 className="text-xl font-bold text-slate-300 mb-6 flex items-center gap-2">

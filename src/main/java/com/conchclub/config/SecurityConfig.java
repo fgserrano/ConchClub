@@ -38,7 +38,7 @@ public class SecurityConfig {
     @Profile("!local")
     public SecurityFilterChain productionFilterChain(HttpSecurity http) throws Exception {
         http
-                // CSRF is enabled by default, which is good for production
+
                 .cors(cors -> cors.configurationSource(productionCorsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")

@@ -79,8 +79,6 @@ public class SubmissionController {
         Ticket ticket = ticketRepository.findBySeasonIdAndUserId(activeSeason.getId(), user.getId())
                 .orElseThrow(() -> new RuntimeException("Submission not found"));
 
-        // specific check: if changing movie, ensure new movie isn't taken by SOMEONE
-        // ELSE
         if (!ticket.getTmdbId().equals(request.tmdbId)) {
             if (ticketRepository.existsBySeasonIdAndTmdbId(activeSeason.getId(), request.tmdbId)) {
                 return ResponseEntity.badRequest().body("This movie has already been submitted!");

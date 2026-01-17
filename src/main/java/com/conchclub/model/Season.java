@@ -16,8 +16,8 @@ public class Season {
     @Id
     private Long id;
 
-    private String name; // e.g., "Season 1: Horror"
+    private String name;
     private boolean active;
-    private boolean locked; // Submissions closed
+    private boolean locked;
     private LocalDateTime createdAt;
 }
