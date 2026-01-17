@@ -1,6 +1,7 @@
 # Environment
 credentials.json
 application-local.yml
+.env
 
 # Client / Node
 # Logs
