@@ -1,11 +1,26 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Shield } from 'lucide-react';
 import NewSeasonForm from '../components/NewSeasonForm';
 import SeasonActions from '../components/SeasonActions';
 import CurrentSeason from '../components/CurrentSeason';
+import api from '../lib/api';
 
 export default function AdminPanel() {
     const [response, setResponse] = useState('');
+    const [season, setSeason] = useState(null);
+
+    const fetchSeason = async () => {
+        try {
+            const res = await api.get('/season/active');
+            setSeason(res.data);
+        } catch (e) {
+            // No active season
+        }
+    };
+
+    useEffect(() => {
+        fetchSeason();
+    }, [response]); // Refresh when actions happen
 
     return (
         <div className="max-w-xl mx-auto space-y-8">
@@ -22,7 +37,7 @@ export default function AdminPanel() {
 
             <NewSeasonForm onStatusChange={setResponse} />
             <CurrentSeason />
-            <SeasonActions onStatusChange={setResponse} />
+            <SeasonActions seasonId={season?.id} onStatusChange={setResponse} />
         </div>
     );
 }

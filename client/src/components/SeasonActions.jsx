@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Lock, Play } from 'lucide-react';
 import api from '../lib/api';
 
-export default function SeasonActions({ onStatusChange }) {
+export default function SeasonActions({ onStatusChange, seasonId }) {
     const revealWinner = async () => {
         try {
             const res = await api.post('/admin/reveal');
@@ -13,10 +13,16 @@ export default function SeasonActions({ onStatusChange }) {
     };
 
     const lockSeason = async () => {
-        // Hardcoded ID for now since we just want to lock the active one usually
-        // Ideally we fetch the active ID first. 
-        // For this MVP let's assume the user knows what they are doing or we improve the API to /season/lock-active
-        alert("This feature needs the active season ID. Go to dashboard to see it.");
+        if (!seasonId) {
+            if (onStatusChange) onStatusChange("Error: No active season to lock.");
+            return;
+        }
+        try {
+            const res = await api.post(`/admin/season/${seasonId}/lock`);
+            if (onStatusChange) onStatusChange(`Season Locked: ${res.data.name}`);
+        } catch (e) {
+            if (onStatusChange) onStatusChange("Error: " + (e.response?.data || e.message));
+        }
     };
 
     return (
