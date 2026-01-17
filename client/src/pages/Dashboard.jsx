@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Search, Plus, Calendar, Film, Lock, Trophy, Edit, X } from 'lucide-react';
-import MovieCard from '../components/MovieCard';
+import MovieCard from '../components/MovieCard/MovieCard';
 import api from '../lib/api';
 import { cn } from '../lib/utils';
 
