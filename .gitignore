@@ -2,6 +2,7 @@
 credentials.json
 application-local.yml
 .env
+.env.example
 
 # Client / Node
 # Logs
@@ -35,3 +36,4 @@ build/*
 gradle/*
 .gradle/*
 tmp/*
+
