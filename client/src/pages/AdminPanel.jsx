@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Shield } from 'lucide-react';
-import NewSeasonForm from '../components/NewSeasonForm';
-import SeasonActions from '../components/SeasonActions';
-import CurrentSeason from '../components/CurrentSeason';
+import NewSeasonForm from '../components/Season/NewSeasonForm';
+import SeasonActions from '../components/Season/SeasonActions';
+import CurrentSeason from '../components/Season/CurrentSeason';
 import api from '../lib/api';
 
 export default function AdminPanel() {
