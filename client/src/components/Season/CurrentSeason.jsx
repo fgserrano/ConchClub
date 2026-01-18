@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Calendar } from 'lucide-react';
-import api from '../lib/api';
-import MovieRow from './MovieCard/MovieRow';
+import api from '../../lib/api';
+import MovieRow from '../MovieCard/MovieRow';
 
 
 export default function CurrentSeason() {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Lock, Play, Unlock } from 'lucide-react';
-import api from '../lib/api';
+import api from '../../lib/api';
 
 export default function SeasonActions({ onStatusChange, seasonId, isLocked }) {
     const revealWinner = async () => {
