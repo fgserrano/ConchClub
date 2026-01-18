@@ -4,6 +4,8 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
+# Verify env file presence and build
+RUN ls -la .env.production || echo ".env.production not found"
 RUN npm run build
 
 # Run stage

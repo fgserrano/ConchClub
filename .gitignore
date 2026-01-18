@@ -36,5 +36,3 @@ gradle/*
 .gradle/*
 tmp/*
 target/
-
-client/.env.production

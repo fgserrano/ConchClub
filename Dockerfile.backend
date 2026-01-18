@@ -9,6 +9,6 @@ FROM eclipse-temurin:17-jre-jammy
 WORKDIR /service
 COPY --from=build /app/build/libs/conchclub-*.jar app.jar
 RUN chmod 644 app.jar
-COPY credentials.json* .
+# NOTE: credentials.json will be mounted at runtime to /secrets/credentials.json
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
