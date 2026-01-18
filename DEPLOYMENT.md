@@ -124,9 +124,6 @@ INVITE_CODE=invite-code:latest" `
 
 *Note: The `--set-secrets` flag can mount a secret as a **file** (if you provide a path like `/app/credentials.json`) or map it to an **environment variable** (if you provide a name like `JWT_SECRET`).*
 
-> [!NOTE]
-> **Why do I still need the --set-secrets mapping?**
-> Even if the service account has project-wide access, Cloud Run needs to know exactly **which** secret maps to **which** environment variable name inside your container. Without this mapping, your Spring Boot app wouldn't find `JWT_SECRET` in its environment.
 
 ### 3.1 Troubleshooting Backend Startup
 If the deployment fails with "Container failed to start", it is almost always due to missing environment variables or a crash during Spring Boot initialization.
@@ -176,3 +173,42 @@ You must rebuild the frontend image with the backend URL.
 1.  Go to the **Frontend URL** provided by Cloud Run.
 2.  Navigate the app.
 3.  Refresh a page to ensure the Nginx 404 fallback (SPA routing) is working.
+
+## 6. CI/CD Automation (Optional)
+
+You can automate everything so that pushing to `main` builds and deploys your app.
+
+### 1. Enable Cloud Build API
+```powershell
+gcloud services enable cloudbuild.googleapis.com
+```
+
+### 2. Grant Cloud Build Permissions
+Cloud Build needs permission to act as your service account and deploy to Cloud Run.
+```powershell
+# Get your project number
+$projectNumber = gcloud projects describe conchclub --format="value(projectNumber)"
+
+# Grant the Cloud Build service account permission to deploy
+gcloud projects add-iam-policy-binding conchclub `
+    --member="serviceAccount:$projectNumber@cloudbuild.gserviceaccount.com" `
+    --role="roles/run.admin"
+
+# Grant it permission to act as the runner
+gcloud iam service-accounts add-iam-policy-binding conchclub-runner@conchclub.iam.gserviceaccount.com `
+    --member="serviceAccount:$projectNumber@cloudbuild.gserviceaccount.com" `
+    --role="roles/iam.serviceAccountUser"
+```
+
+### 3. Create a Trigger in Google Cloud Console
+1.  Go to **Cloud Build > Triggers** in the GCP Console.
+2.  Click **Connect Repository** and follow the steps to link your GitHub/Bitbucket repo.
+3.  Click **Create Trigger**:
+    - **Name**: `deploy-on-push`
+    - **Event**: `Push to a branch`
+    - **Branch**: `^main$`
+    - **Configuration**: `Cloud Build configuration file (yaml or json)`
+    - **File Location**: `cloudbuild.yaml`
+4.  Click **Create**.
+
+Now, every time you `git push origin main`, Google Cloud will build your images and deploy them automatically!
