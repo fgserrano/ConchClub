@@ -1,13 +1,14 @@
 # Build stage
 FROM eclipse-temurin:17-jdk-jammy AS build
-WORKDIR /home/app
+WORKDIR /app
 COPY . .
 RUN ./gradlew bootJar --no-daemon
 
 # Run stage
 FROM eclipse-temurin:17-jre-jammy
-WORKDIR /app
-COPY --from=build /home/app/target/*.jar app.jar
+WORKDIR /service
+COPY --from=build /app/build/libs/conchclub-*.jar app.jar
+RUN chmod 644 app.jar
 COPY credentials.json* .
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
