@@ -29,18 +29,36 @@ gcloud iam service-accounts create conchclub-runner `
     ```powershell
     gcloud services enable secretmanager.googleapis.com
     ```
-2.  **Create the Secret**:
+2.  **Create the secrets**:
     ```powershell
+    # Store the credentials file
     gcloud secrets create conchclub-credentials --data-file="credentials.json"
+
+    # Store sensitive application settings
+    echo "YOUR_JWT_SECRET" | gcloud secrets create jwt-secret --data-file=-
+    echo "YOUR_TMDB_KEY" | gcloud secrets create tmdb-key --data-file=-
+    echo "YOUR_SHEET_ID" | gcloud secrets create sheet-id --data-file=-
+    echo "conchclub" | gcloud secrets create invite-code --data-file=-
     ```
 3.  **Grant Access to the Service Account**:
-    Grant the `Secret Manager Secret Accessor` role to your new service account so it can read the secret at runtime.
+    You can grant access per secret (more secure) or to the entire project (easier).
+
+    **Option A: Project-wide Access (Recommended for simplicity)**:
     ```powershell
-    gcloud secrets add-iam-policy-binding conchclub-credentials `
+    gcloud projects add-iam-policy-binding conchclub `
         --member="serviceAccount:conchclub-runner@conchclub.iam.gserviceaccount.com" `
         --role="roles/secretmanager.secretAccessor"
     ```
-    *(Replace `conchclub` with your actual project ID)*
+
+    **Option B: Per-Secret Access (More secure)**:
+    ```powershell
+    $secrets = "conchclub-credentials", "jwt-secret", "tmdb-key", "sheet-id", "invite-code"
+    foreach ($s in $secrets) {
+        gcloud secrets add-iam-policy-binding $s `
+            --member="serviceAccount:conchclub-runner@conchclub.iam.gserviceaccount.com" `
+            --role="roles/secretmanager.secretAccessor"
+    }
+    ```
 
 #### 3. Verify Permissions
 To confirm the service account has the correct access, you can check the IAM policy of the secret:
@@ -68,10 +86,14 @@ We will use Google Artifact Registry to store our Docker images.
     ```
 
 ### Build & Push Backend
+> [!IMPORTANT]
+> Since we updated `SecurityConfig.java`, you **must** rebuild the backend image before pushing.
+
 ```powershell
 docker build -t us-central1-docker.pkg.dev/conchclub/conchclub-repo/backend:latest -f Dockerfile.backend .
 docker push us-central1-docker.pkg.dev/conchclub/conchclub-repo/backend:latest
 ```
+
 
 ### Build & Push Frontend
 ```powershell
@@ -92,11 +114,29 @@ gcloud run deploy conchclub-backend `
   --allow-unauthenticated `
   --port 8080 `
   --service-account conchclub-runner@conchclub.iam.gserviceaccount.com `
-  --set-secrets /app/credentials.json=conchclub-credentials:latest `
+  --set-secrets "/app/credentials.json=conchclub-credentials:latest,`
+JWT_SECRET=jwt-secret:latest,`
+GOOGLE_SHEETS_ID=sheet-id:latest,`
+TMDB_API_KEY=tmdb-key:latest,`
+INVITE_CODE=invite-code:latest" `
   --set-env-vars "SPRING_PROFILES_ACTIVE=prod"
 ```
 
-*Note: The `--set-secrets` flag mounts the secret as a file at the specified path. This replaces the need to include `credentials.json` in your Docker image.*
+*Note: The `--set-secrets` flag can mount a secret as a **file** (if you provide a path like `/app/credentials.json`) or map it to an **environment variable** (if you provide a name like `JWT_SECRET`).*
+
+> [!NOTE]
+> **Why do I still need the --set-secrets mapping?**
+> Even if the service account has project-wide access, Cloud Run needs to know exactly **which** secret maps to **which** environment variable name inside your container. Without this mapping, your Spring Boot app wouldn't find `JWT_SECRET` in its environment.
+
+### 3.1 Troubleshooting Backend Startup
+If the deployment fails with "Container failed to start", it is almost always due to missing environment variables or a crash during Spring Boot initialization.
+
+**Check the logs immediately:**
+```powershell
+gcloud logs read --service conchclub-backend --limit 50
+```
+Look for `Caused by:` or any `Exception` in the log output to see exactly why it failed.
+
 
 **Copy the Backend URL** from the output (e.g., `https://conchclub-backend-xyz.a.run.app`).
 

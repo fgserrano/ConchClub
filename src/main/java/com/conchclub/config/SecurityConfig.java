@@ -36,13 +36,18 @@ public class SecurityConfig {
 
     @Bean
     @Profile("!local")
-    public SecurityFilterChain productionFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain productionFilterChain(HttpSecurity http, AuthTokenFilter authTokenFilter)
+            throws Exception {
         http
-
+                .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(productionCorsConfigurationSource()))
+                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated());
+                        .anyRequest().authenticated())
+                .addFilterBefore(authTokenFilter,
+                        org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -65,11 +70,11 @@ public class SecurityConfig {
     @Profile("!local")
     public CorsConfigurationSource productionCorsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Configure production allowed origins here. For now, we can be restrictive or
-        // allow specific domains.
-        // If no origins are allowed, it effectively disables CORS for cross-origin
-        // requests.
-        // configuration.setAllowedOrigins(List.of("https://conchclub.com"));
+        // In production, you should ideally restrict this to your frontend URL
+        configuration.setAllowedOriginPatterns(List.of("*"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
