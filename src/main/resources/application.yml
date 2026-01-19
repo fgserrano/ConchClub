@@ -24,14 +24,14 @@ server:
 
 # Default configuration (can be overridden in application-local.yml)
 jwt:
-  secret: ${JWT_SECRET:}
+  secret: ${JWT_SECRET}
   expiration:
     ms: ${JWT_EXPIRATION_MS:86400000}
 
 tmdb:
   api:
-    key: ${TMDB_API_KEY:}
+    key: ${TMDB_API_KEY}
 
 user:
   registration:
-    invite-code: ${INVITE_CODE:}
+    invite-code: ${INVITE_CODE}

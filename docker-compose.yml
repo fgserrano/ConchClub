@@ -10,10 +10,10 @@ services:
     env_file:
       - .env
     environment:
-      SPRING_PROFILES_ACTIVE: docker
+      SPRING_PROFILES_ACTIVE: local
     volumes:
-      - ./credentials.json:/app/credentials.json
-      - ./docker/application-docker.yml:/service/config/application-docker.yml
+      - ./credentials.json:/service/credentials.json
+      - ./src/main/resources/application-local.yml:/service/config/application-local.yml
     depends_on:
       - mysql
     restart: always
@@ -41,9 +41,6 @@ services:
       - mysql_data:/var/lib/mysql
     restart: always
 
-networks:
-  default:
 
 volumes:
   mysql_data:
-

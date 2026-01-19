@@ -12,3 +12,4 @@ RUN chmod 644 app.jar
 # NOTE: credentials.json will be mounted at runtime to /secrets/credentials.json
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
+ENV SPRING_PROFILES_ACTIVE=prod
