@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Repository
 public interface TicketRepository extends ListCrudRepository<Ticket, Long> {
-    @Query(value = "SELECT t.*, u.username FROM TICKETS t JOIN USERS u ON t.USER_ID = u.ID WHERE t.SEASON_ID = :seasonId", rowMapperClass = TicketRowMapper.class)
+    @Query(value = "SELECT t.*, u.username FROM tickets t JOIN users u ON t.user_id = u.id WHERE t.season_id = :seasonId", rowMapperClass = TicketRowMapper.class)
     List<Ticket> findBySeasonId(Long seasonId);
 
     boolean existsBySeasonIdAndUserId(Long seasonId, Long userId);
