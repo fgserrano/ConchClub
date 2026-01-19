@@ -3,7 +3,7 @@ import { cn } from '../../lib/utils';
 import FrontFace from './FrontFace';
 import BackFace from './BackFace';
 
-export default function MovieCard({ ticket }) {
+export default function MovieCard({ ticket, isMine }) {
     const [isFlipped, setIsFlipped] = useState(false);
     const runtime = ticket.runtimeToNearestTenMin;
     const roundedRuntime = runtime ? Math.floor(runtime / 10) * 10 : null;
@@ -18,7 +18,7 @@ export default function MovieCard({ ticket }) {
                 "aspect-[2/3] w-full relative transition-all duration-700 [transform-style:preserve-3d] shadow-lg group-hover:shadow-purple-900/20 rounded-xl group-hover:scale-105",
                 isFlipped ? "[transform:rotateY(180deg)]" : ""
             )}>
-                <FrontFace ticket={ticket} />
+                <FrontFace ticket={ticket} isMine={isMine} />
                 <BackFace ticket={ticket} roundedRuntime={roundedRuntime} year={year} />
             </div>
         </div>

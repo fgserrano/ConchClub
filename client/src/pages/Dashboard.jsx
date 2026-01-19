@@ -172,7 +172,7 @@ export default function Dashboard() {
             )}
 
             <section>
-                <h3 className="text-xl font-bold text-slate-300 mb-6 flex items-center gap-2">
+                <h3 className="text-xl font-bold text-slate-300 mb-10 flex items-center gap-2">
                     <Calendar className="w-5 h-5 text-purple-500" />
                     The Pool
                 </h3>
@@ -182,6 +182,7 @@ export default function Dashboard() {
                         <MovieCard
                             key={ticket.id}
                             ticket={ticket}
+                            isMine={myTicket?.id === ticket.id}
                         />
                     ))}
                 </div>
