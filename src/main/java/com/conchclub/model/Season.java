@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table("SEASONS")
+@Table("seasons")
 public class Season {
     @Id
     private Long id;

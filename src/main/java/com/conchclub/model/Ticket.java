@@ -10,15 +10,15 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table("TICKETS")
+@Table("tickets")
 public class Ticket {
     @Id
     private Long id;
 
-    @Column("USER_ID")
+    @Column("user_id")
     private Long userId;
 
-    @Column("SEASON_ID")
+    @Column("season_id")
     private Long seasonId;
 
     private String tmdbId;

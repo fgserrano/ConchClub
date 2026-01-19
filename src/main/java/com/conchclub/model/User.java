@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table("USERS")
+@Table("users")
 public class User {
     @Id
     private Long id;
