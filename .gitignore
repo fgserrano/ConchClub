@@ -36,3 +36,4 @@ gradle/*
 .gradle/*
 tmp/*
 target/
+cloud-sql-proxy.exe

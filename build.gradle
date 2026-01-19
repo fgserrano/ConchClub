@@ -30,6 +30,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'com.mysql:mysql-connector-j'
+	implementation 'com.google.cloud.sql:mysql-socket-factory-connector-j-8:1.14.1'
 
     // JWT
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
@@ -45,4 +46,17 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+task runProxy(type: Exec) {
+	group = 'application'
+	description = 'Runs the Cloud SQL Auth Proxy'
+	workingDir project.projectDir
+	
+	// Check OS to decide command
+	if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+		commandLine 'cmd', '/c', 'cloud-sql-proxy.exe', '--address', '0.0.0.0', '--port', '3307', '--credentials-file', 'credentials.json', 'conchclub:us-central1:conchclub-db'
+	} else {
+		commandLine './cloud-sql-proxy', '--address', '0.0.0.0', '--port', '3307', '--credentials-file', 'credentials.json', 'conchclub:us-central1:conchclub-db'
+	}
 }
