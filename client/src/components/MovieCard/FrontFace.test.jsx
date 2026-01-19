@@ -20,4 +20,9 @@ describe('FrontFace', () => {
         render(<FrontFace ticket={ticketWithoutPoster} />);
         expect(screen.getByText('?')).toBeInTheDocument();
     });
+
+    it('renders YOUR SUBMISSION label when ticket belongs to user', () => {
+        render(<FrontFace ticket={mockTicket} isMine={true} />);
+        expect(screen.getByText('YOUR SUBMISSION')).toBeInTheDocument();
+    });
 });

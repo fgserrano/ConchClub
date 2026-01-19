@@ -70,4 +70,22 @@ public class SeasonControllerTest {
                 .andExpect(jsonPath("$[0].runtimeToNearestTenMin").value(120))
                 .andExpect(jsonPath("$[0].user.username").value("bob"));
     }
+
+    @Test
+    void getActiveSelection_ReturnsSelectedTickets() throws Exception {
+        Season season = new Season();
+        season.setId(1L);
+        Ticket ticket = new Ticket();
+        ticket.setSelected(true);
+        ticket.setTitle("Winning Movie");
+        ticket.setUsername("alice");
+
+        when(seasonRepository.findByActiveTrue()).thenReturn(Optional.of(season));
+        when(ticketService.getTickets(1L)).thenReturn(Collections.singletonList(ticket));
+
+        mockMvc.perform(get("/api/season/active/selection"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].title").value("Winning Movie"))
+                .andExpect(jsonPath("$[0].user.username").value("alice"));
+    }
 }
