@@ -9,8 +9,11 @@ services:
       - "8080:8080"
     env_file:
       - .env
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
     volumes:
       - ./credentials.json:/app/credentials.json
+      - ./config/application-docker.yml:/service/config/application-docker.yml
     depends_on:
       - mysql
     restart: always
