@@ -1,13 +1,14 @@
 spring:
   application:
     name: conchclub
-  config:
-    import: optional:classpath:application-local.yml
+
+
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres:5432/conchclub}
-    driverClassName: org.postgresql.Driver
-    username: ${SPRING_DATASOURCE_USERNAME:rw}
-    password: ${SPRING_DATASOURCE_PASSWORD:rw}
+    url: ${SPRING_DATASOURCE_URL}
+    driverClassName: com.mysql.cj.jdbc.Driver
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+
   sql:
     init:
       mode: always

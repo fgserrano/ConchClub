@@ -1,6 +1,6 @@
 # Deploying ConchClub to Google Cloud Run
 
-This guide will walk you through deploying the ConchClub application (Backend + Frontend) to Google Cloud Run.
+This guide will walk you through deploying the ConchClub application (Backend + Frontend) to Google Cloud Run, using **Cloud SQL (PostgreSQL)**.
 
 ## Prerequisites
 
@@ -12,100 +12,118 @@ This guide will walk you through deploying the ConchClub application (Backend + 
     ```
 3.  **Docker**: Ensure Docker is running locally to build images.
 
-## 1. Setup Environment Variables & Secrets
+## 1. Cloud SQL Setup
 
-### Backend Credentials & Service Account
-The backend requires `credentials.json` for Google Sheets API access. Following the principle of least privilege, we will create a dedicated service account for the application.
+Since we moved to PostgreSQL, we need a managed database instance.
 
-#### 1. Create a Dedicated Service Account
-It is **highly recommended** to create a custom service account rather than using the default one.
+### 1.1 Create the Instance
+```powershell
+# Create a MySQL 8.0 instance
+gcloud sql instances create conchclub-db `
+    --database-version=MYSQL_8_0 `
+    --cpu=1 `
+    --memory=3840MB `
+    --region=us-central1
+```
+
+### 1.2 Create Database & User
+```powershell
+# Create the database
+gcloud sql databases create conchclub --instance=conchclub-db
+
+# Create the user (replace PASSWORD with a strong password)
+gcloud sql users create conchclub --host=% --instance=conchclub-db --password="YOUR_DB_PASSWORD"
+```
+
+
+### 1.3 Get Connection Name
+You will need this string later (Format: `PROJECT_ID:REGION:INSTANCE_ID`).
+```powershell
+gcloud sql instances describe conchclub-db --format='value(connectionName)'
+```
+
+---
+
+## 2. Setup Environment Variables & Secrets
+
+### 2.1 Service Account
+Create a dedicated service account for the application.
 ```powershell
 gcloud iam service-accounts create conchclub-runner `
     --display-name="ConchClub Cloud Run Service Account"
 ```
 
-#### 2. Secret Manager Setup
-1.  **Enable the Secret Manager API**:
+### 2.2 Grant Permissions
+The service account needs to access **Secret Manager** and **Cloud SQL**.
+```powershell
+# Grant Secret Access
+gcloud projects add-iam-policy-binding conchclub `
+    --member="serviceAccount:conchclub-runner@conchclub.iam.gserviceaccount.com" `
+    --role="roles/secretmanager.secretAccessor"
+
+# Grant Cloud SQL Client Access
+gcloud projects add-iam-policy-binding conchclub `
+    --member="serviceAccount:conchclub-runner@conchclub.iam.gserviceaccount.com" `
+    --role="roles/cloudsql.client"
+```
+
+### 2.3 Secret Manager Setup
+Store sensitive values in Secret Manager.
+
+1.  **Enable API**:
     ```powershell
     gcloud services enable secretmanager.googleapis.com
     ```
-2.  **Create the secrets**:
+2.  **Create Secrets**:
     ```powershell
-    # Store the credentials file
-    gcloud secrets create conchclub-credentials --data-file="credentials.json"
+    # Database Password (The one you set in Step 1.2)
+    echo "YOUR_DB_PASSWORD" | gcloud secrets create db-password --data-file=-
 
-    # Store sensitive application settings
+    # Other App Secrets
     echo "YOUR_JWT_SECRET" | gcloud secrets create jwt-secret --data-file=-
     echo "YOUR_TMDB_KEY" | gcloud secrets create tmdb-key --data-file=-
-    echo "YOUR_SHEET_ID" | gcloud secrets create sheet-id --data-file=-
     echo "conchclub" | gcloud secrets create invite-code --data-file=-
     ```
-3.  **Grant Access to the Service Account**:
-    You can grant access per secret (more secure) or to the entire project (easier).
 
-    **Option A: Project-wide Access (Recommended for simplicity)**:
-    ```powershell
-    gcloud projects add-iam-policy-binding conchclub `
-        --member="serviceAccount:conchclub-runner@conchclub.iam.gserviceaccount.com" `
-        --role="roles/secretmanager.secretAccessor"
-    ```
+---
 
-    **Option B: Per-Secret Access (More secure)**:
-    ```powershell
-    $secrets = "conchclub-credentials", "jwt-secret", "tmdb-key", "sheet-id", "invite-code"
-    foreach ($s in $secrets) {
-        gcloud secrets add-iam-policy-binding $s `
-            --member="serviceAccount:conchclub-runner@conchclub.iam.gserviceaccount.com" `
-            --role="roles/secretmanager.secretAccessor"
-    }
-    ```
-
-#### 3. Verify Permissions
-To confirm the service account has the correct access, you can check the IAM policy of the secret:
-```powershell
-gcloud secrets get-iam-policy conchclub-credentials
-```
-You should see the `conchclub-runner` service account listed under `roles/secretmanager.secretAccessor`.
-
-
-## 2. Build and Push Docker Images
-
-We will use Google Artifact Registry to store our Docker images.
+## 3. Build and Push Docker Images
 
 1.  **Enable Artifact Registry API**:
     ```powershell
     gcloud services enable artifactregistry.googleapis.com run.googleapis.com
     ```
-2.  **Create a Repository**:
+2.  **Create Repository**:
     ```powershell
     gcloud artifacts repositories create conchclub-repo --repository-format=docker --location=us-central1 --description="ConchClub Docker Repository"
     ```
-3.  **Configure Docker to authenticate**:
+3.  **Configure Docker**:
     ```powershell
     gcloud auth configure-docker us-central1-docker.pkg.dev
     ```
 
 ### Build & Push Backend
-> [!IMPORTANT]
-> Since we updated `SecurityConfig.java`, you **must** rebuild the backend image before pushing.
-
 ```powershell
-docker build -t us-central1-docker.pkg.dev/conchclub/conchclub-repo/backend:latest -f Dockerfile.backend .
+docker build -t us-central1-docker.pkg.dev/conchclub/conchclub-repo/backend:latest -f docker/Dockerfile.backend .
 docker push us-central1-docker.pkg.dev/conchclub/conchclub-repo/backend:latest
 ```
 
-
 ### Build & Push Frontend
 ```powershell
-docker build -t us-central1-docker.pkg.dev/conchclub/conchclub-repo/frontend:latest -f client/Dockerfile.frontend ./client
+docker build -t us-central1-docker.pkg.dev/conchclub/conchclub-repo/frontend:latest -f docker/Dockerfile.frontend ./client
 docker push us-central1-docker.pkg.dev/conchclub/conchclub-repo/frontend:latest
 ```
 
 *(Replace `conchclub` with your actual project ID)*
 
-## 3. Deploy Backend Service
+---
 
-Deploy the backend first so we can get the API URL.
+## 4. Deploy Backend Service
+
+We need to tell Cloud Run to connect to Cloud SQL. This is done via `--add-cloudsql-instances` and passing the DB configuration variables.
+
+> [!IMPORTANT]
+> Replace `INSTANCE_CONNECTION_NAME` with the value from Step 1.3 (e.g., `conchclub:us-central1:conchclub-db`).
 
 ```powershell
 gcloud run deploy conchclub-backend `
@@ -114,101 +132,61 @@ gcloud run deploy conchclub-backend `
   --allow-unauthenticated `
   --port 8080 `
   --service-account conchclub-runner@conchclub.iam.gserviceaccount.com `
-  --set-secrets "/app/credentials.json=conchclub-credentials:latest,`
+  --add-cloudsql-instances="conchclub:us-central1:conchclub-db" `
+  --set-secrets="SPRING_DATASOURCE_PASSWORD=db-password:latest,`
 JWT_SECRET=jwt-secret:latest,`
-GOOGLE_SHEETS_ID=sheet-id:latest,`
 TMDB_API_KEY=tmdb-key:latest,`
 INVITE_CODE=invite-code:latest" `
-  --set-env-vars "SPRING_PROFILES_ACTIVE=prod"
+  --set-env-vars="SPRING_PROFILES_ACTIVE=prod,`
+SPRING_DATASOURCE_URL=jdbc:mysql:///conchclub?unixSocketPath=/cloudsql/conchclub:us-central1:conchclub-db&socketFactory=com.google.cloud.sql.mysql.SocketFactory&cloudSqlInstance=conchclub:us-central1:conchclub-db,`
+SPRING_DATASOURCE_USERNAME=conchclub"
 ```
 
-*Note: The `--set-secrets` flag can mount a secret as a **file** (if you provide a path like `/app/credentials.json`) or map it to an **environment variable** (if you provide a name like `JWT_SECRET`).*
+*Note: For MySQL on Cloud Run, we use the `jdbc:mysql:///DB_NAME` format with `unixSocketPath` pointing to the `/cloudsql/INSTANCE_CONNECTION_NAME` socket.*
 
+---
 
-### 3.1 Troubleshooting Backend Startup
-If the deployment fails with "Container failed to start", it is almost always due to missing environment variables or a crash during Spring Boot initialization.
+## 5. Deploy Frontend Service
 
-**Check the logs immediately:**
-```powershell
-gcloud logs read --service conchclub-backend --limit 50
-```
-Look for `Caused by:` or any `Exception` in the log output to see exactly why it failed.
-
-
-**Copy the Backend URL** from the output (e.g., `https://conchclub-backend-xyz.a.run.app`).
-
-## 4. Deploy Frontend Service
-
-You need to tell the frontend where the backend is. Since Vite builds static files, we bake the API URL into the image at build time, OR we can use a runtime configuration.
-
-**Vite Environment Variable Approach (Build Time):**
-You must rebuild the frontend image with the backend URL.
-
-1.  **Update `.env` locally or pass ARG**:
-    Create/Update `client/.env.production`:
+1.  **Update `client/.env.production`** with your new Backend URL (obtained from the backend deployment output).
     ```
     VITE_API_URL=https://conchclub-backend-xyz.a.run.app
     ```
-    *OR* pass it as a build arg if you modify the Dockerfile to accept it.
-    
-    *Simplest way for now:*
-    Update `client/.env.production` with your new Backend URL.
-
 2.  **Rebuild and Push Frontend**:
     ```powershell
-    docker build -t us-central1-docker.pkg.dev/YOUR_PROJECT_ID/conchclub-repo/frontend:latest -f client/Dockerfile.frontend ./client
-    docker push us-central1-docker.pkg.dev/YOUR_PROJECT_ID/conchclub-repo/frontend:latest
+    docker build -t us-central1-docker.pkg.dev/conchclub/conchclub-repo/frontend:latest -f client/Dockerfile.frontend ./client
+    docker push us-central1-docker.pkg.dev/conchclub/conchclub-repo/frontend:latest
     ```
-
 3.  **Deploy Frontend**:
     ```powershell
     gcloud run deploy conchclub-frontend `
-      --image us-central1-docker.pkg.dev/YOUR_PROJECT_ID/conchclub-repo/frontend:latest `
+      --image us-central1-docker.pkg.dev/conchclub/conchclub-repo/frontend:latest `
       --region us-central1 `
       --allow-unauthenticated `
       --port 80
     ```
 
-## 5. Verification
-1.  Go to the **Frontend URL** provided by Cloud Run.
-2.  Navigate the app.
-3.  Refresh a page to ensure the Nginx 404 fallback (SPA routing) is working.
+---
 
-## 6. CI/CD Automation (Optional)
+## 6. Automating with Cloud Build
 
-You can automate everything so that pushing to `main` builds and deploys your app.
+If you are using the `cloudbuild.yaml` file, you need to update it to include the Cloud SQL parameters.
 
-### 1. Enable Cloud Build API
-```powershell
-gcloud services enable cloudbuild.googleapis.com
+**Update your `cloudbuild.yaml` deployment step:**
+
+```yaml
+  # 4. Deploy Backend to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'conchclub-backend'
+      - '--image=us-central1-docker.pkg.dev/$PROJECT_ID/conchclub-repo/backend:latest'
+      - '--region=us-central1'
+      - '--add-cloudsql-instances=YOUR_INSTANCE_CONNECTION_NAME'  # <--- UPDATE THIS
+      - '--service-account=conchclub-runner@$PROJECT_ID.iam.gserviceaccount.com'
+      - '--set-secrets=SPRING_DATASOURCE_PASSWORD=db-password:latest,JWT_SECRET=jwt-secret:latest,TMDB_API_KEY=tmdb-key:latest,INVITE_CODE=invite-code:latest'
+      - '--set-env-vars=SPRING_PROFILES_ACTIVE=prod,SPRING_DATASOURCE_URL=jdbc:postgresql:///conchclub?host=/cloudsql/YOUR_INSTANCE_CONNECTION_NAME,SPRING_DATASOURCE_USERNAME=conchclub'
 ```
-
-### 2. Grant Cloud Build Permissions
-Cloud Build needs permission to act as your service account and deploy to Cloud Run.
-```powershell
-# Get your project number
-$projectNumber = gcloud projects describe conchclub --format="value(projectNumber)"
-
-# Grant the Cloud Build service account permission to deploy
-gcloud projects add-iam-policy-binding conchclub `
-    --member="serviceAccount:$projectNumber@cloudbuild.gserviceaccount.com" `
-    --role="roles/run.admin"
-
-# Grant it permission to act as the runner
-gcloud iam service-accounts add-iam-policy-binding conchclub-runner@conchclub.iam.gserviceaccount.com `
-    --member="serviceAccount:$projectNumber@cloudbuild.gserviceaccount.com" `
-    --role="roles/iam.serviceAccountUser"
-```
-
-### 3. Create a Trigger in Google Cloud Console
-1.  Go to **Cloud Build > Triggers** in the GCP Console.
-2.  Click **Connect Repository** and follow the steps to link your GitHub/Bitbucket repo.
-3.  Click **Create Trigger**:
-    - **Name**: `deploy-on-push`
-    - **Event**: `Push to a branch`
-    - **Branch**: `^main$`
-    - **Configuration**: `Cloud Build configuration file (yaml or json)`
-    - **File Location**: `cloudbuild.yaml`
-4.  Click **Create**.
-
-Now, every time you `git push origin main`, Google Cloud will build your images and deploy them automatically!
+*(Ideally, use substitutions like `_DB_INSTANCE` in Cloud Build trigger settings to avoid hardcoding the instance name).*

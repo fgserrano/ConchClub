@@ -12,7 +12,7 @@ services:
     volumes:
       - ./credentials.json:/app/credentials.json
     depends_on:
-      - postgres
+      - mysql
     restart: always
 
   frontend:
@@ -25,21 +25,22 @@ services:
       - backend
     restart: always
 
-  postgres:
-    image: postgres:15-alpine
+  mysql:
+    image: mysql:8.0
     environment:
-      POSTGRES_DB: conchclub
-      POSTGRES_USER: rw
-      POSTGRES_PASSWORD: rw
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
-      - "5432:5432"
+      - "3306:3306"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - mysql_data:/var/lib/mysql
     restart: always
 
 networks:
   default:
 
 volumes:
-  postgres_data:
+  mysql_data:
 
