@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS tickets (
     release_date VARCHAR(50),
     runtime INTEGER,
     selected BOOLEAN NOT NULL DEFAULT FALSE,
+    selected_at BIGINT,
     CONSTRAINT fk_ticket_user FOREIGN KEY (user_id) REFERENCES users (id),
     CONSTRAINT fk_ticket_season FOREIGN KEY (season_id) REFERENCES seasons (id)
 );

@@ -66,23 +66,27 @@ public class AdminController {
     }
 
     @PostMapping("/reveal")
-    public ResponseEntity<?> revealWinner(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> revealWinner(@RequestHeader("Authorization") String token,
+            @RequestBody RevealRequest request) {
 
         Season activeSeason = seasonRepository.findByActiveTrue()
                 .orElseThrow(() -> new RuntimeException("No active season"));
 
-        List<Ticket> tickets = ticketRepository.findBySeasonId(activeSeason.getId());
+        Ticket ticket = ticketRepository.findById(request.ticketId())
+                .orElseThrow(() -> new RuntimeException("Ticket not found"));
 
-        if (tickets.isEmpty()) {
-            return ResponseEntity.badRequest().body("No tickets to reveal!");
+        if (!ticket.getSeasonId().equals(activeSeason.getId())) {
+            return ResponseEntity.badRequest().body("Ticket does not belong to active season");
         }
 
-        Collections.shuffle(tickets);
-        Ticket winner = tickets.get(0);
-        winner.setSelected(true);
-        ticketRepository.save(winner);
+        ticket.setSelected(true);
+        ticket.setSelectedAt(System.currentTimeMillis());
+        ticketRepository.save(ticket);
 
-        return ResponseEntity.ok(winner);
+        return ResponseEntity.ok(mapToTicketDto(ticket));
+    }
+
+    public record RevealRequest(Long ticketId) {
     }
 
     public record CreateSeasonRequest(String name) {
@@ -101,6 +105,7 @@ public class AdminController {
                 t.getTitle(),
                 t.getPosterPath(),
                 t.getOverview(),
-                t.getReleaseDate());
+                t.getReleaseDate(),
+                t.getSelectedAt());
     }
 }

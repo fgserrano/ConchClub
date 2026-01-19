@@ -30,6 +30,9 @@ public class Ticket {
 
     private boolean selected;
 
+    @Column("selected_at")
+    private Long selectedAt;
+
     @org.springframework.data.annotation.Transient
     private String username;
 }

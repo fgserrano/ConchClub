@@ -52,6 +52,21 @@ public class SeasonController {
                 .orElse(ResponseEntity.ok(Collections.emptyList()));
     }
 
+    @GetMapping("/active/selection")
+    public ResponseEntity<?> getActiveSelection() {
+        return seasonRepository.findByActiveTrue()
+                .map(activeSeason -> {
+                    List<Ticket> tickets = ticketService.getTickets(activeSeason.getId());
+                    return tickets.stream()
+                            .filter(Ticket::isSelected)
+                            .findFirst()
+                            .map(this::mapToTicketDto)
+                            .map(ResponseEntity::ok)
+                            .orElse(ResponseEntity.noContent().build());
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @GetMapping("/tickets/me")
     public ResponseEntity<?> getMyTicket(Principal principal) {
         return Optional.ofNullable(principal)
@@ -81,6 +96,7 @@ public class SeasonController {
                 t.getTitle(),
                 t.getPosterPath(),
                 t.getOverview(),
-                t.getReleaseDate());
+                t.getReleaseDate(),
+                t.getSelectedAt());
     }
 }

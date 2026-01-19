@@ -81,6 +81,7 @@ public class AdminControllerTest {
         season.setId(1L);
         Ticket ticket = new Ticket();
         ticket.setId(10L);
+        ticket.setSeasonId(1L);
         ticket.setUserId(1L);
         ticket.setTitle("Matrix");
         ticket.setReleaseDate("2024");
@@ -89,11 +90,15 @@ public class AdminControllerTest {
         user.setUsername("testuser");
 
         when(seasonRepository.findByActiveTrue()).thenReturn(Optional.of(season));
-        when(ticketRepository.findBySeasonId(1L)).thenReturn(Collections.singletonList(ticket));
+        when(ticketRepository.findById(10L)).thenReturn(Optional.of(ticket)); // Mock findById
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
+        AdminController.RevealRequest request = new AdminController.RevealRequest(10L);
+
         mockMvc.perform(post("/api/admin/reveal")
-                .header("Authorization", "Bearer token"))
+                .header("Authorization", "Bearer token")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.selected").value(true))
                 .andExpect(jsonPath("$.title").value("Matrix"));
