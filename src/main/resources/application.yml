@@ -4,20 +4,16 @@ spring:
   config:
     import: optional:classpath:application-local.yml
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:h2:mem:conchclubdb}
-    driverClassName: org.h2.Driver
-    username: ${SPRING_DATASOURCE_USERNAME:}
-    password: ${SPRING_DATASOURCE_PASSWORD:}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres:5432/conchclub}
+    driverClassName: org.postgresql.Driver
+    username: ${SPRING_DATASOURCE_USERNAME:rw}
+    password: ${SPRING_DATASOURCE_PASSWORD:rw}
   sql:
     init:
       mode: always
-
-  h2:
-    console:
-      enabled: true
-      settings:
-        web-allow-others: true
-
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
+    
 server:
   port: 8080
 
@@ -30,12 +26,6 @@ jwt:
   secret: ${JWT_SECRET:}
   expiration:
     ms: ${JWT_EXPIRATION_MS:86400000}
-
-google:
-  credentials:
-    path: ${GOOGLE_CREDENTIALS_PATH:credentials.json}
-  sheet:
-    id: ${GOOGLE_SHEETS_ID:}
 
 tmdb:
   api:

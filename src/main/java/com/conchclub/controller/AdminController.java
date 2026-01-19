@@ -4,11 +4,8 @@ import com.conchclub.dto.TicketDto;
 import com.conchclub.dto.UserDto;
 import com.conchclub.model.Season;
 import com.conchclub.model.Ticket;
-import com.conchclub.model.User;
 import com.conchclub.repository.SeasonRepository;
 import com.conchclub.repository.TicketRepository;
-import com.conchclub.repository.UserRepository;
-import com.conchclub.service.GoogleSheetsService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,8 +25,6 @@ public class AdminController {
 
     private final SeasonRepository seasonRepository;
     private final TicketRepository ticketRepository;
-    private final UserRepository userRepository;
-    private final GoogleSheetsService googleSheetsService;
 
     @GetMapping("/tickets")
     public ResponseEntity<List<TicketDto>> getTickets() {
@@ -90,23 +85,6 @@ public class AdminController {
         Ticket winner = tickets.get(0);
         winner.setSelected(true);
         ticketRepository.save(winner);
-
-        try {
-            String winnerUsername = userRepository.findById(winner.getUserId())
-                    .map(User::getUsername)
-                    .orElse("Unknown");
-
-            List<Object> row = List.of(
-                    winnerUsername,
-                    winner.getTitle(),
-                    winner.getReleaseDate(),
-                    "WINNER");
-
-            googleSheetsService.writeRow("Sheet1!A:D", row);
-        } catch (Exception e) {
-
-            logger.error("Failed to sync to sheets: {}", e.getMessage());
-        }
 
         return ResponseEntity.ok(winner);
     }

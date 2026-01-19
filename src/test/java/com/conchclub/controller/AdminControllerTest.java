@@ -8,7 +8,6 @@ import com.conchclub.repository.TicketRepository;
 import com.conchclub.repository.UserRepository;
 import com.conchclub.service.AuthService;
 import com.conchclub.config.JwtUtils;
-import com.conchclub.service.GoogleSheetsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,6 @@ import java.util.Collections;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -45,9 +43,6 @@ public class AdminControllerTest {
 
     @MockBean
     private UserRepository userRepository;
-
-    @MockBean
-    private GoogleSheetsService googleSheetsService;
 
     @MockBean
     private AuthService authService;
@@ -103,6 +98,5 @@ public class AdminControllerTest {
                 .andExpect(jsonPath("$.selected").value(true))
                 .andExpect(jsonPath("$.title").value("Matrix"));
 
-        verify(googleSheetsService).writeRow(anyString(), anyList());
     }
 }

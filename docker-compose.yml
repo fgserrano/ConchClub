@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backend
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    volumes:
+      - ./credentials.json:/app/credentials.json
+    depends_on:
+      - postgres
+    restart: always
+
+  frontend:
+    build:
+      context: ./client
+      dockerfile: ../docker/Dockerfile.frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: always
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: conchclub
+      POSTGRES_USER: rw
+      POSTGRES_PASSWORD: rw
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+
+networks:
+  default:
+
+volumes:
+  postgres_data:
+
