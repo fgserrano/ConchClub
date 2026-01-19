@@ -32,11 +32,12 @@ export default function Dashboard() {
                 const [ticketRes, myTicketRes, selectionRes] = await Promise.all([
                     api.get('/season/tickets'),
                     api.get('/season/tickets/me').catch(() => ({ data: null })),
-                    api.get('/season/active/selection').catch(() => ({ data: null }))
+                    api.get('/season/active/selection').catch(() => ({ data: [] }))
                 ]);
 
                 let allTickets = ticketRes.data;
                 const myFullTicket = myTicketRes.data;
+                const allSelections = selectionRes.data;
 
                 if (myFullTicket) {
                     setMyTicket(myFullTicket);
@@ -45,8 +46,15 @@ export default function Dashboard() {
                     setMyTicket(null);
                 }
 
+                if (allSelections.length > 0) {
+                    const selectionMap = new Map(allSelections.map(s => [s.id, s]));
+                    allTickets = allTickets.map(t => selectionMap.has(t.id) ? selectionMap.get(t.id) : t);
+                }
+
                 setTickets(allTickets);
-                setSelection(selectionRes.data);
+
+                const sortedSelections = [...allSelections].sort((a, b) => (b.selectedAt || 0) - (a.selectedAt || 0));
+                setSelection(sortedSelections[0] || null);
             } else {
                 setMyTicket(null);
             }
@@ -130,44 +138,38 @@ export default function Dashboard() {
             </section>
 
 
-            {/* Active Content Grid */}
-            <div className="grid md:grid-cols-2 gap-8 items-start">
-                <OfficialSelection selection={selection} />
+            <SubmissionForm
+                season={season}
+                myTicket={myTicket}
+                isEditing={isEditing}
+                handleSearch={handleSearch}
+                query={query}
+                setQuery={setQuery}
+                searching={searching}
+                setIsEditing={setIsEditing}
+                results={results}
+                handleSubmitMovie={handleSubmitMovie}
+            />
 
-                {/* Right Column: User Action / Status */}
-                <div className="space-y-8">
-                    <SubmissionForm
-                        season={season}
-                        myTicket={myTicket}
-                        isEditing={isEditing}
-                        handleSearch={handleSearch}
-                        query={query}
-                        setQuery={setQuery}
-                        searching={searching}
-                        setIsEditing={setIsEditing}
-                        results={results}
-                        handleSubmitMovie={handleSubmitMovie}
-                    />
+            <OfficialSelection selection={selection} />
 
-                    <MySubmission
-                        myTicket={myTicket}
-                        season={season}
-                        isEditing={isEditing}
-                        onEdit={() => {
-                            setIsEditing(true);
-                            setQuery('');
-                            setResults([]);
-                        }}
-                    />
+            <MySubmission
+                myTicket={myTicket}
+                season={season}
+                isEditing={isEditing}
+                onEdit={() => {
+                    setIsEditing(true);
+                    setQuery('');
+                    setResults([]);
+                }}
+            />
 
-                    {!season && (
-                        <div className="flex flex-col items-center justify-center py-12 text-slate-500 bg-slate-900/30 rounded-3xl border border-slate-800/50">
-                            <Film className="w-12 h-12 mb-4 opacity-50" />
-                            <p className="text-lg font-medium">No season is currently active</p>
-                        </div>
-                    )}
+            {!season && (
+                <div className="flex flex-col items-center justify-center py-12 text-slate-500 bg-slate-900/30 rounded-3xl border border-slate-800/50">
+                    <Film className="w-12 h-12 mb-4 opacity-50" />
+                    <p className="text-lg font-medium">No season is currently active</p>
                 </div>
-            </div>
+            )}
 
             <section>
                 <h3 className="text-xl font-bold text-slate-300 mb-6 flex items-center gap-2">

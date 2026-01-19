@@ -4,7 +4,7 @@ import api from '../../lib/api';
 import MovieRow from '../MovieCard/MovieRow';
 
 
-export default function CurrentSeason() {
+export default function CurrentSeason({ season }) {
     const [tickets, setTickets] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -27,7 +27,7 @@ export default function CurrentSeason() {
     };
 
     const handleRandomize = () => {
-        if (activeTickets.length === 0) return;
+        if (activeTickets.length === 0 || !season?.locked) return;
         setIsRolling(true);
         let steps = 0;
         const maxSteps = 20;
@@ -72,10 +72,15 @@ export default function CurrentSeason() {
                     Current Season Submissions ({activeTickets.length})
                 </h2>
                 <div className="flex gap-2">
+                    {!season?.locked && (
+                        <span className="text-xs text-amber-500 self-center font-bold px-2">
+                            LOCK SEASON TO SELECT
+                        </span>
+                    )}
                     <button
                         onClick={handleRandomize}
-                        disabled={isRolling || activeTickets.length === 0}
-                        className="p-2 bg-slate-800 hover:bg-slate-700 text-purple-400 rounded-lg disabled:opacity-50 transition-colors"
+                        disabled={isRolling || activeTickets.length === 0 || !season?.locked}
+                        className="p-2 bg-slate-800 hover:bg-slate-700 text-purple-400 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                         title="Random Selection"
                     >
                         <Dices className={`w-6 h-6 ${isRolling ? 'animate-spin' : ''}`} />
@@ -95,8 +100,8 @@ export default function CurrentSeason() {
                 {activeTickets.map((ticket) => (
                     <div
                         key={ticket.id}
-                        onClick={() => !isRolling && setSoftSelectedId(ticket.id)}
-                        className={`transition-all duration-300 rounded-xl cursor-pointer ${softSelectedId === ticket.id
+                        onClick={() => !isRolling && season?.locked && setSoftSelectedId(ticket.id)}
+                        className={`transition-all duration-300 rounded-xl ${season?.locked ? 'cursor-pointer' : 'cursor-not-allowed opacity-75'} ${softSelectedId === ticket.id
                             ? 'ring-4 ring-purple-500 ring-offset-4 ring-offset-slate-900 scale-[1.02] bg-slate-800/50'
                             : 'hover:bg-slate-800/30'
                             }`}

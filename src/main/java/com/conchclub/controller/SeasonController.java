@@ -53,18 +53,17 @@ public class SeasonController {
     }
 
     @GetMapping("/active/selection")
-    public ResponseEntity<?> getActiveSelection() {
+    public ResponseEntity<List<TicketDto>> getActiveSelection() {
         return seasonRepository.findByActiveTrue()
                 .map(activeSeason -> {
                     List<Ticket> tickets = ticketService.getTickets(activeSeason.getId());
-                    return tickets.stream()
+                    List<TicketDto> selectedTickets = tickets.stream()
                             .filter(Ticket::isSelected)
-                            .findFirst()
                             .map(this::mapToTicketDto)
-                            .map(ResponseEntity::ok)
-                            .orElse(ResponseEntity.noContent().build());
+                            .toList();
+                    return ResponseEntity.ok(selectedTickets);
                 })
-                .orElse(ResponseEntity.notFound().build());
+                .orElse(ResponseEntity.ok(Collections.emptyList()));
     }
 
     @GetMapping("/tickets/me")

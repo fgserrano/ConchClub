@@ -35,7 +35,7 @@ export default function AdminPanel() {
             )}
 
             <NewSeasonForm onStatusChange={setResponse} />
-            <CurrentSeason />
+            <CurrentSeason season={season} />
             <SeasonActions seasonId={season?.id} isLocked={season?.locked} onStatusChange={setResponse} />
         </div>
     );
