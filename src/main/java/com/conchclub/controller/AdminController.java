@@ -7,8 +7,6 @@ import com.conchclub.model.Ticket;
 import com.conchclub.repository.SeasonRepository;
 import com.conchclub.repository.TicketRepository;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,8 +18,6 @@ import java.util.List;
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
 public class AdminController {
-
-    private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
 
     private final SeasonRepository seasonRepository;
     private final TicketRepository ticketRepository;
