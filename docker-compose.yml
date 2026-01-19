@@ -11,6 +11,10 @@ services:
       - .env
     environment:
       SPRING_PROFILES_ACTIVE: local
+      # SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/conchclub // Local without Proxy
+      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3307/conchclub
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - ./credentials.json:/service/credentials.json
       - ./src/main/resources/application-local.yml:/service/config/application-local.yml
