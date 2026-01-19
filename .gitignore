@@ -37,3 +37,4 @@ gradle/*
 tmp/*
 target/
 cloud-sql-proxy.exe
+client/.env.production
