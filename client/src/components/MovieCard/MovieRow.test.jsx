@@ -32,9 +32,9 @@ describe('MovieRow', () => {
         expect(screen.getByText('?')).toBeInTheDocument();
     });
 
-    it('uses runtime property if runtimeToNearestTenMin is missing', () => {
+    it('renders placeholder if runtimeToNearestTenMin is missing', () => {
         const ticketWithRuntime = { ...mockTicket, runtimeToNearestTenMin: null, runtime: 136 };
         render(<MovieRow ticket={ticketWithRuntime} />);
-        expect(screen.getByText('136m')).toBeInTheDocument();
+        expect(screen.getByText('? m')).toBeInTheDocument();
     });
 });

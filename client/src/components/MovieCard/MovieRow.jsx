@@ -17,7 +17,7 @@ export default function MovieRow({ ticket }) {
                         <div className="flex items-center gap-2 text-sm text-slate-400">
                             <span>{ticket.releaseDate?.split('-')[0]}</span>
                             <span>•</span>
-                            <span>{ticket.runtimeToNearestTenMin || ticket.runtime}m</span>
+                            <span>{ticket.runtimeToNearestTenMin || '? '}m</span>
                         </div>
                     </div>
                     <span className="px-3 py-1 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20 text-xs font-bold uppercase tracking-wider">

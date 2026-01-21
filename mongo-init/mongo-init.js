@@ -3,7 +3,6 @@ db = db.getSiblingDB('conchclub');
 // Create collections (optional but good for explicit checking)
 db.createCollection('users');
 db.createCollection('seasons');
-db.createCollection('tickets');
 
 // Insert Initial Admin User if not exists
 // Password: password (BCrypt hash)
@@ -26,6 +25,7 @@ if (!db.seasons.findOne({ name: 'Local Test Season 1' })) {
         active: true,
         locked: false,
         createdAt: new Date(),
+        submissions: [],
         _class: 'com.conchclub.model.Season'
     });
     print('Inserted default season');

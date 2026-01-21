@@ -1,12 +1,14 @@
 package com.conchclub.model;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -20,4 +22,6 @@ public class Season {
     private boolean active;
     private boolean locked;
     private LocalDateTime createdAt;
+
+    private List<Submission> submissions = new ArrayList<>();
 }

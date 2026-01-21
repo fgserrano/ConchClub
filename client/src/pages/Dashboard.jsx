@@ -30,8 +30,8 @@ export default function Dashboard() {
             setSeason(seasonRes.data);
             if (seasonRes.data) {
                 const [ticketRes, myTicketRes, selectionRes] = await Promise.all([
-                    api.get('/season/tickets'),
-                    api.get('/season/tickets/me').catch(() => ({ data: null })),
+                    api.get('/season/submissions'),
+                    api.get('/season/submissions/me').catch(() => ({ data: null })),
                     api.get('/season/active/selection').catch(() => ({ data: [] }))
                 ]);
 

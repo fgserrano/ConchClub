@@ -1,11 +1,10 @@
 package com.conchclub.controller;
 
 import com.conchclub.model.Season;
-import com.conchclub.model.Ticket;
+import com.conchclub.model.Submission;
 import com.conchclub.model.User;
 import com.conchclub.service.AuthService;
 import com.conchclub.service.SeasonService;
-import com.conchclub.service.TicketService;
 import com.conchclub.config.JwtUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -37,9 +36,6 @@ public class AdminControllerTest {
     private SeasonService seasonService;
 
     @MockBean
-    private TicketService ticketService;
-
-    @MockBean
     private AuthService authService;
 
     @MockBean
@@ -49,10 +45,10 @@ public class AdminControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    void getTickets_ReturnsEmptyList_WhenNoActiveSeason() throws Exception {
+    void getSubmissions_ReturnsEmptyList_WhenNoActiveSeason() throws Exception {
         when(seasonService.getActiveSeason()).thenReturn(Optional.empty());
 
-        mockMvc.perform(get("/api/admin/tickets"))
+        mockMvc.perform(get("/api/admin/submissions"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty());
     }
@@ -74,19 +70,20 @@ public class AdminControllerTest {
     void revealWinner_Success() throws Exception {
         Season season = new Season();
         season.setId("1");
-        Ticket ticket = new Ticket();
-        ticket.setId("10");
-        ticket.setSeasonId("1");
-        ticket.setUserId("1");
-        ticket.setTitle("Matrix");
-        ticket.setReleaseDate("2024");
-        ticket.setUsername("testuser");
+
+        Submission submission = new Submission();
+        submission.setId("10");
+        submission.setUserId("1");
+        submission.setTitle("Matrix");
+        submission.setReleaseDate("2024");
+        submission.setUsername("testuser");
+
+        season.getSubmissions().add(submission);
 
         User user = new User();
         user.setUsername("testuser");
 
         when(seasonService.getActiveSeason()).thenReturn(Optional.of(season));
-        when(ticketService.getTicketById("10")).thenReturn(Optional.of(ticket));
 
         AdminController.RevealRequest request = new AdminController.RevealRequest("10");
 
@@ -97,6 +94,5 @@ public class AdminControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.selected").value(true))
                 .andExpect(jsonPath("$.title").value("Matrix"));
-
     }
 }

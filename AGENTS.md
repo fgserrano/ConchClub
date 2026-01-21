@@ -10,7 +10,7 @@
 -   **Reasoning**: Dangerous TODOs are easily forgotten. Enforcing behavior via active profiles ensures security by default in production while maintaining developer velocity locally.
 
 ### Self-Documenting Code
--   **Rule**: Always refrain from using comments in code. Instead favor highly descriptive names (even if they are verbose).
+-   **Rule**: STRICTLY FORBIDDEN. Do not add comments to the code. The code must be self-documenting through highly descriptive variable, method, and class names (even if verbose). Comments often become outdated; expressive code does not.
 
 ### Explicit Types
 -   **Rule**: Do not use the `var` keyword. Always use the exact types.

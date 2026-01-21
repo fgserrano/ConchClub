@@ -1,11 +1,10 @@
 package com.conchclub.controller;
 
-import com.conchclub.dto.TicketDto;
+import com.conchclub.dto.SubmissionDto;
 import com.conchclub.dto.UserDto;
 import com.conchclub.model.Season;
-import com.conchclub.model.Ticket;
+import com.conchclub.model.Submission;
 import com.conchclub.service.SeasonService;
-import com.conchclub.service.TicketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,14 +19,13 @@ import java.util.List;
 public class AdminController {
 
     private final SeasonService seasonService;
-    private final TicketService ticketService;
 
-    @GetMapping("/tickets")
-    public ResponseEntity<List<TicketDto>> getTickets() {
+    @GetMapping("/submissions")
+    public ResponseEntity<List<SubmissionDto>> getSubmissions() {
         return seasonService.getActiveSeason()
                 .map(activeSeason -> {
-                    List<Ticket> tickets = ticketService.getTickets(activeSeason.getId());
-                    List<TicketDto> dtos = tickets.stream().map(this::mapToTicketDto).toList();
+                    List<Submission> submissions = activeSeason.getSubmissions();
+                    List<SubmissionDto> dtos = submissions.stream().map(this::mapToSubmissionDto).toList();
                     return ResponseEntity.ok(dtos);
                 })
                 .orElse(ResponseEntity.ok(Collections.emptyList()));
@@ -72,40 +70,39 @@ public class AdminController {
         Season activeSeason = seasonService.getActiveSeason()
                 .orElseThrow(() -> new RuntimeException("No active season"));
 
-        Ticket ticket = ticketService.getTicketById(request.ticketId())
-                .orElseThrow(() -> new RuntimeException("Ticket not found"));
+        Submission submission = activeSeason.getSubmissions().stream()
+                .filter(s -> s.getId().equals(request.submissionId()))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Submission not found"));
 
-        if (!ticket.getSeasonId().equals(activeSeason.getId())) {
-            return ResponseEntity.badRequest().body("Ticket does not belong to active season");
-        }
+        submission.setSelected(true);
+        submission.setSelectedAt(System.currentTimeMillis());
 
-        ticket.setSelected(true);
-        ticket.setSelectedAt(System.currentTimeMillis());
-        ticketService.save(ticket);
+        seasonService.updateSubmission(activeSeason.getId(), submission);
 
-        return ResponseEntity.ok(mapToTicketDto(ticket));
+        return ResponseEntity.ok(mapToSubmissionDto(submission));
     }
 
-    public record RevealRequest(String ticketId) {
+    public record RevealRequest(String submissionId) {
     }
 
     public record CreateSeasonRequest(String name) {
     }
 
-    private TicketDto mapToTicketDto(Ticket t) {
-        UserDto user = new UserDto(t.getUsername());
-        Integer runtime = t.getRuntime();
+    private SubmissionDto mapToSubmissionDto(Submission s) {
+        UserDto user = new UserDto(s.getUsername());
+        Integer runtime = s.getRuntime();
         Integer rounded = (runtime == null) ? null : (int) (Math.round(runtime / 10.0) * 10);
-        return new TicketDto(
-                t.getId(),
+        return new SubmissionDto(
+                s.getId(),
                 user,
                 rounded,
-                t.isSelected(),
-                t.getTmdbId(),
-                t.getTitle(),
-                t.getPosterPath(),
-                t.getOverview(),
-                t.getReleaseDate(),
-                t.getSelectedAt());
+                s.isSelected(),
+                s.getTmdbId(),
+                s.getTitle(),
+                s.getPosterPath(),
+                s.getOverview(),
+                s.getReleaseDate(),
+                s.getSelectedAt());
     }
 }

@@ -1,11 +1,10 @@
 package com.conchclub.controller;
 
 import com.conchclub.model.Season;
-import com.conchclub.model.Ticket;
+import com.conchclub.model.Submission;
 import com.conchclub.service.SeasonService;
 import com.conchclub.service.AuthService;
 import com.conchclub.config.JwtUtils;
-import com.conchclub.service.TicketService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -33,9 +32,6 @@ public class SeasonControllerTest {
     private SeasonService seasonService;
 
     @MockBean
-    private TicketService ticketService;
-
-    @MockBean
     private AuthService authService;
 
     @MockBean
@@ -55,17 +51,20 @@ public class SeasonControllerTest {
     }
 
     @Test
-    void getTickets_ReturnsRoundedRuntime() throws Exception {
+    void getSubmissions_ReturnsRoundedRuntime() throws Exception {
         Season season = new Season();
         season.setId("1");
-        Ticket ticket = new Ticket();
-        ticket.setRuntime(115); // Should round to 120
-        ticket.setUsername("bob");
+
+        Submission submission = new Submission();
+        submission.setId("sub1");
+        submission.setRuntime(115); // Should round to 120
+        submission.setUsername("bob");
+
+        season.getSubmissions().add(submission);
 
         when(seasonService.getActiveSeason()).thenReturn(Optional.of(season));
-        when(ticketService.getTickets("1")).thenReturn(Collections.singletonList(ticket));
 
-        mockMvc.perform(get("/api/season/tickets"))
+        mockMvc.perform(get("/api/season/submissions"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].runtimeToNearestTenMin").value(120))
                 .andExpect(jsonPath("$[0].user.username").value("bob"));
@@ -75,13 +74,16 @@ public class SeasonControllerTest {
     void getActiveSelection_ReturnsSelectedTickets() throws Exception {
         Season season = new Season();
         season.setId("1");
-        Ticket ticket = new Ticket();
-        ticket.setSelected(true);
-        ticket.setTitle("Winning Movie");
-        ticket.setUsername("alice");
+
+        Submission submission = new Submission();
+        submission.setId("sub2");
+        submission.setSelected(true);
+        submission.setTitle("Winning Movie");
+        submission.setUsername("alice");
+
+        season.getSubmissions().add(submission);
 
         when(seasonService.getActiveSeason()).thenReturn(Optional.of(season));
-        when(ticketService.getTickets("1")).thenReturn(Collections.singletonList(ticket));
 
         mockMvc.perform(get("/api/season/active/selection"))
                 .andExpect(status().isOk())

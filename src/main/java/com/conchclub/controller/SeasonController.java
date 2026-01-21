@@ -1,12 +1,11 @@
 package com.conchclub.controller;
 
-import com.conchclub.dto.MysteryTicketDto;
-import com.conchclub.dto.TicketDto;
+import com.conchclub.dto.MysterySubmissionDto;
+import com.conchclub.dto.SubmissionDto;
 import com.conchclub.dto.UserDto;
-import com.conchclub.model.Ticket;
+import com.conchclub.model.Submission;
 
 import com.conchclub.service.SeasonService;
-import com.conchclub.service.TicketService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +24,6 @@ import java.util.Optional;
 public class SeasonController {
 
     private final SeasonService seasonService;
-    private final TicketService ticketService;
 
     @GetMapping("/active")
     public ResponseEntity<?> getActiveSeason() {
@@ -34,19 +32,19 @@ public class SeasonController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/tickets")
-    public ResponseEntity<List<MysteryTicketDto>> getTickets() {
+    @GetMapping("/submissions")
+    public ResponseEntity<List<MysterySubmissionDto>> getSubmissions() {
         return seasonService.getActiveSeason()
                 .map(activeSeason -> {
-                    List<Ticket> tickets = ticketService.getTickets(activeSeason.getId());
-                    List<MysteryTicketDto> dtos = tickets.stream().map(t -> {
-                        UserDto user = new UserDto(t.getUsername());
-                        Integer runtime = t.getRuntime();
+                    List<Submission> submissions = activeSeason.getSubmissions();
+                    List<MysterySubmissionDto> dtos = submissions.stream().map(s -> {
+                        UserDto user = new UserDto(s.getUsername());
+                        Integer runtime = s.getRuntime();
                         Integer rounded = (runtime == null) ? null : (int) (Math.round(runtime / 10.0) * 10);
-                        String year = (t.getReleaseDate() != null && t.getReleaseDate().contains("-"))
-                                ? t.getReleaseDate().split("-")[0]
-                                : t.getReleaseDate();
-                        return new MysteryTicketDto(t.getId(), user, rounded, year, t.isSelected());
+                        String year = (s.getReleaseDate() != null && s.getReleaseDate().contains("-"))
+                                ? s.getReleaseDate().split("-")[0]
+                                : s.getReleaseDate();
+                        return new MysterySubmissionDto(s.getId(), user, rounded, year, s.isSelected());
                     }).toList();
                     return ResponseEntity.ok(dtos);
                 })
@@ -54,49 +52,49 @@ public class SeasonController {
     }
 
     @GetMapping("/active/selection")
-    public ResponseEntity<List<TicketDto>> getActiveSelection() {
+    public ResponseEntity<List<SubmissionDto>> getActiveSelection() {
         return seasonService.getActiveSeason()
                 .map(activeSeason -> {
-                    List<Ticket> tickets = ticketService.getTickets(activeSeason.getId());
-                    List<TicketDto> selectedTickets = tickets.stream()
-                            .filter(Ticket::isSelected)
-                            .map(this::mapToTicketDto)
+                    List<Submission> submissions = activeSeason.getSubmissions();
+                    List<SubmissionDto> selectedTickets = submissions.stream()
+                            .filter(Submission::isSelected)
+                            .map(this::mapToSubmissionDto)
                             .toList();
                     return ResponseEntity.ok(selectedTickets);
                 })
                 .orElse(ResponseEntity.ok(Collections.emptyList()));
     }
 
-    @GetMapping("/tickets/me")
-    public ResponseEntity<?> getMyTicket(Principal principal) {
+    @GetMapping("/submissions/me")
+    public ResponseEntity<?> getMySubmission(Principal principal) {
         return Optional.ofNullable(principal)
                 .flatMap(p -> seasonService.getActiveSeason())
                 .map(season -> {
-                    List<Ticket> tickets = ticketService.getTickets(season.getId());
-                    return tickets.stream()
-                            .filter(t -> t.getUsername() != null && t.getUsername().equals(principal.getName()))
+                    List<Submission> submissions = season.getSubmissions();
+                    return submissions.stream()
+                            .filter(s -> s.getUsername() != null && s.getUsername().equals(principal.getName()))
                             .findFirst()
-                            .map(this::mapToTicketDto)
+                            .map(this::mapToSubmissionDto)
                             .map(ResponseEntity::ok)
                             .orElse(ResponseEntity.noContent().build());
                 })
                 .orElse(ResponseEntity.ok().build());
     }
 
-    private TicketDto mapToTicketDto(Ticket t) {
-        UserDto user = new UserDto(t.getUsername());
-        Integer runtime = t.getRuntime();
+    private SubmissionDto mapToSubmissionDto(Submission s) {
+        UserDto user = new UserDto(s.getUsername());
+        Integer runtime = s.getRuntime();
         Integer rounded = (runtime == null) ? null : (int) (Math.round(runtime / 10.0) * 10);
-        return new TicketDto(
-                t.getId(),
+        return new SubmissionDto(
+                s.getId(),
                 user,
                 rounded,
-                t.isSelected(),
-                t.getTmdbId(),
-                t.getTitle(),
-                t.getPosterPath(),
-                t.getOverview(),
-                t.getReleaseDate(),
-                t.getSelectedAt());
+                s.isSelected(),
+                s.getTmdbId(),
+                s.getTitle(),
+                s.getPosterPath(),
+                s.getOverview(),
+                s.getReleaseDate(),
+                s.getSelectedAt());
     }
 }

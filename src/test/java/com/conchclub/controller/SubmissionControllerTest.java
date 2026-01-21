@@ -2,10 +2,10 @@ package com.conchclub.controller;
 
 import com.conchclub.config.JwtUtils;
 import com.conchclub.model.Season;
+import com.conchclub.model.Submission;
 import com.conchclub.model.User;
 import com.conchclub.service.AuthService;
 import com.conchclub.service.SeasonService;
-import com.conchclub.service.TicketService;
 import com.conchclub.service.TmdbService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -36,9 +36,6 @@ public class SubmissionControllerTest {
         private SeasonService seasonService;
 
         @MockBean
-        private TicketService ticketService;
-
-        @MockBean
         private TmdbService tmdbService;
 
         @MockBean
@@ -52,7 +49,8 @@ public class SubmissionControllerTest {
 
         @Test
         void submitMovie_ReturnsBadRequest_WhenSeasonIsLocked() throws Exception {
-                SubmissionController.TicketRequest request = new SubmissionController.TicketRequest("1", "Title",
+                SubmissionController.SubmissionRequest request = new SubmissionController.SubmissionRequest("1",
+                                "Title",
                                 "Path",
                                 "Desc", "2024");
                 Season season = new Season();
@@ -74,7 +72,8 @@ public class SubmissionControllerTest {
 
         @Test
         void submitMovie_ReturnsBadRequest_WhenAlreadySubmitted() throws Exception {
-                SubmissionController.TicketRequest request = new SubmissionController.TicketRequest("1", "Title",
+                SubmissionController.SubmissionRequest request = new SubmissionController.SubmissionRequest("1",
+                                "Title",
                                 "Path",
                                 "Desc", "2024");
                 Season season = new Season();
@@ -83,10 +82,13 @@ public class SubmissionControllerTest {
                 User user = new User();
                 user.setId("1");
 
+                Submission submission = new Submission();
+                submission.setUserId("1");
+                season.getSubmissions().add(submission);
+
                 when(jwtUtils.extractUsername(anyString())).thenReturn("user");
                 when(authService.getUserByUsername("user")).thenReturn(Optional.of(user));
                 when(seasonService.getActiveSeason()).thenReturn(Optional.of(season));
-                when(ticketService.existsBySeasonIdAndUserId("1", "1")).thenReturn(true);
 
                 mockMvc.perform(post("/api/submission/submit")
                                 .header("Authorization", "Bearer token")

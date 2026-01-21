@@ -17,7 +17,7 @@ export default function CurrentSeason({ season }) {
 
     const fetchTickets = async () => {
         try {
-            const res = await api.get('/admin/tickets');
+            const res = await api.get('/admin/submissions');
             setTickets(res.data);
         } catch (e) {
             console.error("Failed to fetch tickets", e);
@@ -42,8 +42,8 @@ export default function CurrentSeason({ season }) {
         }, 100);
     };
 
-    const revealWinner = (ticketId) => {
-        return api.post('/admin/reveal', { ticketId });
+    const revealWinner = (submissionId) => {
+        return api.post('/admin/reveal', { submissionId });
     };
 
     const handleReveal = async () => {
