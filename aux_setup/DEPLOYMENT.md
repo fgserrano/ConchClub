@@ -1,6 +1,6 @@
 # Deploying ConchClub to Google Cloud Run
 
-This guide will walk you through deploying the ConchClub application (Backend + Frontend) to Google Cloud Run, using **Cloud SQL (PostgreSQL)**.
+This guide will walk you through deploying the ConchClub application (Backend + Frontend) to Google Cloud Run, using **MongoDB Atlas**.
 
 ## Prerequisites
 
@@ -11,60 +11,53 @@ This guide will walk you through deploying the ConchClub application (Backend + 
     gcloud config set project conchclub
     ```
 3.  **Docker**: Ensure Docker is running locally to build images.
+4.  **MongoDB Atlas Account**: You need an account on [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
 
-## 1. Cloud SQL Setup
+## 1. MongoDB Atlas Setup
 
-Since we moved to PostgreSQL, we need a managed database instance.
+### 1.1 Create the Cluster
+1.  Log in to MongoDB Atlas and create a new project.
+2.  Create a **Cluster** (M0 Free Tier is sufficient for development, M10+ for production).
+3.  Choose **Google Cloud** as the provider and **Iowa (us-central1)** as the region (to match Cloud Run).
 
-### 1.1 Create the Instance
-```powershell
-# Create a MySQL 8.0 instance
-gcloud sql instances create conchclub-db `
-    --database-version=MYSQL_8_0 `
-    --cpu=1 `
-    --memory=3840MB `
-    --region=us-central1
-```
+### 1.2 Network Access
+To allow Cloud Run to connect:
+1.  Go to **Network Access** in the Atlas sidebar.
+2.  Add IP Address: `0.0.0.0/0` (Allow Access from Anywhere).
+    *   *Note: For production, consider using VPC Peering for better security, but `0.0.0.0/0` is the standard way for Cloud Run without detailed VPC configuration.*
 
-### 1.2 Create Database & User
-```powershell
-# Create the database
-gcloud sql databases create conchclub --instance=conchclub-db
+### 1.3 Create Database User
+1.  Go to **Database Access**.
+2.  Add a new database user.
+3.  Authentication Method: **Password**.
+4.  Username: `conchclub` (or your choice).
+5.  Password: Generate a secure password and **save it**.
+6.  Database User Privileges: `Read and write to any database` (or specifically for `conchclub` database).
 
-# Create the user (replace PASSWORD with a strong password)
-gcloud sql users create conchclub --host=% --instance=conchclub-db --password="YOUR_DB_PASSWORD"
-```
-
-
-### 1.3 Get Connection Name
-You will need this string later (Format: `PROJECT_ID:REGION:INSTANCE_ID`).
-```powershell
-gcloud sql instances describe conchclub-db --format='value(connectionName)'
-```
+### 1.4 Get Connection String
+1.  Go to **Database** > **Connect**.
+2.  Choose **Drivers**.
+3.  Select **Java** as the driver.
+4.  Copy the connection string. It will look like:
+    `mongodb+srv://conchclub:<password>@cluster0.abcde.mongodb.net/?retryWrites=true&w=majority`
 
 ---
 
-## 2. Setup Environment Variables & Secrets
+## 2. Setup (Secrets)
 
 ### 2.1 Service Account
-Create a dedicated service account for the application.
+Create a dedicated service account for the application (if not already created).
 ```powershell
 gcloud iam service-accounts create conchclub-runner `
     --display-name="ConchClub Cloud Run Service Account"
 ```
 
 ### 2.2 Grant Permissions
-The service account needs to access **Secret Manager** and **Cloud SQL**.
+The service account needs to access **Secret Manager**.
 ```powershell
-# Grant Secret Access
 gcloud projects add-iam-policy-binding conchclub `
     --member="serviceAccount:conchclub-runner@conchclub.iam.gserviceaccount.com" `
     --role="roles/secretmanager.secretAccessor"
-
-# Grant Cloud SQL Client Access
-gcloud projects add-iam-policy-binding conchclub `
-    --member="serviceAccount:conchclub-runner@conchclub.iam.gserviceaccount.com" `
-    --role="roles/cloudsql.client"
 ```
 
 ### 2.3 Secret Manager Setup
@@ -76,8 +69,8 @@ Store sensitive values in Secret Manager.
     ```
 2.  **Create Secrets**:
     ```powershell
-    # Database Password (The one you set in Step 1.2)
-    echo "YOUR_DB_PASSWORD" | gcloud secrets create db-password --data-file=-
+    # MongoDB URI (Replace with your actual string, inserting the password)
+    echo "mongodb+srv://conchclub:YOUR_PASSWORD@cluster0.abcde.mongodb.net/conchclub?retryWrites=true&w=majority" | gcloud secrets create mongodb-uri --data-file=-
 
     # Other App Secrets
     echo "YOUR_JWT_SECRET" | gcloud secrets create jwt-secret --data-file=-
@@ -114,16 +107,11 @@ docker build -t us-central1-docker.pkg.dev/conchclub/conchclub-repo/frontend:lat
 docker push us-central1-docker.pkg.dev/conchclub/conchclub-repo/frontend:latest
 ```
 
-*(Replace `conchclub` with your actual project ID)*
-
 ---
 
 ## 4. Deploy Backend Service
 
-We need to tell Cloud Run to connect to Cloud SQL. This is done via `--add-cloudsql-instances` and passing the DB configuration variables.
-
-> [!IMPORTANT]
-> Replace `INSTANCE_CONNECTION_NAME` with the value from Step 1.3 (e.g., `conchclub:us-central1:conchclub-db`).
+Deploy the backend, injecting the MongoDB URI from Secret Manager.
 
 ```powershell
 gcloud run deploy conchclub-backend `
@@ -132,17 +120,12 @@ gcloud run deploy conchclub-backend `
   --allow-unauthenticated `
   --port 8080 `
   --service-account conchclub-runner@conchclub.iam.gserviceaccount.com `
-  --add-cloudsql-instances="conchclub:us-central1:conchclub-db" `
-  --set-secrets="SPRING_DATASOURCE_PASSWORD=db-password:latest,`
+  --set-secrets="SPRING_DATA_MONGODB_URI=mongodb-uri:latest,`
 JWT_SECRET=jwt-secret:latest,`
 TMDB_API_KEY=tmdb-key:latest,`
 INVITE_CODE=invite-code:latest" `
-  --set-env-vars="SPRING_PROFILES_ACTIVE=prod,`
-SPRING_DATASOURCE_URL=jdbc:mysql:///conchclub?unixSocketPath=/cloudsql/conchclub:us-central1:conchclub-db&socketFactory=com.google.cloud.sql.mysql.SocketFactory&cloudSqlInstance=conchclub:us-central1:conchclub-db,`
-SPRING_DATASOURCE_USERNAME=conchclub"
+  --set-env-vars="SPRING_PROFILES_ACTIVE=prod"
 ```
-
-*Note: For MySQL on Cloud Run, we use the `jdbc:mysql:///DB_NAME` format with `unixSocketPath` pointing to the `/cloudsql/INSTANCE_CONNECTION_NAME` socket.*
 
 ---
 
@@ -154,7 +137,7 @@ SPRING_DATASOURCE_USERNAME=conchclub"
     ```
 2.  **Rebuild and Push Frontend**:
     ```powershell
-    docker build -t us-central1-docker.pkg.dev/conchclub/conchclub-repo/frontend:latest -f client/Dockerfile.frontend ./client
+    docker build -t us-central1-docker.pkg.dev/conchclub/conchclub-repo/frontend:latest -f docker/Dockerfile.frontend ./client
     docker push us-central1-docker.pkg.dev/conchclub/conchclub-repo/frontend:latest
     ```
 3.  **Deploy Frontend**:
@@ -165,28 +148,3 @@ SPRING_DATASOURCE_USERNAME=conchclub"
       --allow-unauthenticated `
       --port 80
     ```
-
----
-
-## 6. Automating with Cloud Build
-
-If you are using the `cloudbuild.yaml` file, you need to update it to include the Cloud SQL parameters.
-
-**Update your `cloudbuild.yaml` deployment step:**
-
-```yaml
-  # 4. Deploy Backend to Cloud Run
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: 'gcloud'
-    args:
-      - 'run'
-      - 'deploy'
-      - 'conchclub-backend'
-      - '--image=us-central1-docker.pkg.dev/$PROJECT_ID/conchclub-repo/backend:latest'
-      - '--region=us-central1'
-      - '--add-cloudsql-instances=YOUR_INSTANCE_CONNECTION_NAME'  # <--- UPDATE THIS
-      - '--service-account=conchclub-runner@$PROJECT_ID.iam.gserviceaccount.com'
-      - '--set-secrets=SPRING_DATASOURCE_PASSWORD=db-password:latest,JWT_SECRET=jwt-secret:latest,TMDB_API_KEY=tmdb-key:latest,INVITE_CODE=invite-code:latest'
-      - '--set-env-vars=SPRING_PROFILES_ACTIVE=prod,SPRING_DATASOURCE_URL=jdbc:postgresql:///conchclub?host=/cloudsql/YOUR_INSTANCE_CONNECTION_NAME,SPRING_DATASOURCE_USERNAME=conchclub'
-```
-*(Ideally, use substitutions like `_DB_INSTANCE` in Cloud Build trigger settings to avoid hardcoding the instance name).*

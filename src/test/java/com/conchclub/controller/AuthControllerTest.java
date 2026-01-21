@@ -3,7 +3,7 @@ package com.conchclub.controller;
 import com.conchclub.config.JwtUtils;
 import com.conchclub.model.Role;
 import com.conchclub.model.User;
-import com.conchclub.repository.UserRepository;
+
 import com.conchclub.service.AuthService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -40,9 +40,6 @@ public class AuthControllerTest {
     @MockBean
     private PasswordEncoder passwordEncoder;
 
-    @MockBean
-    private UserRepository userRepository;
-
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -65,7 +62,13 @@ public class AuthControllerTest {
         user.setPassword("encoded");
         user.setRole(Role.MEMBER);
 
-        when(userRepository.findByUsername("user")).thenReturn(Optional.of(user));
+        when(authService.getUserByUsername("user")).thenReturn(Optional.of(user));
+        when(authService.loadUserByUsername("user"))
+                .thenReturn(org.springframework.security.core.userdetails.User.builder()
+                        .username("user")
+                        .password("encoded")
+                        .roles("MEMBER")
+                        .build());
         when(passwordEncoder.matches("pass", "encoded")).thenReturn(true);
         when(jwtUtils.generateToken(any())).thenReturn("mock-token");
 
@@ -84,7 +87,7 @@ public class AuthControllerTest {
         user.setUsername("user");
         user.setPassword("encoded");
 
-        when(userRepository.findByUsername("user")).thenReturn(Optional.of(user));
+        when(authService.getUserByUsername("user")).thenReturn(Optional.of(user));
         when(passwordEncoder.matches("wrong", "encoded")).thenReturn(false);
 
         mockMvc.perform(post("/api/auth/login")

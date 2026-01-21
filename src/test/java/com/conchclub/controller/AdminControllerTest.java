@@ -3,10 +3,9 @@ package com.conchclub.controller;
 import com.conchclub.model.Season;
 import com.conchclub.model.Ticket;
 import com.conchclub.model.User;
-import com.conchclub.repository.SeasonRepository;
-import com.conchclub.repository.TicketRepository;
-import com.conchclub.repository.UserRepository;
 import com.conchclub.service.AuthService;
+import com.conchclub.service.SeasonService;
+import com.conchclub.service.TicketService;
 import com.conchclub.config.JwtUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -35,13 +34,10 @@ public class AdminControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private SeasonRepository seasonRepository;
+    private SeasonService seasonService;
 
     @MockBean
-    private TicketRepository ticketRepository;
-
-    @MockBean
-    private UserRepository userRepository;
+    private TicketService ticketService;
 
     @MockBean
     private AuthService authService;
@@ -54,7 +50,7 @@ public class AdminControllerTest {
 
     @Test
     void getTickets_ReturnsEmptyList_WhenNoActiveSeason() throws Exception {
-        when(seasonRepository.findByActiveTrue()).thenReturn(Optional.empty());
+        when(seasonService.getActiveSeason()).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/api/admin/tickets"))
                 .andExpect(status().isOk())
@@ -64,7 +60,7 @@ public class AdminControllerTest {
     @Test
     void createSeason_Success() throws Exception {
         AdminController.CreateSeasonRequest request = new AdminController.CreateSeasonRequest("Season 2");
-        when(seasonRepository.save(any(Season.class))).thenAnswer(i -> i.getArgument(0));
+        when(seasonService.save(any(Season.class))).thenAnswer(i -> i.getArgument(0));
 
         mockMvc.perform(post("/api/admin/season")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -77,22 +73,22 @@ public class AdminControllerTest {
     @Test
     void revealWinner_Success() throws Exception {
         Season season = new Season();
-        season.setId(1L);
+        season.setId("1");
         Ticket ticket = new Ticket();
-        ticket.setId(10L);
-        ticket.setSeasonId(1L);
-        ticket.setUserId(1L);
+        ticket.setId("10");
+        ticket.setSeasonId("1");
+        ticket.setUserId("1");
         ticket.setTitle("Matrix");
         ticket.setReleaseDate("2024");
+        ticket.setUsername("testuser");
 
         User user = new User();
         user.setUsername("testuser");
 
-        when(seasonRepository.findByActiveTrue()).thenReturn(Optional.of(season));
-        when(ticketRepository.findById(10L)).thenReturn(Optional.of(ticket)); // Mock findById
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(seasonService.getActiveSeason()).thenReturn(Optional.of(season));
+        when(ticketService.getTicketById("10")).thenReturn(Optional.of(ticket));
 
-        AdminController.RevealRequest request = new AdminController.RevealRequest(10L);
+        AdminController.RevealRequest request = new AdminController.RevealRequest("10");
 
         mockMvc.perform(post("/api/admin/reveal")
                 .header("Authorization", "Bearer token")

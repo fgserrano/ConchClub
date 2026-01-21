@@ -5,7 +5,8 @@ import com.conchclub.dto.TicketDto;
 import com.conchclub.dto.UserDto;
 import com.conchclub.model.Ticket;
 
-import com.conchclub.repository.SeasonRepository;
+import com.conchclub.service.SeasonService;
+import com.conchclub.service.TicketService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,19 +24,19 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class SeasonController {
 
-    private final SeasonRepository seasonRepository;
-    private final com.conchclub.service.TicketService ticketService;
+    private final SeasonService seasonService;
+    private final TicketService ticketService;
 
     @GetMapping("/active")
     public ResponseEntity<?> getActiveSeason() {
-        return seasonRepository.findByActiveTrue()
+        return seasonService.getActiveSeason()
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/tickets")
     public ResponseEntity<List<MysteryTicketDto>> getTickets() {
-        return seasonRepository.findByActiveTrue()
+        return seasonService.getActiveSeason()
                 .map(activeSeason -> {
                     List<Ticket> tickets = ticketService.getTickets(activeSeason.getId());
                     List<MysteryTicketDto> dtos = tickets.stream().map(t -> {
@@ -54,7 +55,7 @@ public class SeasonController {
 
     @GetMapping("/active/selection")
     public ResponseEntity<List<TicketDto>> getActiveSelection() {
-        return seasonRepository.findByActiveTrue()
+        return seasonService.getActiveSeason()
                 .map(activeSeason -> {
                     List<Ticket> tickets = ticketService.getTickets(activeSeason.getId());
                     List<TicketDto> selectedTickets = tickets.stream()
@@ -69,7 +70,7 @@ public class SeasonController {
     @GetMapping("/tickets/me")
     public ResponseEntity<?> getMyTicket(Principal principal) {
         return Optional.ofNullable(principal)
-                .flatMap(p -> seasonRepository.findByActiveTrue())
+                .flatMap(p -> seasonService.getActiveSeason())
                 .map(season -> {
                     List<Ticket> tickets = ticketService.getTickets(season.getId());
                     return tickets.stream()

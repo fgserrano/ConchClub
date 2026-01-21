@@ -20,7 +20,6 @@ public class AuthController {
     private final AuthService authService;
     private final JwtUtils jwtUtils;
     private final PasswordEncoder passwordEncoder;
-    private final com.conchclub.repository.UserRepository userRepository;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
@@ -35,7 +34,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
 
-        User user = userRepository.findByUsername(request.username())
+        User user = authService.getUserByUsername(request.username())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {

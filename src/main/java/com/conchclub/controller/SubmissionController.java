@@ -4,9 +4,9 @@ import com.conchclub.config.JwtUtils;
 import com.conchclub.model.Season;
 import com.conchclub.model.Ticket;
 import com.conchclub.model.User;
-import com.conchclub.repository.SeasonRepository;
-import com.conchclub.repository.TicketRepository;
-import com.conchclub.repository.UserRepository;
+import com.conchclub.service.AuthService;
+import com.conchclub.service.SeasonService;
+import com.conchclub.service.TicketService;
 import com.conchclub.service.TmdbService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class SubmissionController {
 
-    private final SeasonRepository seasonRepository;
-    private final TicketRepository ticketRepository;
-    private final UserRepository userRepository;
+    private final SeasonService seasonService;
+    private final TicketService ticketService;
+    private final AuthService authService;
     private final TmdbService tmdbService;
     private final JwtUtils jwtUtils;
 
@@ -32,20 +32,20 @@ public class SubmissionController {
     public ResponseEntity<?> submitMovie(@RequestHeader("Authorization") String token,
             @RequestBody TicketRequest request) {
         String username = jwtUtils.extractUsername(token.substring(7));
-        User user = userRepository.findByUsername(username).orElseThrow();
+        User user = authService.getUserByUsername(username).orElseThrow();
 
-        Season activeSeason = seasonRepository.findByActiveTrue()
+        Season activeSeason = seasonService.getActiveSeason()
                 .orElseThrow(() -> new RuntimeException("No active season"));
 
         if (activeSeason.isLocked()) {
             return ResponseEntity.badRequest().body("Season is locked");
         }
 
-        if (ticketRepository.existsBySeasonIdAndUserId(activeSeason.getId(), user.getId())) {
+        if (ticketService.existsBySeasonIdAndUserId(activeSeason.getId(), user.getId())) {
             return ResponseEntity.badRequest().body("You have already submitted a movie for this season");
         }
 
-        if (ticketRepository.existsBySeasonIdAndTmdbId(activeSeason.getId(), request.tmdbId)) {
+        if (ticketService.existsBySeasonIdAndTmdbId(activeSeason.getId(), request.tmdbId)) {
             return ResponseEntity.badRequest().body("This movie has already been submitted!");
         }
 
@@ -60,27 +60,27 @@ public class SubmissionController {
         ticket.setRuntime(tmdbService.getMovieRuntime(request.tmdbId));
         ticket.setSelected(false);
 
-        return ResponseEntity.ok(ticketRepository.save(ticket));
+        return ResponseEntity.ok(ticketService.save(ticket));
     }
 
     @PutMapping("/update")
     public ResponseEntity<?> updateSubmission(@RequestHeader("Authorization") String token,
             @RequestBody TicketRequest request) {
         String username = jwtUtils.extractUsername(token.substring(7));
-        User user = userRepository.findByUsername(username).orElseThrow();
+        User user = authService.getUserByUsername(username).orElseThrow();
 
-        Season activeSeason = seasonRepository.findByActiveTrue()
+        Season activeSeason = seasonService.getActiveSeason()
                 .orElseThrow(() -> new RuntimeException("No active season"));
 
         if (activeSeason.isLocked()) {
             return ResponseEntity.badRequest().body("Season is locked");
         }
 
-        Ticket ticket = ticketRepository.findBySeasonIdAndUserId(activeSeason.getId(), user.getId())
+        Ticket ticket = ticketService.findBySeasonIdAndUserId(activeSeason.getId(), user.getId())
                 .orElseThrow(() -> new RuntimeException("Submission not found"));
 
         if (!ticket.getTmdbId().equals(request.tmdbId)) {
-            if (ticketRepository.existsBySeasonIdAndTmdbId(activeSeason.getId(), request.tmdbId)) {
+            if (ticketService.existsBySeasonIdAndTmdbId(activeSeason.getId(), request.tmdbId)) {
                 return ResponseEntity.badRequest().body("This movie has already been submitted!");
             }
         }
@@ -92,7 +92,7 @@ public class SubmissionController {
         ticket.setReleaseDate(request.releaseDate);
         ticket.setRuntime(tmdbService.getMovieRuntime(request.tmdbId));
 
-        return ResponseEntity.ok(ticketRepository.save(ticket));
+        return ResponseEntity.ok(ticketService.save(ticket));
     }
 
     public record TicketRequest(String tmdbId, String title, String posterPath, String overview, String releaseDate) {

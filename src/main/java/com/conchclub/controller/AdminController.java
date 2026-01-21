@@ -4,8 +4,8 @@ import com.conchclub.dto.TicketDto;
 import com.conchclub.dto.UserDto;
 import com.conchclub.model.Season;
 import com.conchclub.model.Ticket;
-import com.conchclub.repository.SeasonRepository;
-import com.conchclub.repository.TicketRepository;
+import com.conchclub.service.SeasonService;
+import com.conchclub.service.TicketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,14 +19,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AdminController {
 
-    private final SeasonRepository seasonRepository;
-    private final TicketRepository ticketRepository;
+    private final SeasonService seasonService;
+    private final TicketService ticketService;
 
     @GetMapping("/tickets")
     public ResponseEntity<List<TicketDto>> getTickets() {
-        return seasonRepository.findByActiveTrue()
+        return seasonService.getActiveSeason()
                 .map(activeSeason -> {
-                    List<Ticket> tickets = ticketRepository.findBySeasonId(activeSeason.getId());
+                    List<Ticket> tickets = ticketService.getTickets(activeSeason.getId());
                     List<TicketDto> dtos = tickets.stream().map(this::mapToTicketDto).toList();
                     return ResponseEntity.ok(dtos);
                 })
@@ -35,9 +35,9 @@ public class AdminController {
 
     @PostMapping("/season")
     public ResponseEntity<?> createSeason(@RequestBody CreateSeasonRequest request) {
-        seasonRepository.findByActiveTrue().ifPresent(s -> {
+        seasonService.getActiveSeason().ifPresent(s -> {
             s.setActive(false);
-            seasonRepository.save(s);
+            seasonService.save(s);
         });
 
         Season season = new Season();
@@ -46,22 +46,22 @@ public class AdminController {
         season.setLocked(false);
         season.setCreatedAt(LocalDateTime.now());
 
-        return ResponseEntity.ok(seasonRepository.save(season));
+        return ResponseEntity.ok(seasonService.save(season));
     }
 
     @PostMapping("/season/{id}/lock")
-    public ResponseEntity<?> lockSeason(@PathVariable Long id) {
-        return seasonRepository.findById(id).map(season -> {
+    public ResponseEntity<?> lockSeason(@PathVariable String id) {
+        return seasonService.getSeasonById(id).map(season -> {
             season.setLocked(true);
-            return ResponseEntity.ok(seasonRepository.save(season));
+            return ResponseEntity.ok(seasonService.save(season));
         }).orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping("/season/{id}/unlock")
-    public ResponseEntity<?> unlockSeason(@PathVariable Long id) {
-        return seasonRepository.findById(id).map(season -> {
+    public ResponseEntity<?> unlockSeason(@PathVariable String id) {
+        return seasonService.getSeasonById(id).map(season -> {
             season.setLocked(false);
-            return ResponseEntity.ok(seasonRepository.save(season));
+            return ResponseEntity.ok(seasonService.save(season));
         }).orElse(ResponseEntity.notFound().build());
     }
 
@@ -69,10 +69,10 @@ public class AdminController {
     public ResponseEntity<?> revealWinner(@RequestHeader("Authorization") String token,
             @RequestBody RevealRequest request) {
 
-        Season activeSeason = seasonRepository.findByActiveTrue()
+        Season activeSeason = seasonService.getActiveSeason()
                 .orElseThrow(() -> new RuntimeException("No active season"));
 
-        Ticket ticket = ticketRepository.findById(request.ticketId())
+        Ticket ticket = ticketService.getTicketById(request.ticketId())
                 .orElseThrow(() -> new RuntimeException("Ticket not found"));
 
         if (!ticket.getSeasonId().equals(activeSeason.getId())) {
@@ -81,12 +81,12 @@ public class AdminController {
 
         ticket.setSelected(true);
         ticket.setSelectedAt(System.currentTimeMillis());
-        ticketRepository.save(ticket);
+        ticketService.save(ticket);
 
         return ResponseEntity.ok(mapToTicketDto(ticket));
     }
 
-    public record RevealRequest(Long ticketId) {
+    public record RevealRequest(String ticketId) {
     }
 
     public record CreateSeasonRequest(String name) {

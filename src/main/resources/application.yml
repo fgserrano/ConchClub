@@ -1,19 +1,10 @@
 spring:
   application:
     name: conchclub
-
-
-  datasource:
-    url: ${SPRING_DATASOURCE_URL}
-    driverClassName: com.mysql.cj.jdbc.Driver
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
-
-  sql:
-    init:
-      mode: always
-      schema-locations: classpath:schema.sql
-      data-locations: classpath:data.sql
+  data:
+    mongodb:
+      uri: ${SPRING_DATA_MONGODB_URI}
+      database: ${SPRING_DATA_MONGODB_DATABASE:conchclub}
     
 server:
   port: 8080
@@ -22,7 +13,6 @@ server:
     include-message: always
     include-stacktrace: always
 
-# Default configuration (can be overridden in application-local.yml)
 jwt:
   secret: ${JWT_SECRET}
   expiration:

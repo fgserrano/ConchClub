@@ -1,8 +1,7 @@
 package com.conchclub.model;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Table;
-import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.mongodb.core.mapping.Document;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,16 +9,14 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table("tickets")
+@Document(collection = "tickets")
 public class Ticket {
     @Id
-    private Long id;
+    private String id;
 
-    @Column("user_id")
-    private Long userId;
+    private String userId;
 
-    @Column("season_id")
-    private Long seasonId;
+    private String seasonId;
 
     private String tmdbId;
     private String title;
@@ -30,7 +27,6 @@ public class Ticket {
 
     private boolean selected;
 
-    @Column("selected_at")
     private Long selectedAt;
 
     @org.springframework.data.annotation.Transient
