@@ -71,7 +71,7 @@ public class SeasonControllerTest {
     }
 
     @Test
-    void getActiveSelection_ReturnsSelectedTickets() throws Exception {
+    void getActiveSelection_ReturnsSelectedSubmissions() throws Exception {
         Season season = new Season();
         season.setId("1");
 

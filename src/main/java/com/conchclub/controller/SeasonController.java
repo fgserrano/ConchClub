@@ -56,11 +56,11 @@ public class SeasonController {
         return seasonService.getActiveSeason()
                 .map(activeSeason -> {
                     List<Submission> submissions = activeSeason.getSubmissions();
-                    List<SubmissionDto> selectedTickets = submissions.stream()
+                    List<SubmissionDto> selectedSubmissions = submissions.stream()
                             .filter(Submission::isSelected)
                             .map(this::mapToSubmissionDto)
                             .toList();
-                    return ResponseEntity.ok(selectedTickets);
+                    return ResponseEntity.ok(selectedSubmissions);
                 })
                 .orElse(ResponseEntity.ok(Collections.emptyList()));
     }

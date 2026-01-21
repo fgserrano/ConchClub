@@ -5,6 +5,7 @@ spring:
     mongodb:
       uri: ${SPRING_DATA_MONGODB_URI}
       database: ${SPRING_DATA_MONGODB_DATABASE:conchclub}
+      auto-index-creation: true
     
 server:
   port: 8080
