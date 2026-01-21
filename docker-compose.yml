@@ -11,8 +11,6 @@ services:
       - .env
     environment:
       SPRING_PROFILES_ACTIVE: local
-      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/conchclub
-      SPRING_DATA_MONGODB_DATABASE: conchclub
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:

@@ -15,7 +15,7 @@ public class User {
     @Id
     private String id;
 
-    @Indexed(unique = true)
+    @Indexed(unique = true, name = "idx_username_unique")
     private String username;
 
     private String password;
