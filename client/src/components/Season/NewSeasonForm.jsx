@@ -1,12 +1,21 @@
 import React, { useState } from 'react';
 import api from '../../lib/api';
 
+import ConfirmDialog from '../UI/ConfirmDialog';
+
 export default function NewSeasonForm({ onStatusChange }) {
     const [loading, setLoading] = useState(false);
     const [seasonName, setSeasonName] = useState('');
+    const [showConfirm, setShowConfirm] = useState(false);
 
-    const createSeason = async (e) => {
+    const handleCreateClick = (e) => {
         e.preventDefault();
+        if (!seasonName.trim()) return;
+        setShowConfirm(true);
+    };
+
+    const confirmCreateSeason = async () => {
+        setShowConfirm(false);
         try {
             setLoading(true);
             await api.post('/admin/season', { name: seasonName });
@@ -22,7 +31,7 @@ export default function NewSeasonForm({ onStatusChange }) {
     return (
         <section className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
             <h2 className="text-xl font-bold text-white mb-4">Start New Season</h2>
-            <form onSubmit={createSeason} className="flex gap-2">
+            <form onSubmit={handleCreateClick} className="flex gap-2">
                 <input
                     type="text"
                     value={seasonName}
@@ -35,6 +44,16 @@ export default function NewSeasonForm({ onStatusChange }) {
                     Create
                 </button>
             </form>
+
+            <ConfirmDialog
+                isOpen={showConfirm}
+                title="Create New Season?"
+                message={`Are you sure you want to start a new season named "${seasonName}"? This will reset all current submissions.`}
+                confirmText="Yes, Create It"
+                cancelText="Cancel"
+                onConfirm={confirmCreateSeason}
+                onCancel={() => setShowConfirm(false)}
+            />
         </section>
     );
 }

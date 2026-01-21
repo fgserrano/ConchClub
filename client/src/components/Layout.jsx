@@ -21,10 +21,10 @@ export default function Layout() {
 
             <nav className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-purple-400">
+                    <Link to="/" className="flex items-center gap-2 text-purple-400 hover:opacity-80 transition-opacity">
                         <Film className="w-6 h-6" />
                         <span className="font-bold text-xl tracking-wide bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">ConchClub</span>
-                    </div>
+                    </Link>
 
                     <div className="flex items-center gap-6">
                         {role === 'ADMIN' && (
