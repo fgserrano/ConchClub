@@ -131,16 +131,8 @@ INVITE_CODE=invite-code:latest" `
 
 ## 5. Deploy Frontend Service
 
-1.  **Update `client/.env.production`** with your new Backend URL (obtained from the backend deployment output).
-    ```
-    VITE_API_URL=https://conchclub-backend-xyz.a.run.app
-    ```
-2.  **Rebuild and Push Frontend**:
-    ```powershell
-    docker build -t us-central1-docker.pkg.dev/conchclub/conchclub-repo/frontend:latest -f docker/Dockerfile.frontend ./client
-    docker push us-central1-docker.pkg.dev/conchclub/conchclub-repo/frontend:latest
-    ```
-3.  **Deploy Frontend**:
+    Deploy Frontend
+    
     ```powershell
     gcloud run deploy conchclub-frontend `
       --image us-central1-docker.pkg.dev/conchclub/conchclub-repo/frontend:latest `

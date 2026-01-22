@@ -4,11 +4,15 @@ import api from '../../lib/api';
 import NewSeasonForm from './NewSeasonForm';
 
 export default function SeasonActions({ onStatusChange, season }) {
-    const [isLocked, setIsLocked] = useState(season?.locked || false);
+    const [isLocked, setIsLocked] = useState(season ? season.locked : null);
 
     useEffect(() => {
-        setIsLocked(season?.locked || false);
-    }, [season?.locked]);
+        if (season) {
+            setIsLocked(season.locked);
+        } else {
+            setIsLocked(null);
+        }
+    }, [season?.id, season?.locked]);
 
     const lockSeason = async () => {
         if (!season?.id) {
@@ -47,7 +51,11 @@ export default function SeasonActions({ onStatusChange, season }) {
                     <span className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Current Season</span>
                     <span className="text-2xl font-bold text-white tracking-tight">{season ? season.name : 'No Active Season'}</span>
                 </div>
-                {isLocked ? (
+                {isLocked === null ? (
+                    <div className="flex-1 bg-slate-800/50 p-4 rounded-xl flex items-center justify-center">
+                        <div className="w-6 h-6 border-2 border-slate-600 border-t-transparent rounded-full animate-spin" />
+                    </div>
+                ) : isLocked ? (
                     <button onClick={unlockSeason} className="flex-1 bg-green-800 hover:bg-green-700 text-green-100 p-4 rounded-xl flex flex-col items-center gap-2 transition-all">
                         <Unlock className="w-8 h-8" />
                         <span className="font-bold">UNLOCK</span>
@@ -58,6 +66,7 @@ export default function SeasonActions({ onStatusChange, season }) {
                         <span className="font-bold">LOCK</span>
                     </button>
                 )}
+
             </div>
             <div className="mt-4">
                 <NewSeasonForm onStatusChange={onStatusChange} />
