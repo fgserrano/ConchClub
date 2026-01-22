@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function BackFace({ ticket, roundedRuntime, year }) {
     return (
-        <div className="absolute inset-0 w-full h-full bg-slate-900 rounded-xl overflow-hidden border border-purple-500/30 [backface-visibility:hidden] [transform:rotateY(180deg)] flex flex-col items-center justify-center">
+        <div className="absolute inset-0 w-full h-full bg-slate-900 rounded-xl overflow-hidden border border-purple-500/30 [backface-visibility:hidden] [webkit-backface-visibility:hidden] [transform:rotateY(180deg)] flex flex-col items-center justify-center">
             <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 to-blue-900/20" />
 
             <div className="relative z-10 flex flex-col items-center gap-6 text-center p-4">

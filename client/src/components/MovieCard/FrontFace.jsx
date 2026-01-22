@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function FrontFace({ ticket, isMine }) {
     return (
-        <div className="absolute inset-0 w-full h-full [backface-visibility:hidden]">
+        <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [webkit-backface-visibility:hidden] [transform:translateZ(1px)]">
             <div className={`absolute inset-0 w-full h-full bg-slate-800 rounded-xl overflow-hidden border ${isMine ? 'border-purple-500' : 'border-slate-700'} flex flex-col items-center justify-center`}>
                 {ticket.posterPath ? (
                     <div className="absolute inset-0">
