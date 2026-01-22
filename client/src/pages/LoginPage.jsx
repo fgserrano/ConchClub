@@ -86,7 +86,7 @@ export default function LoginPage() {
                 </form>
 
                 <p className="text-center text-slate-600 text-sm mt-6">
-                    Need an invite? <Link to="/register" className="text-purple-400 hover:text-purple-300 transition-colors">Redeem Code</Link>
+                    New user? <Link to="/register" className="text-purple-400 hover:text-purple-300 transition-colors">Register Here</Link>
                 </p>
             </div>
         </div>
