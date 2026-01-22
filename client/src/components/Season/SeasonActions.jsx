@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Lock, Unlock } from 'lucide-react';
 import api from '../../lib/api';
 import NewSeasonForm from './NewSeasonForm';
