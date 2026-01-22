@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Collections;
 import java.util.List;
 import java.security.Principal;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/season")
@@ -24,6 +23,7 @@ import java.util.Optional;
 public class SeasonController {
 
     private final SeasonService seasonService;
+    private final com.conchclub.service.AuthService authService;
 
     @GetMapping("/active")
     public ResponseEntity<?> getActiveSeason() {
@@ -67,18 +67,22 @@ public class SeasonController {
 
     @GetMapping("/submissions/me")
     public ResponseEntity<?> getMySubmission(Principal principal) {
-        return Optional.ofNullable(principal)
-                .flatMap(p -> seasonService.getActiveSeason())
-                .map(season -> {
-                    List<Submission> submissions = season.getSubmissions();
-                    return submissions.stream()
-                            .filter(s -> s.getUsername() != null && s.getUsername().equals(principal.getName()))
-                            .findFirst()
-                            .map(this::mapToSubmissionDto)
-                            .map(ResponseEntity::ok)
-                            .orElse(ResponseEntity.noContent().build());
-                })
-                .orElse(ResponseEntity.ok().build());
+        if (principal == null) {
+            return ResponseEntity.ok().build();
+        }
+
+        return authService.getUserByUsername(principal.getName())
+                .flatMap(user -> seasonService.getActiveSeason()
+                        .map(season -> {
+                            List<Submission> submissions = season.getSubmissions();
+                            return submissions.stream()
+                                    .filter(s -> s.getUserId() != null && s.getUserId().equals(user.getId()))
+                                    .findFirst()
+                                    .map(this::mapToSubmissionDto)
+                                    .map(ResponseEntity::ok)
+                                    .orElse(ResponseEntity.noContent().build());
+                        }))
+                .orElse(ResponseEntity.noContent().build());
     }
 
     private SubmissionDto mapToSubmissionDto(Submission s) {

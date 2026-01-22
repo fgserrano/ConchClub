@@ -5,6 +5,11 @@ import NewSeasonForm from './NewSeasonForm';
 
 export default function SeasonActions({ onStatusChange, season }) {
     const [isLocked, setIsLocked] = useState(season?.locked || false);
+
+    useEffect(() => {
+        setIsLocked(season?.locked || false);
+    }, [season?.locked]);
+
     const lockSeason = async () => {
         if (!season?.id) {
             onStatusChange("Error: No active season to lock.");
@@ -13,7 +18,9 @@ export default function SeasonActions({ onStatusChange, season }) {
         try {
             await api.post(`/admin/season/${season.id}/lock`);
             setIsLocked(true);
+            onStatusChange("Season Locked!");
         } catch (e) {
+
             onStatusChange();
         }
     };
@@ -23,9 +30,11 @@ export default function SeasonActions({ onStatusChange, season }) {
             return;
         }
         try {
-           await api.post(`/admin/season/${season.id}/unlock`);
-           setIsLocked(false);
+            await api.post(`/admin/season/${season.id}/unlock`);
+            setIsLocked(false);
+            onStatusChange("Season Unlocked!");
         } catch (e) {
+
             onStatusChange("Error: " + (e.response?.data || e.message));
         }
     };
