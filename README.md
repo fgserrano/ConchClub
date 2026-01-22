@@ -7,7 +7,6 @@ Conch Club is a specialized web application designed to manage and facilitate a 
 - **Season Management**: Admins can create and manage themed seasons.
 - **Movie Submissions**: Users can search for and submit movies via integration with The Movie Database (TMDB).
 - **Automated Winner Reveal**: Randomly select and reveal movies for sessions.
-- **Google Sheets Integration**: Automatically syncs winner data to a shared Google Sheet for tracking.
 - **Security**: Robust authentication and role-based access control (Admin/Member).
 
 ## 🛠️ Tech Stack
@@ -17,7 +16,7 @@ Conch Club is a specialized web application designed to manage and facilitate a 
 - **Language**: Java 17
 - **Database**: H2 (In-memory for development)
 - **Security**: Spring Security + JJWT
-- **Integrations**: Google Sheets API, TMDB API
+- **Integrations**: TMDB API
 
 ### Frontend
 - **Framework**: React 19 + Vite
@@ -31,7 +30,6 @@ Conch Club is a specialized web application designed to manage and facilitate a 
 - Java 17 or higher
 - Node.js (Latest LTS recommended)
 - TMDB API Key
-- Google Cloud Credentials (for Sheets integration)
 
 ### Backend Setup
 
@@ -48,18 +46,13 @@ Conch Club is a specialized web application designed to manage and facilitate a 
     google:
       credentials:
         path: ./credentials.json
-      sheet:
-        id: your_sheet_id_here
 
     tmdb:
       api:
         key: your_tmdb_read_access_token
     ```
 
-2.  **Google API Credentials**:
-    Create a `credentials.json` file in the project root. For detailed instructions on generating this file and setting up the Google Sheets integration, see the **[Google Sheets Setup Guide](aux_setup/GOOGLE_SHEETS.md)**.
-
-3.  **TMDB Setup**:
+2.  **TMDB Setup**:
     - Register at [themoviedb.org](https://www.themoviedb.org/documentation/api).
     - Get your API Key (v3) or Read Access Token (v4) and add it to `application-local.yml`.
 
