@@ -13,7 +13,7 @@ export default function CurrentSeason({ season }) {
 
     useEffect(() => {
         fetchTickets();
-    }, []);
+    }, [season?.id]);
 
     const fetchTickets = async () => {
         try {
