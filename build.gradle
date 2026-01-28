@@ -61,7 +61,7 @@ tasks.register('buildAndPushFE', Exec) {
 tasks.register('deployBE', Exec) {
 	group = 'deployment'
 	description = 'Deploy Backend to Cloud Run'
-	commandLine 'gcloud', 'run', 'deploy', 'conchclub-backend',
+	commandLine 'cmd', '/c', 'gcloud', 'run', 'deploy', 'conchclub-backend',
 		'--image', 'us-central1-docker.pkg.dev/conchclub/conchclub-repo/backend:latest',
 		'--region', 'us-central1',
 		'--allow-unauthenticated',
@@ -74,7 +74,7 @@ tasks.register('deployBE', Exec) {
 tasks.register('deployFE', Exec) {
 	group = 'deployment'
 	description = 'Deploy Frontend to Cloud Run'
-	commandLine 'gcloud', 'run', 'deploy', 'conchclub-frontend',
+	commandLine 'cmd', '/c', 'gcloud', 'run', 'deploy', 'conchclub-frontend',
 		'--image', 'us-central1-docker.pkg.dev/conchclub/conchclub-repo/frontend:latest',
 		'--region', 'us-central1',
 		'--allow-unauthenticated',

@@ -1,0 +1,7 @@
+.gradle
+build
+target
+.git
+.vscode
+.idea
+**/*.DS_Store
