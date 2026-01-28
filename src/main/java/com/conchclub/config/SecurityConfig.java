@@ -16,70 +16,74 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Bean
-    @Profile("local")
-    public SecurityFilterChain localFilterChain(HttpSecurity http, AuthTokenFilter authTokenFilter) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(localCorsConfigurationSource()))
-                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/h2-console/**").permitAll()
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated())
-                .addFilterBefore(authTokenFilter,
-                        org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);
+        @Bean
+        @Profile("local")
+        public SecurityFilterChain localFilterChain(HttpSecurity http, AuthTokenFilter authTokenFilter,
+                        CustomAuthEntryPoint unauthorizedHandler) throws Exception {
+                http
+                                .csrf(csrf -> csrf.disable())
+                                .cors(cors -> cors.configurationSource(localCorsConfigurationSource()))
+                                .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
+                                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))
+                                .authorizeHttpRequests(auth -> auth
+                                                .requestMatchers("/api/auth/**").permitAll()
+                                                .requestMatchers("/h2-console/**").permitAll()
+                                                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                                                .anyRequest().authenticated())
+                                .addFilterBefore(authTokenFilter,
+                                                org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);
 
-        return http.build();
-    }
+                return http.build();
+        }
 
-    @Bean
-    @Profile("!local")
-    public SecurityFilterChain productionFilterChain(HttpSecurity http, AuthTokenFilter authTokenFilter)
-            throws Exception {
-        http
-                .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(productionCorsConfigurationSource()))
-                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/h2-console/**").permitAll()
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated())
-                .addFilterBefore(authTokenFilter,
-                        org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);
+        @Bean
+        @Profile("!local")
+        public SecurityFilterChain productionFilterChain(HttpSecurity http, AuthTokenFilter authTokenFilter,
+                        CustomAuthEntryPoint unauthorizedHandler)
+                        throws Exception {
+                http
+                                .csrf(csrf -> csrf.disable())
+                                .cors(cors -> cors.configurationSource(productionCorsConfigurationSource()))
+                                .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
+                                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))
+                                .authorizeHttpRequests(auth -> auth
+                                                .requestMatchers("/api/auth/**").permitAll()
+                                                .requestMatchers("/h2-console/**").permitAll()
+                                                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                                                .anyRequest().authenticated())
+                                .addFilterBefore(authTokenFilter,
+                                                org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);
 
-        return http.build();
-    }
+                return http.build();
+        }
 
-    @Bean
-    @Profile("local")
-    public CorsConfigurationSource localCorsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(List.of("http://localhost:3000", "http://127.0.0.1:3000",
-                "http://192.168.*:3000", "http://*.local:3000"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true);
+        @Bean
+        @Profile("local")
+        public CorsConfigurationSource localCorsConfigurationSource() {
+                CorsConfiguration configuration = new CorsConfiguration();
+                configuration.setAllowedOriginPatterns(List.of("http://localhost:3000", "http://127.0.0.1:3000",
+                                "http://192.168.*:3000", "http://*.local:3000"));
+                configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                configuration.setAllowedHeaders(List.of("*"));
+                configuration.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
+                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+                source.registerCorsConfiguration("/**", configuration);
+                return source;
+        }
 
-    @Bean
-    @Profile("!local")
-    public CorsConfigurationSource productionCorsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        // In production, you should ideally restrict this to your frontend URL
-        configuration.setAllowedOriginPatterns(List.of("*"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true);
+        @Bean
+        @Profile("!local")
+        public CorsConfigurationSource productionCorsConfigurationSource() {
+                CorsConfiguration configuration = new CorsConfiguration();
+                // In production, you should ideally restrict this to your frontend URL
+                configuration.setAllowedOriginPatterns(List.of("https://conch-club.fgserrano.com"));
+                configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                configuration.setAllowedHeaders(List.of("*"));
+                configuration.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
+                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+                source.registerCorsConfiguration("/**", configuration);
+                return source;
+        }
 }
