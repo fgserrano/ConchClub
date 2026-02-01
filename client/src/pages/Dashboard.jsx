@@ -67,18 +67,38 @@ export default function Dashboard() {
 
     const [isEditing, setIsEditing] = useState(false);
 
-    const handleSearch = async (e) => {
-        e.preventDefault();
-        if (!query.trim()) return;
+    const searchMovies = async (searchQuery) => {
+        if (!searchQuery.trim()) {
+            setResults([]);
+            return;
+        }
         setSearching(true);
         try {
-            const res = await api.get(`/submission/search?query=${query}`);
+            const res = await api.get(`/submission/search?query=${searchQuery}`);
             setResults(res.data.results || []);
         } catch (e) {
             console.error(e);
         } finally {
             setSearching(false);
         }
+    };
+
+    useEffect(() => {
+        const delay = parseInt(import.meta.env.VITE_SEARCH_DEBOUNCE_MS || '500', 10);
+
+        const timer = setTimeout(() => {
+            if (query) {
+                searchMovies(query);
+            } else {
+                setResults([]);
+            }
+        }, delay);
+
+        return () => clearTimeout(timer);
+    }, [query]);
+
+    const handleSearch = (e) => {
+        e.preventDefault();
     };
 
     const handleSubmitMovie = async (movie) => {
