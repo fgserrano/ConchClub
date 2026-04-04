@@ -1,9 +1,13 @@
 package com.conchclub.controller;
 
+import com.conchclub.dto.AdminUserDto;
+import com.conchclub.dto.ResetTokenResponse;
 import com.conchclub.dto.SubmissionDto;
 import com.conchclub.dto.UserDto;
 import com.conchclub.model.Season;
 import com.conchclub.model.Submission;
+import com.conchclub.repository.UserRepository;
+import com.conchclub.service.PasswordResetService;
 import com.conchclub.service.SeasonService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +23,26 @@ import java.util.List;
 public class AdminController {
 
     private final SeasonService seasonService;
+    private final UserRepository userRepository;
+    private final PasswordResetService passwordResetService;
+
+    @GetMapping("/users")
+    public ResponseEntity<List<AdminUserDto>> getAllUsers() {
+        List<AdminUserDto> users = userRepository.findAll().stream()
+                .map(user -> new AdminUserDto(user.getUsername(), user.getRole().name()))
+                .toList();
+        return ResponseEntity.ok(users);
+    }
+
+    @PostMapping("/users/{username}/reset-token")
+    public ResponseEntity<?> generatePasswordResetToken(@PathVariable String username) {
+        return userRepository.findByUsername(username)
+                .map(user -> {
+                    String resetUrl = passwordResetService.generateResetLink(user.getId());
+                    return ResponseEntity.ok(new ResetTokenResponse(resetUrl));
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
 
     @GetMapping("/submissions")
     public ResponseEntity<List<SubmissionDto>> getSubmissions() {

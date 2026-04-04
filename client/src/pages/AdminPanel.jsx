@@ -3,6 +3,7 @@ import { Shield } from 'lucide-react';
 import NewSeasonForm from '../components/Season/NewSeasonForm';
 import SeasonActions from '../components/Season/SeasonActions';
 import CurrentSeason from '../components/Season/CurrentSeason';
+import UserManagement from '../components/Admin/UserManagement';
 import api from '../lib/api';
 
 export default function AdminPanel() {
@@ -36,6 +37,7 @@ export default function AdminPanel() {
 
             <SeasonActions onStatusChange={setResponse} season={season} />
             <CurrentSeason season={season} />
+            <UserManagement />
         </div>
     );
 }

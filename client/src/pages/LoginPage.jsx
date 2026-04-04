@@ -88,6 +88,9 @@ export default function LoginPage() {
                 <p className="text-center text-slate-600 text-sm mt-6">
                     New user? <Link to="/register" className="text-purple-400 hover:text-purple-300 transition-colors">Register Here</Link>
                 </p>
+                <p className="text-center text-slate-600 text-sm mt-2">
+                    Forgot your password? Ask an admin for a reset link.
+                </p>
             </div>
         </div>
     );

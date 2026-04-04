@@ -1,8 +1,8 @@
 package com.conchclub.controller;
 
 import com.conchclub.config.JwtUtils;
-
 import com.conchclub.service.AuthService;
+import com.conchclub.service.PasswordResetService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +21,7 @@ public class AuthController {
     private final AuthService authService;
     private final JwtUtils jwtUtils;
     private final PasswordEncoder passwordEncoder;
+    private final PasswordResetService passwordResetService;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
@@ -56,9 +57,22 @@ public class AuthController {
         );
     }
 
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+        try {
+            passwordResetService.resetPassword(request.token(), request.newPassword());
+            return ResponseEntity.ok("Password has been reset successfully");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     public record RegisterRequest(String username, String password, String inviteCode) {
     }
 
     public record LoginRequest(String username, String password) {
+    }
+
+    public record ResetPasswordRequest(String token, String newPassword) {
     }
 }
