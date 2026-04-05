@@ -68,7 +68,7 @@ tasks.register('deployBE', Exec) {
 		'--port', '8080',
 		'--service-account', 'conchclub-runner@conchclub.iam.gserviceaccount.com',
 		'--set-secrets=SPRING_DATA_MONGODB_URI=mongodb-uri:latest,JWT_SECRET=jwt-secret:latest,TMDB_API_KEY=tmdb-key:latest,INVITE_CODE=invite-code:latest',
-		'--set-env-vars=SPRING_PROFILES_ACTIVE=prod'
+		'--set-env-vars=SPRING_PROFILES_ACTIVE=prod,APP_FRONTEND_URL=https://conch-club.fgserrano.com'
 }
 
 tasks.register('deployFE', Exec) {
