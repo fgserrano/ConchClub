@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { cn } from '../../lib/utils';
 import FrontFace from './FrontFace';
 import BackFace from './BackFace';
@@ -15,7 +15,7 @@ export default function MovieCard({ ticket, isMine }) {
             onClick={() => setIsFlipped(!isFlipped)}
         >
             <div className={cn(
-                "aspect-[2/3] w-full relative transition-all duration-700 [transform-style:preserve-3d] [webkit-transform-style:preserve-3d] shadow-lg group-hover:shadow-purple-900/20 rounded-xl group-hover:scale-105",
+                "aspect-[2/3] w-full relative transition-all duration-700 [transform-style:preserve-3d] [webkit-transform-style:preserve-3d] group-hover:shadow-[0_0_20px_rgba(255,128,228,0.3)] group-hover:scale-105",
                 isFlipped ? "[transform:rotateY(180deg)]" : ""
             )}>
                 <FrontFace ticket={ticket} isMine={isMine} />

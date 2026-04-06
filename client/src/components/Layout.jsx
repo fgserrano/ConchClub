@@ -1,7 +1,8 @@
-import React from 'react';
 import { Outlet, useNavigate, Link } from 'react-router-dom';
-import { LogOut, Film, Shield } from 'lucide-react';
+import { LogOut, Shield } from 'lucide-react';
 import tmdbLogo from '../assets/tmdb-logo.svg';
+
+const MARQUEE_TEXT = 'NOW SCREENING AT CONCH CLUB FILM SOCIETY • PULP FICTION • THE MATRIX • GOODFELLAS • FARGO • HEAT • FIGHT CLUB • AMERICAN BEAUTY • THE SILENCE OF THE LAMBS • FORREST GUMP • SCHINDLER\'S LIST • ';
 
 export default function Layout() {
     const navigate = useNavigate();
@@ -16,39 +17,53 @@ export default function Layout() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-900 text-slate-100 font-sans selection:bg-purple-500/30 flex flex-col">
-            <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-800 via-slate-900 to-black pointer-events-none -z-10" />
+        <div className="min-h-screen bg-[#140727] text-[#eee0ff] font-sans flex flex-col selection:bg-[#00f1fd] selection:text-[#140727]">
+            <div className="scanlines" />
+            <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#ff80e4]/10 blur-[120px] rounded-full pointer-events-none z-0" />
+            <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#00f1fd]/10 blur-[120px] rounded-full pointer-events-none z-0" />
 
-            <nav className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
+            <div className="fixed top-0 w-full bg-[#2e1c4b] border-b-2 border-[#ff80e4] z-50 h-8 flex items-center overflow-hidden">
+                <div className="marquee-content px-4">
+                    <span className="text-[#ffc965] font-bold tracking-[0.2em] text-xs uppercase">
+                        {MARQUEE_TEXT}{MARQUEE_TEXT}
+                    </span>
+                </div>
+            </div>
+
+            <nav className="border-b-2 border-[#4f4165] bg-[#2e1c4b]/70 backdrop-blur-[20px] sticky top-8 z-40">
                 <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-                    <Link to="/" className="flex items-center gap-2 text-purple-400 hover:opacity-80 transition-opacity">
-                        <Film className="w-6 h-6" />
-                        <span className="font-bold text-xl tracking-wide bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">ConchClub</span>
+                    <Link to="/" className="font-black text-2xl italic tracking-tighter text-[#ff80e4] neon-glow-primary hover:opacity-80 transition-opacity">
+                        CONCH CLUB
                     </Link>
 
                     <div className="flex items-center gap-6">
                         {role === 'ADMIN' && (
-                            <Link to="/admin" className="flex items-center gap-2 text-slate-400 hover:text-purple-400 transition-colors">
+                            <Link to="/admin" className="flex items-center gap-2 text-[#ffc965] hover:text-white transition-colors">
                                 <Shield className="w-4 h-4" />
-                                <span className="text-sm font-medium">Admin</span>
+                                <span className="text-xs font-black uppercase tracking-widest">Admin</span>
                             </Link>
                         )}
-                        <span className="text-sm text-slate-400">Welcome, <span className="text-slate-200 font-medium">{username}</span></span>
-                        <button onClick={handleLogout} className="p-2 hover:bg-slate-800 rounded-full transition-colors text-slate-400 hover:text-white">
-                            <LogOut className="w-5 h-5" />
+                        <span className="text-xs text-[#b5a4cd] uppercase tracking-wider">
+                            Welcome, <span className="text-[#eee0ff] font-bold">{username}</span>
+                        </span>
+                        <button
+                            onClick={handleLogout}
+                            className="p-2 border-2 border-[#7e6f95] hover:border-[#ff80e4] transition-colors text-[#b5a4cd] hover:text-[#ff80e4]"
+                        >
+                            <LogOut className="w-4 h-4" />
                         </button>
                     </div>
                 </div>
             </nav>
 
-            <main className="max-w-7xl mx-auto px-4 py-8 flex-grow w-full">
+            <main className="max-w-7xl mx-auto px-4 py-8 flex-grow w-full relative z-10">
                 <Outlet />
             </main>
 
-            <footer className="border-t border-slate-800 bg-slate-900/30 py-6">
+            <footer className="border-t-2 border-[#4f4165] bg-[#201139]/50 py-6 relative z-10">
                 <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-center gap-4">
-                    <img src={tmdbLogo} alt="TMDB Logo" className="h-8 opacity-80" />
-                    <p className="text-xs text-slate-500 max-w-md text-center md:text-left">
+                    <img src={tmdbLogo} alt="TMDB Logo" className="h-6 opacity-60 invert" />
+                    <p className="text-[10px] text-[#7e6f95] max-w-md text-center md:text-left uppercase tracking-[0.2em] font-bold">
                         This product uses the TMDB API but is not endorsed or certified by TMDB.
                     </p>
                 </div>

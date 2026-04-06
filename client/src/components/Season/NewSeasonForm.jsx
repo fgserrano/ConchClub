@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import api from '../../lib/api';
-
 import ConfirmDialog from '../UI/ConfirmDialog';
 
 export default function NewSeasonForm({ onStatusChange }) {
@@ -29,18 +28,21 @@ export default function NewSeasonForm({ onStatusChange }) {
     };
 
     return (
-        <section className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
-            <h2 className="text-xl font-bold text-white mb-4">Start New Season</h2>
+        <section className="bg-[#271641] border-2 border-[#4f4165] p-4 mt-2">
+            <h2 className="text-[10px] font-black text-[#7e6f95] uppercase tracking-[0.3em] mb-3">Start New Season</h2>
             <form onSubmit={handleCreateClick} className="flex gap-2">
                 <input
                     type="text"
                     value={seasonName}
                     onChange={e => setSeasonName(e.target.value)}
-                    placeholder="Season Name (e.g. 'Horror Month')"
-                    className="flex-1 bg-black/40 border border-slate-700 rounded-lg px-4 py-2 text-white"
+                    placeholder="Season name (e.g. Horror Month)"
+                    className="flex-1 bg-black border-2 border-[#7e6f95] focus:border-[#00f1fd] px-4 py-2 text-[#eee0ff] focus:outline-none focus:ring-0 transition-all placeholder:text-[#7e6f95]/40 text-sm font-bold"
                     required
                 />
-                <button disabled={loading} className="bg-purple-600 hover:bg-purple-500 text-white px-6 py-2 rounded-lg font-bold transition-colors">
+                <button
+                    disabled={loading}
+                    className="border-2 border-[#ff80e4] text-[#ff80e4] px-6 py-2 font-black text-xs uppercase tracking-widest hover:bg-[#ff80e4]/10 transition-colors disabled:opacity-50"
+                >
                     Create
                 </button>
             </form>

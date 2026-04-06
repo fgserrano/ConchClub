@@ -1,12 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700;900&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --color-conch-dark: #0f172a;
-  --color-conch-light: #38bdf8;
-  --color-conch-accent: #c084fc;
+  --color-background: #140727;
+  --color-surface: #140727;
+  --color-surface-container-lowest: #000000;
+  --color-surface-container: #201139;
+  --color-surface-container-high: #271641;
+  --color-surface-container-highest: #2e1c4b;
+  --color-surface-bright: #352254;
+  --color-primary: #ff80e4;
+  --color-primary-dim: #ff59e3;
+  --color-on-primary: #5a0050;
+  --color-secondary: #00f1fd;
+  --color-secondary-dim: #00e2ed;
+  --color-on-secondary: #00565a;
+  --color-tertiary: #ffc965;
+  --color-on-surface: #eee0ff;
+  --color-on-surface-variant: #b5a4cd;
+  --color-outline: #7e6f95;
+  --color-outline-variant: #4f4165;
+  --color-error: #ff6e84;
 }
 
 body {
-    background-color: var(--color-conch-dark);
-    color: #f1f5f9;
+  background-color: #140727;
+  color: #eee0ff;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.scanlines {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%,
+    rgba(0, 0, 0, 0.07) 50%
+  ), linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 0.02),
+    rgba(0, 255, 0, 0.01),
+    rgba(0, 0, 255, 0.02)
+  );
+  background-size: 100% 4px, 3px 100%;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.neon-glow-primary {
+  text-shadow: 0 0 10px #ff80e4, 0 0 20px #ff80e4;
+}
+
+.neon-glow-secondary {
+  text-shadow: 0 0 10px #00f1fd, 0 0 20px #00f1fd;
+}
+
+.neon-glow-tertiary {
+  text-shadow: 0 0 10px #ffc965, 0 0 20px #ffc965;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.marquee-content {
+  animation: marquee 30s linear infinite;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+@keyframes crt-flicker {
+  0%   { opacity: 0.98; }
+  5%   { opacity: 0.95; }
+  10%  { opacity: 0.99; }
+  15%  { opacity: 0.94; }
+  20%  { opacity: 0.98; }
+  50%  { opacity: 0.99; }
+  75%  { opacity: 0.94; }
+  100% { opacity: 0.98; }
+}
+
+.crt-flicker {
+  animation: crt-flicker 0.15s infinite;
 }

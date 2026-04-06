@@ -1,13 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Calendar, Dices } from 'lucide-react';
 import api from '../../lib/api';
 import MovieRow from '../MovieCard/MovieRow';
 
-
 export default function CurrentSeason({ season }) {
     const [tickets, setTickets] = useState([]);
     const [loading, setLoading] = useState(true);
-
     const [softSelectedId, setSoftSelectedId] = useState(null);
     const [isRolling, setIsRolling] = useState(false);
 
@@ -61,34 +59,38 @@ export default function CurrentSeason({ season }) {
     const pastTickets = tickets.filter(t => t.selected).sort((a, b) => (b.selectedAt || 0) - (a.selectedAt || 0));
 
     if (loading) {
-        return <div className="text-center py-8 text-slate-500">Loading submissions...</div>;
+        return (
+            <div className="text-center py-8 text-[#7e6f95] text-xs font-black uppercase tracking-[0.3em]">
+                Loading submissions...
+            </div>
+        );
     }
 
     return (
-        <section className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
+        <section className="bg-[#201139] border-2 border-[#4f4165] p-6">
             <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-purple-500" />
-                    Current Season Submissions ({activeTickets.length})
+                <h2 className="text-xs font-black text-[#ff80e4] neon-glow-primary uppercase tracking-[0.3em] flex items-center gap-2">
+                    <Calendar className="w-4 h-4" />
+                    Current Season ({activeTickets.length})
                 </h2>
-                <div className="flex gap-2">
+                <div className="flex gap-2 items-center">
                     {!season?.locked && (
-                        <span className="text-xs text-amber-500 self-center font-bold px-2">
-                            LOCK SEASON TO SELECT
+                        <span className="text-[10px] text-[#ffc965] font-black uppercase tracking-widest px-2">
+                            LOCK TO SELECT
                         </span>
                     )}
                     <button
                         onClick={handleRandomize}
                         disabled={isRolling || activeTickets.length === 0 || !season?.locked}
-                        className="p-2 bg-slate-800 hover:bg-slate-700 text-purple-400 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        className="p-2 bg-[#271641] border-2 border-[#7e6f95] hover:border-[#00f1fd] text-[#00f1fd] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                         title="Random Selection"
                     >
-                        <Dices className={`w-6 h-6 ${isRolling ? 'animate-spin' : ''}`} />
+                        <Dices className={`w-5 h-5 ${isRolling ? 'animate-spin' : ''}`} />
                     </button>
                     {softSelectedId && !isRolling && (
                         <button
                             onClick={handleReveal}
-                            className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-lg hover:opacity-90 transition-all shadow-lg animate-pulse"
+                            className="relative px-4 py-2 border-4 border-[#ff80e4] text-[#ff80e4] font-black text-xs uppercase tracking-widest hover:bg-[#ff80e4]/10 transition-all animate-pulse"
                         >
                             REVEAL WINNER
                         </button>
@@ -96,14 +98,14 @@ export default function CurrentSeason({ season }) {
                 </div>
             </div>
 
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3">
                 {activeTickets.map((ticket) => (
                     <div
                         key={ticket.id}
                         onClick={() => !isRolling && season?.locked && setSoftSelectedId(ticket.id)}
-                        className={`transition-all duration-300 rounded-xl ${season?.locked ? 'cursor-pointer' : 'cursor-not-allowed opacity-75'} ${softSelectedId === ticket.id
-                            ? 'ring-4 ring-purple-500 ring-offset-4 ring-offset-slate-900 scale-[1.02] bg-slate-800/50'
-                            : 'hover:bg-slate-800/30'
+                        className={`transition-all duration-300 ${season?.locked ? 'cursor-pointer' : 'cursor-not-allowed opacity-75'} ${softSelectedId === ticket.id
+                            ? 'ring-4 ring-[#ff80e4] scale-[1.02]'
+                            : 'hover:brightness-110'
                             }`}
                     >
                         <MovieRow ticket={ticket} />
@@ -112,17 +114,17 @@ export default function CurrentSeason({ season }) {
             </div>
 
             {tickets.length === 0 && (
-                <div className="text-center py-12 border-2 border-dashed border-slate-800 rounded-xl text-slate-600">
+                <div className="text-center py-12 border-2 border-dashed border-[#4f4165] text-[#7e6f95] text-xs font-black uppercase tracking-[0.2em]">
                     No submissions yet.
                 </div>
             )}
 
             {pastTickets.length > 0 && (
-                <div className="mt-12 pt-8 border-t border-slate-800">
-                    <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-6">
+                <div className="mt-12 pt-8 border-t-2 border-[#4f4165]">
+                    <h3 className="text-[10px] font-black text-[#7e6f95] uppercase tracking-[0.3em] mb-6">
                         Past Selections
                     </h3>
-                    <div className="flex flex-col gap-4 opacity-75">
+                    <div className="flex flex-col gap-3 opacity-60">
                         {pastTickets.map((ticket) => (
                             <MovieRow key={ticket.id} ticket={ticket} />
                         ))}

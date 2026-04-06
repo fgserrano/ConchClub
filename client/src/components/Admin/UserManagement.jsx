@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Users, KeyRound, Copy, Check } from 'lucide-react';
 import api from '../../lib/api';
 
@@ -25,10 +25,10 @@ export default function UserManagement() {
     };
 
     return (
-        <section className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
+        <section className="bg-[#201139] border-2 border-[#4f4165] p-6">
             <div className="flex items-center gap-2 mb-4">
-                <Users className="w-5 h-5 text-purple-400" />
-                <h2 className="text-xl font-bold text-white">Members</h2>
+                <Users className="w-4 h-4 text-[#ff80e4]" />
+                <h2 className="text-xs font-black text-[#ff80e4] uppercase tracking-[0.3em]">Members</h2>
             </div>
             <div className="space-y-2">
                 {users.map(user => (
@@ -48,19 +48,19 @@ export default function UserManagement() {
 
 function UserRow({ user, resetUrl, isCopied, onGenerateLink, onCopyLink }) {
     return (
-        <div className="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-2">
+        <div className="bg-black border-2 border-[#4f4165] p-4 space-y-2">
             <div className="flex items-center justify-between">
-                <div>
-                    <span className="text-white font-medium">{user.username}</span>
-                    <span className={`ml-2 text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded ${user.role === 'ADMIN' ? 'bg-purple-900/50 text-purple-300' : 'bg-slate-800 text-slate-400'}`}>
+                <div className="flex items-center gap-2">
+                    <span className="text-[#eee0ff] font-bold uppercase tracking-wide text-sm">{user.username}</span>
+                    <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 border ${user.role === 'ADMIN' ? 'border-[#ff80e4] text-[#ff80e4]' : 'border-[#7e6f95] text-[#7e6f95]'}`}>
                         {user.role}
                     </span>
                 </div>
                 <button
                     onClick={onGenerateLink}
-                    className="flex items-center gap-1.5 text-sm bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg transition-colors"
+                    className="flex items-center gap-1.5 text-[10px] border border-[#7e6f95] hover:border-[#00f1fd] text-[#b5a4cd] hover:text-[#00f1fd] px-3 py-1.5 font-black uppercase tracking-widest transition-colors"
                 >
-                    <KeyRound className="w-4 h-4" />
+                    <KeyRound className="w-3 h-3" />
                     Reset Password
                 </button>
             </div>
@@ -77,11 +77,11 @@ function ResetLinkRow({ resetUrl, isCopied, onCopy }) {
             <input
                 readOnly
                 value={resetUrl}
-                className="flex-1 bg-black/40 border border-slate-700 text-slate-400 text-xs rounded-lg px-3 py-2 truncate"
+                className="flex-1 bg-black border border-[#4f4165] text-[#b5a4cd] text-xs px-3 py-2 truncate focus:outline-none"
             />
             <button
                 onClick={onCopy}
-                className="flex items-center gap-1 text-xs bg-purple-700 hover:bg-purple-600 text-white px-3 py-2 rounded-lg transition-colors shrink-0"
+                className="flex items-center gap-1 text-[10px] border-2 border-[#00f1fd] text-[#00f1fd] hover:bg-[#00f1fd]/10 px-3 py-2 font-black uppercase tracking-widest transition-colors shrink-0"
             >
                 {isCopied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                 {isCopied ? 'Copied!' : 'Copy'}

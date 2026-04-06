@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Shield } from 'lucide-react';
-import NewSeasonForm from '../components/Season/NewSeasonForm';
 import SeasonActions from '../components/Season/SeasonActions';
 import CurrentSeason from '../components/Season/CurrentSeason';
 import UserManagement from '../components/Admin/UserManagement';
@@ -24,13 +23,13 @@ export default function AdminPanel() {
 
     return (
         <div className="max-w-xl mx-auto space-y-8">
-            <div className="flex items-center gap-3 text-purple-400 mb-8">
-                <Shield className="w-8 h-8" />
-                <h1 className="text-3xl font-bold text-white">Admin Control</h1>
+            <div className="flex items-center gap-3 mb-8">
+                <Shield className="w-8 h-8 text-[#00f1fd]" />
+                <h1 className="text-3xl font-black italic tracking-tighter text-[#ff80e4] neon-glow-primary">ADMIN CONTROL</h1>
             </div>
 
             {response && (
-                <div className="p-4 bg-slate-800 border-l-4 border-purple-500 text-white rounded">
+                <div className="border-l-4 border-[#00f1fd] bg-[#201139] text-[#eee0ff] p-4 font-bold uppercase tracking-wider text-sm">
                     {response}
                 </div>
             )}

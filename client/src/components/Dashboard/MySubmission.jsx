@@ -1,30 +1,35 @@
-import React from 'react';
 import { Edit } from 'lucide-react';
 
 export default function MySubmission({ myTicket, season, isEditing, onEdit }) {
     if (!myTicket || !season || season.locked || isEditing) return null;
 
     return (
-        <div className="relative flex flex-col items-center justify-center p-8 border border-green-500/20 bg-green-500/5 rounded-3xl gap-6 h-full text-center">
-            <div className="w-full flex justify-between items-start absolute top-6 right-6">
-                <button
-                    title="edit"
-                    onClick={onEdit}
-                    className="p-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-full transition-colors border border-transparent hover:border-slate-700 ml-auto"
-                >
-                    <Edit className="w-5 h-5" />
-                </button>
-            </div>
+        <div className="relative flex flex-col items-center justify-center p-8 border-2 border-[#00f1fd] bg-[#201139] shadow-[0_0_20px_rgba(0,241,253,0.15)] gap-6 text-center">
+            <button
+                title="edit"
+                onClick={onEdit}
+                className="absolute top-4 right-4 p-2 border-2 border-[#7e6f95] hover:border-[#ff80e4] text-[#b5a4cd] hover:text-[#ff80e4] transition-colors"
+            >
+                <Edit className="w-4 h-4" />
+            </button>
 
-            <p className="text-green-400 text-sm font-bold tracking-widest uppercase mb-2">My Submission</p>
+            <p className="text-[#00f1fd] text-xs font-black tracking-[0.3em] uppercase neon-glow-secondary">
+                Your Submission
+            </p>
 
             {myTicket.posterPath && (
-                <img src={`https://image.tmdb.org/t/p/w200${myTicket.posterPath}`} alt={myTicket.title} className="w-40 rounded-xl shadow-lg" />
+                <img
+                    src={`https://image.tmdb.org/t/p/w200${myTicket.posterPath}`}
+                    alt={myTicket.title}
+                    className="w-40 shadow-[0_0_20px_rgba(0,241,253,0.2)]"
+                />
             )}
 
             <div>
-                <h3 className="text-2xl font-black text-white mb-2">{myTicket.title}</h3>
-                <p className="text-slate-400">Runtime: {myTicket.runtimeToNearestTenMin || myTicket.runtime}m</p>
+                <h3 className="text-2xl font-black text-[#eee0ff] mb-2 uppercase tracking-tight">{myTicket.title}</h3>
+                <p className="text-[#b5a4cd] text-xs uppercase tracking-[0.2em] font-bold">
+                    Runtime: {myTicket.runtimeToNearestTenMin || myTicket.runtime}m
+                </p>
             </div>
         </div>
     );

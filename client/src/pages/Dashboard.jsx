@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Search, Plus, Calendar, Film, Lock, Trophy, Edit, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Film, Lock, Plus, Calendar } from 'lucide-react';
 import MovieCard from '../components/MovieCard/MovieCard';
 import OfficialSelection from '../components/Dashboard/OfficialSelection';
 import SubmissionForm from '../components/Dashboard/SubmissionForm';
@@ -8,7 +8,6 @@ import api from '../lib/api';
 import { cn } from '../lib/utils';
 
 export default function Dashboard() {
-
     const [season, setSeason] = useState(null);
     const [tickets, setTickets] = useState([]);
     const [myTicket, setMyTicket] = useState(null);
@@ -85,7 +84,6 @@ export default function Dashboard() {
 
     useEffect(() => {
         const delay = parseInt(import.meta.env.VITE_SEARCH_DEBOUNCE_MS || '500', 10);
-
         const timer = setTimeout(() => {
             if (query) {
                 searchMovies(query);
@@ -93,7 +91,6 @@ export default function Dashboard() {
                 setResults([]);
             }
         }, delay);
-
         return () => clearTimeout(timer);
     }, [query]);
 
@@ -102,7 +99,6 @@ export default function Dashboard() {
     };
 
     const handleSubmitMovie = async (movie) => {
-
         try {
             const payload = {
                 tmdbId: movie.id.toString(),
@@ -127,36 +123,36 @@ export default function Dashboard() {
         }
     };
 
-    const winner = tickets.find(t => t.selected);
-
     if (loading) {
-        return <div className="text-center mt-20 text-slate-500 flex flex-col items-center">
-            <div className="w-8 h-8 rounded-full border-2 border-purple-500 border-t-transparent animate-spin mb-4" />
-            Loading magic...
-        </div>;
+        return (
+            <div className="text-center mt-20 text-[#b5a4cd] flex flex-col items-center gap-4">
+                <div className="w-8 h-8 border-2 border-[#ff80e4] border-t-transparent animate-spin" />
+                <span className="text-xs uppercase tracking-[0.3em] font-bold">Loading...</span>
+            </div>
+        );
     }
 
-
-
     return (
-        <div className="space-y-12 animate-in fade-in duration-700">
-            <section className="relative rounded-3xl overflow-hidden bg-slate-900/50 border border-slate-800 p-8 md:p-12 text-center">
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-900/10 to-blue-900/10" />
-                <div className="relative z-10">
-                    {season && (
-                        <span className={cn("inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold tracking-wider mb-4",
-                            season.locked ? "bg-red-500/10 text-red-400 border border-red-500/20" : "bg-green-500/10 text-green-400 border border-green-500/20")}>
-                            {season.locked ? <Lock className="w-3 h-3" /> : <Plus className="w-3 h-3" />}
-                            {season.locked ? "SUBMISSIONS LOCKED" : "OPEN FOR SUBMISSIONS"}
-                        </span>
-                    )}
-                    <h1 className="text-4xl md:text-6xl font-black text-white mb-2 tracking-tight">
-                        {season?.name || "Conch Club"}
-                    </h1>
-                    <p className="text-slate-400">Total Submissions: {tickets.length}</p>
-                </div>
+        <div className="space-y-12">
+            <section className="relative overflow-hidden bg-[#201139] border-2 border-[#4f4165] p-8 md:p-12 text-center">
+                {season && (
+                    <span className={cn(
+                        "inline-flex items-center gap-2 px-3 py-1 text-xs font-black tracking-wider mb-4 border-2 uppercase",
+                        season.locked
+                            ? "border-[#ff6e84] text-[#ff6e84]"
+                            : "border-[#00f1fd] text-[#00f1fd]"
+                    )}>
+                        {season.locked ? <Lock className="w-3 h-3" /> : <Plus className="w-3 h-3" />}
+                        {season.locked ? "SUBMISSIONS LOCKED" : "OPEN FOR SUBMISSIONS"}
+                    </span>
+                )}
+                <h1 className="text-4xl md:text-6xl font-black text-[#ff80e4] neon-glow-primary mb-2 tracking-tight italic">
+                    {season?.name || "Conch Club"}
+                </h1>
+                <p className="text-[#b5a4cd] uppercase tracking-[0.3em] text-xs font-bold">
+                    Total Submissions: {tickets.length}
+                </p>
             </section>
-
 
             <SubmissionForm
                 season={season}
@@ -185,15 +181,15 @@ export default function Dashboard() {
             />
 
             {!season && (
-                <div className="flex flex-col items-center justify-center py-12 text-slate-500 bg-slate-900/30 rounded-3xl border border-slate-800/50">
+                <div className="flex flex-col items-center justify-center py-12 text-[#7e6f95] bg-[#201139] border-2 border-[#4f4165]">
                     <Film className="w-12 h-12 mb-4 opacity-50" />
-                    <p className="text-lg font-medium">No season is currently active</p>
+                    <p className="text-sm font-bold uppercase tracking-[0.3em]">No season is currently active</p>
                 </div>
             )}
 
             <section>
-                <h3 className="text-xl font-bold text-slate-300 mb-10 flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-purple-500" />
+                <h3 className="text-sm font-black text-[#ffc965] neon-glow-tertiary mb-10 uppercase tracking-[0.3em] flex items-center gap-2">
+                    <Calendar className="w-4 h-4" />
                     The Pool
                 </h3>
 
@@ -207,7 +203,7 @@ export default function Dashboard() {
                     ))}
                 </div>
                 {tickets.length === 0 && (
-                    <div className="text-center py-12 border-2 border-dashed border-slate-800 rounded-3xl text-slate-600">
+                    <div className="text-center py-12 border-2 border-dashed border-[#4f4165] text-[#7e6f95] text-sm font-bold uppercase tracking-[0.2em]">
                         No submissions yet. Be the first!
                     </div>
                 )}
