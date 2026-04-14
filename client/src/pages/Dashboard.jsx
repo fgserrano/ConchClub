@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Search, Plus, Calendar, Film, Lock, Trophy, Edit, X } from 'lucide-react';
+import { Search, Plus, Calendar, Film, Lock } from 'lucide-react';
 import MovieCard from '../components/MovieCard/MovieCard';
 import OfficialSelection from '../components/Dashboard/OfficialSelection';
 import SubmissionForm from '../components/Dashboard/SubmissionForm';
@@ -8,17 +8,14 @@ import api from '../lib/api';
 import { cn } from '../lib/utils';
 
 export default function Dashboard() {
-
     const [season, setSeason] = useState(null);
     const [tickets, setTickets] = useState([]);
     const [myTicket, setMyTicket] = useState(null);
     const [selection, setSelection] = useState(null);
     const [loading, setLoading] = useState(true);
-
     const [query, setQuery] = useState('');
     const [results, setResults] = useState([]);
     const [searching, setSearching] = useState(false);
-    const username = localStorage.getItem('username');
 
     useEffect(() => {
         fetchData();
@@ -52,7 +49,6 @@ export default function Dashboard() {
                 }
 
                 setTickets(allTickets);
-
                 const sortedSelections = [...allSelections].sort((a, b) => (b.selectedAt || 0) - (a.selectedAt || 0));
                 setSelection(sortedSelections[0] || null);
             } else {
@@ -68,10 +64,7 @@ export default function Dashboard() {
     const [isEditing, setIsEditing] = useState(false);
 
     const searchMovies = async (searchQuery) => {
-        if (!searchQuery.trim()) {
-            setResults([]);
-            return;
-        }
+        if (!searchQuery.trim()) { setResults([]); return; }
         setSearching(true);
         try {
             const res = await api.get(`/submission/search?query=${searchQuery}`);
@@ -85,24 +78,16 @@ export default function Dashboard() {
 
     useEffect(() => {
         const delay = parseInt(import.meta.env.VITE_SEARCH_DEBOUNCE_MS || '500', 10);
-
         const timer = setTimeout(() => {
-            if (query) {
-                searchMovies(query);
-            } else {
-                setResults([]);
-            }
+            if (query) searchMovies(query);
+            else setResults([]);
         }, delay);
-
         return () => clearTimeout(timer);
     }, [query]);
 
-    const handleSearch = (e) => {
-        e.preventDefault();
-    };
+    const handleSearch = (e) => { e.preventDefault(); };
 
     const handleSubmitMovie = async (movie) => {
-
         try {
             const payload = {
                 tmdbId: movie.id.toString(),
@@ -111,14 +96,12 @@ export default function Dashboard() {
                 overview: movie.overview,
                 releaseDate: movie.release_date
             };
-
             if (isEditing) {
                 await api.put('/submission/update', payload);
                 setIsEditing(false);
             } else {
                 await api.post('/submission/submit', payload);
             }
-
             setQuery('');
             setResults([]);
             fetchData();
@@ -127,36 +110,36 @@ export default function Dashboard() {
         }
     };
 
-    const winner = tickets.find(t => t.selected);
-
     if (loading) {
-        return <div className="text-center mt-20 text-slate-500 flex flex-col items-center">
-            <div className="w-8 h-8 rounded-full border-2 border-purple-500 border-t-transparent animate-spin mb-4" />
-            Loading magic...
-        </div>;
+        return (
+            <div className="text-center mt-20 text-on-surface-variant flex flex-col items-center">
+                <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin mb-4" />
+                Loading...
+            </div>
+        );
     }
-
-
 
     return (
         <div className="space-y-12 animate-in fade-in duration-700">
-            <section className="relative rounded-3xl overflow-hidden bg-slate-900/50 border border-slate-800 p-8 md:p-12 text-center">
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-900/10 to-blue-900/10" />
-                <div className="relative z-10">
-                    {season && (
-                        <span className={cn("inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold tracking-wider mb-4",
-                            season.locked ? "bg-red-500/10 text-red-400 border border-red-500/20" : "bg-green-500/10 text-green-400 border border-green-500/20")}>
-                            {season.locked ? <Lock className="w-3 h-3" /> : <Plus className="w-3 h-3" />}
-                            {season.locked ? "SUBMISSIONS LOCKED" : "OPEN FOR SUBMISSIONS"}
-                        </span>
-                    )}
-                    <h1 className="text-4xl md:text-6xl font-black text-white mb-2 tracking-tight">
-                        {season?.name || "Conch Club"}
-                    </h1>
-                    <p className="text-slate-400">Total Submissions: {tickets.length}</p>
-                </div>
+            <section className="bg-surface-low rounded-sm p-8 md:p-12 text-center">
+                {season && (
+                    <span className={cn(
+                        "inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-display font-bold tracking-[0.05em] uppercase mb-4",
+                        season.locked
+                            ? "bg-tertiary/10 text-tertiary"
+                            : "bg-accent-forest/10 text-accent-forest"
+                    )}>
+                        {season.locked ? <Lock className="w-3 h-3" /> : <Plus className="w-3 h-3" />}
+                        {season.locked ? "Submissions Locked" : "Open for Submissions"}
+                    </span>
+                )}
+                <h1 className="text-4xl md:text-6xl font-display font-black text-on-surface mb-2 tracking-tight">
+                    {season?.name || "Conch Club"}
+                </h1>
+                <p className="text-on-surface-variant text-sm uppercase tracking-[0.05em] font-display">
+                    {tickets.length} {tickets.length === 1 ? 'submission' : 'submissions'}
+                </p>
             </section>
-
 
             <SubmissionForm
                 season={season}
@@ -177,37 +160,33 @@ export default function Dashboard() {
                 myTicket={myTicket}
                 season={season}
                 isEditing={isEditing}
-                onEdit={() => {
-                    setIsEditing(true);
-                    setQuery('');
-                    setResults([]);
-                }}
+                onEdit={() => { setIsEditing(true); setQuery(''); setResults([]); }}
             />
 
             {!season && (
-                <div className="flex flex-col items-center justify-center py-12 text-slate-500 bg-slate-900/30 rounded-3xl border border-slate-800/50">
-                    <Film className="w-12 h-12 mb-4 opacity-50" />
-                    <p className="text-lg font-medium">No season is currently active</p>
+                <div className="flex flex-col items-center justify-center py-12 text-on-surface-variant bg-surface-low rounded-sm">
+                    <Film className="w-12 h-12 mb-4 opacity-40" />
+                    <p className="text-lg font-display font-medium">No season is currently active</p>
                 </div>
             )}
 
             <section>
-                <h3 className="text-xl font-bold text-slate-300 mb-10 flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-purple-500" />
+                <h3 className="text-xl font-display font-bold text-on-surface mb-10 flex items-center gap-2">
+                    <Calendar className="w-5 h-5 text-primary" />
                     The Pool
                 </h3>
-
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
-                    {tickets.map((ticket) => (
-                        <MovieCard
-                            key={ticket.id}
-                            ticket={ticket}
-                            isMine={myTicket?.id === ticket.id}
-                        />
+                    {tickets.map((ticket, i) => (
+                        <div key={ticket.id} className={i % 2 === 1 ? "mt-3" : ""}>
+                            <MovieCard
+                                ticket={ticket}
+                                isMine={myTicket?.id === ticket.id}
+                            />
+                        </div>
                     ))}
                 </div>
                 {tickets.length === 0 && (
-                    <div className="text-center py-12 border-2 border-dashed border-slate-800 rounded-3xl text-slate-600">
+                    <div className="text-center py-12 bg-surface-low rounded-sm text-on-surface-variant">
                         No submissions yet. Be the first!
                     </div>
                 )}

@@ -25,10 +25,10 @@ export default function UserManagement() {
     };
 
     return (
-        <section className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
+        <section className="bg-surface-low rounded-sm p-6">
             <div className="flex items-center gap-2 mb-4">
-                <Users className="w-5 h-5 text-purple-400" />
-                <h2 className="text-xl font-bold text-white">Members</h2>
+                <Users className="w-5 h-5 text-primary" />
+                <h2 className="text-xl font-display font-bold text-on-surface">Members</h2>
             </div>
             <div className="space-y-2">
                 {users.map(user => (
@@ -48,17 +48,17 @@ export default function UserManagement() {
 
 function UserRow({ user, resetUrl, isCopied, onGenerateLink, onCopyLink }) {
     return (
-        <div className="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-2">
+        <div className="bg-surface-container rounded-sm p-4 space-y-2">
             <div className="flex items-center justify-between">
-                <div>
-                    <span className="text-white font-medium">{user.username}</span>
-                    <span className={`ml-2 text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded ${user.role === 'ADMIN' ? 'bg-purple-900/50 text-purple-300' : 'bg-slate-800 text-slate-400'}`}>
+                <div className="flex items-center gap-2">
+                    <span className="text-on-surface font-medium">{user.username}</span>
+                    <span className={`text-[10px] font-display font-bold uppercase tracking-[0.05em] px-2 py-0.5 rounded-full ${user.role === 'ADMIN' ? 'bg-tertiary-container/60 text-on-tertiary-container' : 'bg-surface-high text-on-surface-variant'}`}>
                         {user.role}
                     </span>
                 </div>
                 <button
                     onClick={onGenerateLink}
-                    className="flex items-center gap-1.5 text-sm bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg transition-colors"
+                    className="flex items-center gap-1.5 text-sm bg-surface-high hover:bg-surface-highest text-on-surface px-3 py-1.5 rounded-sm transition-colors"
                 >
                     <KeyRound className="w-4 h-4" />
                     Reset Password
@@ -77,11 +77,11 @@ function ResetLinkRow({ resetUrl, isCopied, onCopy }) {
             <input
                 readOnly
                 value={resetUrl}
-                className="flex-1 bg-black/40 border border-slate-700 text-slate-400 text-xs rounded-lg px-3 py-2 truncate"
+                className="flex-1 bg-surface-high text-on-surface-variant text-xs rounded-sm px-3 py-2 truncate focus:outline-none border-0"
             />
             <button
                 onClick={onCopy}
-                className="flex items-center gap-1 text-xs bg-purple-700 hover:bg-purple-600 text-white px-3 py-2 rounded-lg transition-colors shrink-0"
+                className="flex items-center gap-1 text-xs bg-primary text-on-primary px-3 py-2 rounded-sm hover:bg-primary-container transition-colors shrink-0"
             >
                 {isCopied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                 {isCopied ? 'Copied!' : 'Copy'}

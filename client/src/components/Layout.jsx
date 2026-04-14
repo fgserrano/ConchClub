@@ -16,25 +16,23 @@ export default function Layout() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-900 text-slate-100 font-sans selection:bg-purple-500/30 flex flex-col">
-            <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-800 via-slate-900 to-black pointer-events-none -z-10" />
-
-            <nav className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
+        <div className="min-h-screen bg-surface text-on-surface font-body selection:bg-tertiary-container/30 flex flex-col">
+            <nav className="bg-surface-lowest/70 backdrop-blur-[12px] sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-                    <Link to="/" className="flex items-center gap-2 text-purple-400 hover:opacity-80 transition-opacity">
-                        <Film className="w-6 h-6" />
-                        <span className="font-bold text-xl tracking-wide bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">ConchClub</span>
+                    <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                        <Film className="w-6 h-6 text-primary" />
+                        <span className="font-display font-bold text-xl tracking-wide text-primary">ConchClub</span>
                     </Link>
 
                     <div className="flex items-center gap-6">
                         {role === 'ADMIN' && (
-                            <Link to="/admin" className="flex items-center gap-2 text-slate-400 hover:text-purple-400 transition-colors">
+                            <Link to="/admin" className="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors">
                                 <Shield className="w-4 h-4" />
                                 <span className="text-sm font-medium">Admin</span>
                             </Link>
                         )}
-                        <span className="text-sm text-slate-400">Welcome, <span className="text-slate-200 font-medium">{username}</span></span>
-                        <button onClick={handleLogout} className="p-2 hover:bg-slate-800 rounded-full transition-colors text-slate-400 hover:text-white">
+                        <span className="text-sm text-on-surface-variant">Welcome, <span className="text-on-surface font-medium">{username}</span></span>
+                        <button onClick={handleLogout} className="p-2 hover:bg-surface-container rounded-full transition-colors text-on-surface-variant hover:text-on-surface">
                             <LogOut className="w-5 h-5" />
                         </button>
                     </div>
@@ -45,10 +43,10 @@ export default function Layout() {
                 <Outlet />
             </main>
 
-            <footer className="border-t border-slate-800 bg-slate-900/30 py-6">
+            <footer className="bg-surface-low py-6">
                 <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-center gap-4">
-                    <img src={tmdbLogo} alt="TMDB Logo" className="h-8 opacity-80" />
-                    <p className="text-xs text-slate-500 max-w-md text-center md:text-left">
+                    <img src={tmdbLogo} alt="TMDB Logo" className="h-8 opacity-60" />
+                    <p className="text-xs text-on-surface-variant max-w-md text-center md:text-left">
                         This product uses the TMDB API but is not endorsed or certified by TMDB.
                     </p>
                 </div>

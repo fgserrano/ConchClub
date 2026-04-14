@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Film, User, Lock, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import api from '../lib/api';
 
 export default function LoginPage() {
@@ -30,65 +30,61 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-black flex items-center justify-center p-4 relative overflow-hidden">
-            {/* Dynamic Background */}
-            <div className="absolute top-[-50%] left-[-50%] w-[200%] h-[200%] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-purple-900/20 via-black to-black animate-pulse-slow" />
+        <div className="min-h-screen relative overflow-hidden flex items-center justify-center md:justify-end px-4 md:px-16">
+            <img
+                src="/vhs-archive.jpg"
+                alt=""
+                className="absolute inset-0 w-full h-full object-cover object-center"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent from-30% to-[#211b00]/80" />
 
-            <div className="w-full max-w-md bg-slate-900/50 backdrop-blur-xl border border-slate-800 p-8 rounded-2xl shadow-2xl relative z-10">
-                <div className="flex justify-center mb-8">
-                    <div className="w-16 h-16 bg-purple-600/20 rounded-2xl flex items-center justify-center rotate-3 border border-purple-500/30">
-                        <Film className="w-8 h-8 text-purple-400" />
-                    </div>
-                </div>
-
-                <h2 className="text-3xl font-bold text-center mb-2 bg-gradient-to-r from-purple-200 to-purple-400 bg-clip-text text-transparent">ConchClub</h2>
-                <p className="text-slate-500 text-center mb-8">Enter the inner circle</p>
+            <div className="relative z-10 w-full max-w-sm bg-surface-lowest/70 backdrop-blur-[12px] rounded-sm p-8 border border-outline-variant/15 shadow-[0_24px_48px_rgba(33,27,0,0.06)]">
+                <h1 className="font-display font-bold text-3xl text-primary tracking-tight mb-1">ConchClub</h1>
+                <p className="text-sm text-on-surface-variant mb-8">Enter the inner circle</p>
 
                 {error && (
-                    <div className="bg-red-500/10 border border-red-500/20 text-red-500 text-sm p-3 rounded-lg mb-4 text-center">
+                    <div className="bg-tertiary/10 text-tertiary text-sm p-3 rounded-sm mb-4 text-center">
                         {error}
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="group">
-                        <div className="relative">
-                            <User className="absolute left-3 top-3 w-5 h-5 text-slate-500 group-focus-within:text-purple-400 transition-colors" />
-                            <input
-                                name="username"
-                                type="text"
-                                placeholder="Username"
-                                required
-                                className="w-full bg-black/40 border border-slate-800 text-slate-200 rounded-xl px-10 py-3 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all placeholder:text-slate-600"
-                            />
-                        </div>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    <div>
+                        <label className="block text-[11px] uppercase tracking-[0.05em] font-display text-on-surface-variant mb-1">
+                            Username
+                        </label>
+                        <input
+                            name="username"
+                            type="text"
+                            required
+                            className="w-full bg-transparent border-0 border-b border-outline/40 rounded-none py-2 text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary transition-colors"
+                        />
                     </div>
 
-                    <div className="group">
-                        <div className="relative">
-                            <Lock className="absolute left-3 top-3 w-5 h-5 text-slate-500 group-focus-within:text-purple-400 transition-colors" />
-                            <input
-                                name="password"
-                                type="password"
-                                placeholder="Password"
-                                required
-                                className="w-full bg-black/40 border border-slate-800 text-slate-200 rounded-xl px-10 py-3 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all placeholder:text-slate-600"
-                            />
-                        </div>
+                    <div>
+                        <label className="block text-[11px] uppercase tracking-[0.05em] font-display text-on-surface-variant mb-1">
+                            Password
+                        </label>
+                        <input
+                            name="password"
+                            type="password"
+                            required
+                            className="w-full bg-transparent border-0 border-b border-outline/40 rounded-none py-2 text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary transition-colors"
+                        />
                     </div>
 
                     <button
                         disabled={loading}
-                        className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center disabled:opacity-50 mt-6"
+                        className="w-full bg-primary text-on-primary font-bold py-3 rounded-sm hover:bg-primary-container transition-colors flex items-center justify-center disabled:opacity-50 mt-2"
                     >
                         {loading ? <Loader2 className="animate-spin w-5 h-5" /> : 'Enter'}
                     </button>
                 </form>
 
-                <p className="text-center text-slate-600 text-sm mt-6">
-                    New user? <Link to="/register" className="text-purple-400 hover:text-purple-300 transition-colors">Register Here</Link>
+                <p className="text-center text-on-surface-variant text-sm mt-6">
+                    New user? <Link to="/register" className="text-primary hover:opacity-70 transition-opacity">Register Here</Link>
                 </p>
-                <p className="text-center text-slate-600 text-sm mt-2">
+                <p className="text-center text-on-surface-variant/60 text-sm mt-2">
                     Forgot your password? Ask an admin for a reset link.
                 </p>
             </div>
