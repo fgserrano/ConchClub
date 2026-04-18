@@ -18,6 +18,11 @@ We move beyond the "flat grid" by embracing **Intentional Density**. The layout 
 ## 2. Colors
  
 Our palette is rooted in the "Golden Hour" of the 1980s—creamy, sun-saturated bases punctuated by the deep, functional colors of commercial packaging.
+
+### Accent Colors
+- `accent-forest` (`#2A5A35`) – Deep forest green. Used for "Staff Pick" spine indicators and other positive accent moments.
+- `accent-navy` (`#1D3557`) – Deep navy blue. Available for accent use where a cool, archival tone is needed.
+- `accent-terracotta` (`#a23e2a`) – Matches `tertiary`. Used for "New Release" spine indicators and critical alerts.
  
 ### The "No-Line" Rule
 **Explicit Instruction:** Designers are prohibited from using 1px solid borders for sectioning. Boundaries must be defined through background color shifts. Use `surface-container-low` to sit against a `surface` background. The eye should perceive the edge through a change in "material," not a drawn line.
@@ -72,10 +77,18 @@ We reject traditional box shadows in favor of **Tonal Layering**.
 *   **Border Radius:** `full` (9999px) to contrast against the rectangular nature of the "shelves" (cards).
  
 ### Input Fields
-*   **Style:** Underlined only. Use `outline` (#827661) at 40% opacity for the underline. This mimics a ledger or an archival check-out sheet. Labels should be `label-md` tucked 4px above the line.
+*   **Style (default):** Underlined only. Use `outline` (#827661) at 40% opacity for the underline. This mimics a ledger or an archival check-out sheet. Labels should be `label-md` tucked 4px above the line.
+*   **Style (overlay/dark-background variant):** When inputs appear over a full-bleed image or dark overlay (e.g. the login page), use a full border in `primary-container` at 75% opacity with `rounded-b-sm rounded-tr-sm`. Labels adopt the **Folder Tab** treatment: `block w-fit bg-primary-container/75 text-on-primary-container px-2 py-0.5 rounded-t-sm`, flush against the top of the input border with no gap. Input text uses `text-surface-lowest` (off-white) rather than the standard `text-primary-container`.
  
 ### Special Component: "The Spine Indicator"
-A vertical 4px bar of `accent_3` (Terracotta Red) or `accent_2` (Forest Green) placed on the left edge of a card or list item to indicate a "New Release" or "Staff Pick," mirroring the colored stickers on a tape spine.
+A vertical bar of `accent-terracotta` or `accent-forest` placed on the left edge of a card, list item, or page to indicate a "New Release" or "Staff Pick," mirroring the colored stickers on a tape spine. The bar must be **fully opaque and solid** — no gradients, no transparency. Width is typically `w-1.5` (6px) for page-level indicators and `w-1` (4px) for card-level indicators.
+
+### Text Legibility on Overlays
+When display text or labels appear over a full-bleed background image, apply a layered `text-shadow` to lift the text without altering its color:
+```
+textShadow: '0 0 16px rgba(0,0,0,0.55), 0 2px 4px rgba(0,0,0,0.85)'
+```
+This creates a soft dark halo (ambient) paired with a tight grounding shadow. It should feel like depth, not a visible drop shadow.
  
 ---
  

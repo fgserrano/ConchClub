@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ArrowRight } from 'lucide-react';
 import api from '../lib/api';
 
 export default function LoginPage() {
@@ -30,63 +30,90 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen relative overflow-hidden flex items-center justify-center md:justify-end px-4 md:px-16">
-            <img
-                src="/vhs-archive.jpg"
-                alt=""
-                className="absolute inset-0 w-full h-full object-cover object-center"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent from-30% to-[#211b00]/80" />
+        <div className="min-h-screen bg-[#211b00] flex justify-center overflow-hidden">
+            <div className="relative h-screen w-full md:w-auto">
+                <img
+                    src="/vhs-archive.jpg"
+                    alt=""
+                    className="absolute inset-0 w-full h-full object-cover object-[center_25%] md:relative md:inset-auto md:h-full md:w-auto md:block"
+                />
 
-            <div className="relative z-10 w-full max-w-sm bg-surface-lowest/70 backdrop-blur-[12px] rounded-sm p-8 border border-outline-variant/15 shadow-[0_24px_48px_rgba(33,27,0,0.06)]">
-                <h1 className="font-display font-bold text-3xl text-primary tracking-tight mb-1">ConchClub</h1>
-                <p className="text-sm text-on-surface-variant mb-8">Enter the inner circle</p>
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent from-30% to-[#211b00]/80" />
 
-                {error && (
-                    <div className="bg-tertiary/10 text-tertiary text-sm p-3 rounded-sm mb-4 text-center">
-                        {error}
-                    </div>
-                )}
-
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div>
-                        <label className="block text-[11px] uppercase tracking-[0.05em] font-display text-on-surface-variant mb-1">
-                            Username
-                        </label>
-                        <input
-                            name="username"
-                            type="text"
-                            required
-                            className="w-full bg-transparent border-0 border-b border-outline/40 rounded-none py-2 text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary transition-colors"
-                        />
+<div className="absolute inset-0 flex flex-col px-8 md:px-16">
+                    <div className="pt-10 md:text-right">
+                        <h1
+                            className="font-display font-black text-4xl text-primary-container uppercase tracking-[0.12em] leading-none"
+                            style={{ textShadow: '0 0 16px rgba(0,0,0,0.55), 0 2px 4px rgba(0,0,0,0.85)' }}
+                        >
+                            Conch Club
+                        </h1>
                     </div>
 
-                    <div>
-                        <label className="block text-[11px] uppercase tracking-[0.05em] font-display text-on-surface-variant mb-1">
-                            Password
-                        </label>
-                        <input
-                            name="password"
-                            type="password"
-                            required
-                            className="w-full bg-transparent border-0 border-b border-outline/40 rounded-none py-2 text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary transition-colors"
-                        />
+                    <div className="flex-1 flex items-center justify-center md:justify-end">
+                        <div className="w-full max-w-xs" style={{ filter: 'drop-shadow(0 0 16px rgba(0,0,0,0.55)) drop-shadow(0 2px 4px rgba(0,0,0,0.85))' }}>
+                            {error && (
+                                <p className="text-tertiary-container text-sm mb-6">{error}</p>
+                            )}
+
+                            <form onSubmit={handleSubmit} className="space-y-8">
+                                <div>
+                                    <label className="block w-fit text-[10px] uppercase tracking-[0.1em] font-display bg-primary-container/75 text-on-primary-container px-2 py-0.5 rounded-t-sm ml-1.5">
+                                        Username
+                                    </label>
+                                    <div className="flex">
+                                        <div className="w-1.5 bg-accent-navy rounded-l-sm flex-shrink-0" />
+                                        <input
+                                            name="username"
+                                            type="text"
+                                            required
+                                            className="w-full bg-primary/20 border border-primary-container/75 rounded-br-sm px-2 py-2 text-surface-lowest placeholder:text-surface-lowest/30 focus:outline-none focus:border-primary-container focus:bg-primary/30 transition-colors"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block w-fit text-[10px] uppercase tracking-[0.1em] font-display bg-primary-container/75 text-on-primary-container px-2 py-0.5 rounded-t-sm ml-1.5">
+                                        Password
+                                    </label>
+                                    <div className="flex">
+                                        <div className="w-1.5 bg-accent-forest rounded-l-sm flex-shrink-0" />
+                                        <input
+                                            name="password"
+                                            type="password"
+                                            required
+                                            className="w-full bg-primary/20 border border-primary-container/75 rounded-br-sm px-2 py-2 text-surface-lowest placeholder:text-surface-lowest/30 focus:outline-none focus:border-primary-container focus:bg-primary/30 transition-colors"
+                                        />
+                                    </div>
+                                </div>
+
+                                <button
+                                    disabled={loading}
+                                    className="w-full bg-accent-terracotta text-surface-lowest font-display font-bold py-3 rounded-sm uppercase tracking-[0.1em] hover:brightness-110 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+                                >
+                                    {loading
+                                        ? <Loader2 className="animate-spin w-5 h-5" />
+                                        : <><span>Enter Archive</span><ArrowRight className="w-4 h-4" /></>
+                                    }
+                                </button>
+                            </form>
+                        </div>
                     </div>
 
-                    <button
-                        disabled={loading}
-                        className="w-full bg-primary text-on-primary font-bold py-3 rounded-sm hover:bg-primary-container transition-colors flex items-center justify-center disabled:opacity-50 mt-2"
-                    >
-                        {loading ? <Loader2 className="animate-spin w-5 h-5" /> : 'Enter'}
-                    </button>
-                </form>
-
-                <p className="text-center text-on-surface-variant text-sm mt-6">
-                    New user? <Link to="/register" className="text-primary hover:opacity-70 transition-opacity">Register Here</Link>
-                </p>
-                <p className="text-center text-on-surface-variant/60 text-sm mt-2">
-                    Forgot your password? Ask an admin for a reset link.
-                </p>
+                    <div className="flex gap-8 pb-10 md:justify-end">
+                        <div>
+                            <p className="text-surface/50 text-xs uppercase tracking-[0.08em] font-display">
+                                Forgot Password?
+                            </p>
+                            <p className="text-surface/50 text-xs uppercase tracking-[0.08em] font-display">
+                                Ask an  admin for a reset link
+                            </p>
+                        </div>
+                        <Link to="/register" className="text-surface/80 text-xs uppercase tracking-[0.08em] font-display hover:text-surface/80 transition-colors">
+                            Register
+                        </Link>
+                    </div>
+                </div>
             </div>
         </div>
     );

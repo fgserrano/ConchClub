@@ -6,8 +6,8 @@ export default function OfficialSelection({ selection }) {
 
     return (
         <section className="relative overflow-hidden rounded-sm hover:scale-[1.005] transition-transform duration-500">
-            <div className="absolute left-0 inset-y-0 w-1 bg-accent-forest z-10" />
-            <div className="bg-surface-low p-8 flex flex-col md:flex-row gap-8 items-center">
+            <div className="absolute left-0 inset-y-0 w-1.5 bg-accent-forest z-10" />
+            <div className="bg-surface-container p-8 flex flex-col md:flex-row gap-8 items-center">
                 <img
                     src={`https://image.tmdb.org/t/p/w500${selection.posterPath}`}
                     alt={selection.title}
@@ -15,9 +15,9 @@ export default function OfficialSelection({ selection }) {
                 />
 
                 <div className="flex-1 text-center md:text-left">
-                    <div className="flex items-center gap-2 justify-center md:justify-start text-primary mb-4">
-                        <Trophy className="w-4 h-4" />
-                        <span className="font-display font-bold tracking-[0.05em] text-xs uppercase">Official Selection</span>
+                    <div className="inline-flex items-center gap-2 bg-accent-forest/10 text-accent-forest px-3 py-1 rounded-full mb-4">
+                        <Trophy className="w-3.5 h-3.5" />
+                        <span className="font-display font-bold tracking-[0.08em] text-xs uppercase">Staff Pick — Official Selection</span>
                     </div>
 
                     <h2 className="text-3xl md:text-4xl font-display font-bold text-on-surface mb-4">{selection.title}</h2>

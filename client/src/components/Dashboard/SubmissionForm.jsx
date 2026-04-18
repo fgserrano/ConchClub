@@ -5,7 +5,8 @@ export default function SubmissionForm({ season, myTicket, isEditing, handleSear
     if (!season || season.locked || (myTicket && !isEditing)) return null;
 
     return (
-        <div className="bg-surface-low rounded-sm p-6">
+        <div className="relative overflow-hidden bg-surface-container rounded-sm p-6">
+            <div className="absolute left-0 inset-y-0 w-1.5 bg-primary/30" />
             <h3 className="text-xl font-display font-bold text-on-surface mb-6 flex items-center gap-2">
                 <Plus className="w-5 h-5 text-primary" />
                 Submit a Movie
@@ -39,7 +40,7 @@ export default function SubmissionForm({ season, myTicket, isEditing, handleSear
                     <div
                         key={movie.id}
                         onClick={() => handleSubmitMovie(movie)}
-                        className="bg-surface-container hover:bg-surface-high p-4 rounded-sm flex gap-4 cursor-pointer transition-colors group"
+                        className="bg-surface-high hover:bg-surface-highest border border-outline-variant/15 p-4 rounded-sm flex gap-4 cursor-pointer transition-colors group"
                     >
                         {movie.poster_path && (
                             <img src={`https://image.tmdb.org/t/p/w92${movie.poster_path}`} className="w-16 h-24 object-cover rounded-sm bg-surface-high shrink-0" alt="" />
@@ -47,7 +48,7 @@ export default function SubmissionForm({ season, myTicket, isEditing, handleSear
                         <div className="flex-1 text-left min-w-0">
                             <h3 className="font-display font-bold text-on-surface">{movie.title}</h3>
                             <p className="text-on-surface-variant text-sm mt-1 line-clamp-2">{movie.overview}</p>
-                            <p className="text-on-surface-variant/60 text-xs mt-2">{movie.release_date?.split('-')[0]}</p>
+                            <p className="text-on-surface-variant/60 text-xs mt-2 uppercase tracking-[0.05em] font-display">{movie.release_date?.split('-')[0]}</p>
                         </div>
                         <div className="self-center shrink-0">
                             <Plus className="w-5 h-5 text-on-surface-variant group-hover:text-primary transition-colors" />

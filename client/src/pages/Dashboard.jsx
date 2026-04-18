@@ -121,7 +121,14 @@ export default function Dashboard() {
 
     return (
         <div className="space-y-12 animate-in fade-in duration-700">
-            <section className="bg-surface-low rounded-sm p-8 md:p-12 text-center">
+            <section className="relative overflow-hidden rounded-sm bg-surface-low p-8 md:p-12 text-center">
+                <div className={cn(
+                    "absolute left-0 inset-y-0 w-1.5",
+                    season?.locked ? "bg-tertiary" : "bg-accent-forest"
+                )} />
+                <p className="text-[10px] font-display font-bold uppercase tracking-[0.12em] text-on-surface-variant mb-3">
+                    Current Season
+                </p>
                 {season && (
                     <span className={cn(
                         "inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-display font-bold tracking-[0.05em] uppercase mb-4",
@@ -137,7 +144,7 @@ export default function Dashboard() {
                     {season?.name || "Conch Club"}
                 </h1>
                 <p className="text-on-surface-variant text-sm uppercase tracking-[0.05em] font-display">
-                    {tickets.length} {tickets.length === 1 ? 'submission' : 'submissions'}
+                    {tickets.length} {tickets.length === 1 ? 'title on the shelf' : 'titles on the shelf'}
                 </p>
             </section>
 
@@ -164,13 +171,16 @@ export default function Dashboard() {
             />
 
             {!season && (
-                <div className="flex flex-col items-center justify-center py-12 text-on-surface-variant bg-surface-low rounded-sm">
+                <div className="relative overflow-hidden flex flex-col items-center justify-center py-12 text-on-surface-variant bg-surface-low rounded-sm">
+                    <div className="absolute left-0 inset-y-0 w-1.5 bg-outline-variant opacity-40" />
                     <Film className="w-12 h-12 mb-4 opacity-40" />
                     <p className="text-lg font-display font-medium">No season is currently active</p>
+                    <p className="text-xs font-display uppercase tracking-[0.08em] text-on-surface-variant/60 mt-1">Check back soon</p>
                 </div>
             )}
 
-            <section>
+            <section className="relative overflow-hidden rounded-sm bg-surface-low p-8">
+                <div className="absolute left-0 inset-y-0 w-1.5 bg-accent-navy" />
                 <h3 className="text-xl font-display font-bold text-on-surface mb-10 flex items-center gap-2">
                     <Calendar className="w-5 h-5 text-primary" />
                     The Pool
@@ -186,7 +196,7 @@ export default function Dashboard() {
                     ))}
                 </div>
                 {tickets.length === 0 && (
-                    <div className="text-center py-12 bg-surface-low rounded-sm text-on-surface-variant">
+                    <div className="text-center py-12 text-on-surface-variant">
                         No submissions yet. Be the first!
                     </div>
                 )}
