@@ -1,12 +1,126 @@
 @import "tailwindcss";
 
 @theme {
-  --color-conch-dark: #0f172a;
-  --color-conch-light: #38bdf8;
-  --color-conch-accent: #c084fc;
+  /* Canvas / Surface */
+  --color-canvas: #fcf9f0;
+  --color-canvas-dim: #dddad1;
+  --color-canvas-container: #f1eee5;
+  --color-canvas-high: #ebe8df;
+  --color-canvas-highest: #e5e2da;
+
+  /* Forest Green — Primary */
+  --color-forest: #1b2e1d;
+  --color-forest-deep: #07190a;
+  --color-forest-light: #b6cdb4;
+  --color-forest-on: #819780;
+
+  /* Chocolate Brown — Secondary / Text */
+  --color-brown: #1c1c17;
+  --color-brown-light: #434842;
+
+  /* Oxblood Red — Accent / CTA */
+  --color-oxblood: #a13d39;
+  --color-oxblood-deep: #822624;
+  --color-oxblood-container: #751c1c;
+
+  /* Borders / Outlines */
+  --color-outline: #737871;
+  --color-outline-light: #c3c8c0;
+
+  /* Near-black ink — used for hard shadows */
+  --color-ink: #251007;
+
+  /* Error */
+  --color-error: #ba1a1a;
+
+  /* Typography */
+  --font-sans: 'Hanken Grotesk', system-ui, sans-serif;
+  --font-serif: 'Bodoni Moda', Georgia, serif;
+  --font-body: 'Source Serif 4', Georgia, serif;
 }
 
 body {
-    background-color: var(--color-conch-dark);
-    color: #f1f5f9;
+  background-color: var(--color-canvas);
+  color: var(--color-brown);
+  font-family: var(--font-sans);
+  position: relative;
+  min-height: 100vh;
 }
+
+/* Film grain overlay */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px 200px;
+}
+
+/* Hard offset shadow — applied as a utility class */
+.hard-shadow {
+  box-shadow: 4px 4px 0 0 var(--color-ink);
+}
+
+/* Viewfinder corner brackets — applied to poster containers */
+.viewfinder-corner {
+  position: relative;
+}
+
+.viewfinder-corner::before {
+  content: "";
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 18px;
+  height: 18px;
+  border-top: 2px solid var(--color-oxblood);
+  border-left: 2px solid var(--color-oxblood);
+  z-index: 10;
+  pointer-events: none;
+}
+
+.viewfinder-corner::after {
+  content: "";
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  width: 18px;
+  height: 18px;
+  border-bottom: 2px solid var(--color-oxblood);
+  border-right: 2px solid var(--color-oxblood);
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* Material Symbols */
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24;
+  font-style: normal;
+  line-height: 1;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Small-caps label utility */
+.small-caps {
+  font-variant-caps: small-caps;
+  letter-spacing: 0.06em;
+  font-family: var(--font-sans);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--color-canvas); }
+::-webkit-scrollbar-thumb { background: var(--color-outline); }

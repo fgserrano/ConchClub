@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Search, Plus, Calendar, Film, Lock, Trophy, Edit, X } from 'lucide-react';
+import { Calendar, Film, Lock, Plus } from 'lucide-react';
 import MovieCard from '../components/MovieCard/MovieCard';
 import OfficialSelection from '../components/Dashboard/OfficialSelection';
-import SubmissionForm from '../components/Dashboard/SubmissionForm';
 import MySubmission from '../components/Dashboard/MySubmission';
 import api from '../lib/api';
 import { cn } from '../lib/utils';
@@ -14,11 +13,6 @@ export default function Dashboard() {
     const [myTicket, setMyTicket] = useState(null);
     const [selection, setSelection] = useState(null);
     const [loading, setLoading] = useState(true);
-
-    const [query, setQuery] = useState('');
-    const [results, setResults] = useState([]);
-    const [searching, setSearching] = useState(false);
-    const username = localStorage.getItem('username');
 
     useEffect(() => {
         fetchData();
@@ -65,73 +59,11 @@ export default function Dashboard() {
         }
     };
 
-    const [isEditing, setIsEditing] = useState(false);
-
-    const searchMovies = async (searchQuery) => {
-        if (!searchQuery.trim()) {
-            setResults([]);
-            return;
-        }
-        setSearching(true);
-        try {
-            const res = await api.get(`/submission/search?query=${searchQuery}`);
-            setResults(res.data.results || []);
-        } catch (e) {
-            console.error(e);
-        } finally {
-            setSearching(false);
-        }
-    };
-
-    useEffect(() => {
-        const delay = parseInt(import.meta.env.VITE_SEARCH_DEBOUNCE_MS || '500', 10);
-
-        const timer = setTimeout(() => {
-            if (query) {
-                searchMovies(query);
-            } else {
-                setResults([]);
-            }
-        }, delay);
-
-        return () => clearTimeout(timer);
-    }, [query]);
-
-    const handleSearch = (e) => {
-        e.preventDefault();
-    };
-
-    const handleSubmitMovie = async (movie) => {
-
-        try {
-            const payload = {
-                tmdbId: movie.id.toString(),
-                title: movie.title,
-                posterPath: movie.poster_path,
-                overview: movie.overview,
-                releaseDate: movie.release_date
-            };
-
-            if (isEditing) {
-                await api.put('/submission/update', payload);
-                setIsEditing(false);
-            } else {
-                await api.post('/submission/submit', payload);
-            }
-
-            setQuery('');
-            setResults([]);
-            fetchData();
-        } catch (e) {
-            alert(e.response?.data || "Submission failed");
-        }
-    };
-
     const winner = tickets.find(t => t.selected);
 
     if (loading) {
-        return <div className="text-center mt-20 text-slate-500 flex flex-col items-center">
-            <div className="w-8 h-8 rounded-full border-2 border-purple-500 border-t-transparent animate-spin mb-4" />
+        return <div className="text-center mt-20 text-outline flex flex-col items-center">
+            <div className="w-8 h-8 rounded-full border-2 border-forest border-t-transparent animate-spin mb-4" />
             Loading magic...
         </div>;
     }
@@ -140,61 +72,42 @@ export default function Dashboard() {
 
     return (
         <div className="space-y-12 animate-in fade-in duration-700">
-            <section className="relative rounded-3xl overflow-hidden bg-slate-900/50 border border-slate-800 p-8 md:p-12 text-center">
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-900/10 to-blue-900/10" />
-                <div className="relative z-10">
-                    {season && (
-                        <span className={cn("inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold tracking-wider mb-4",
-                            season.locked ? "bg-red-500/10 text-red-400 border border-red-500/20" : "bg-green-500/10 text-green-400 border border-green-500/20")}>
-                            {season.locked ? <Lock className="w-3 h-3" /> : <Plus className="w-3 h-3" />}
-                            {season.locked ? "SUBMISSIONS LOCKED" : "OPEN FOR SUBMISSIONS"}
-                        </span>
-                    )}
-                    <h1 className="text-4xl md:text-6xl font-black text-white mb-2 tracking-tight">
-                        {season?.name || "Conch Club"}
-                    </h1>
-                    <p className="text-slate-400">Total Submissions: {tickets.length}</p>
-                </div>
+            <section className="pb-8 border-b border-outline-light">
+                {season && (
+                    <span className={cn("small-caps text-xs font-semibold mb-3 inline-flex items-center gap-1.5",
+                        season.locked ? "text-oxblood" : "text-forest")}>
+                        {season.locked ? <Lock className="w-3 h-3" /> : <Plus className="w-3 h-3" />}
+                        {season.locked ? "Submissions Locked" : "Open for Submissions"}
+                    </span>
+                )}
+                <h1 className="font-serif text-5xl md:text-7xl font-semibold text-brown mb-3 tracking-tight leading-none">
+                    {season?.name || "Conch Club"}
+                </h1>
+                <p className="font-body text-brown-light text-sm mt-4">
+                    {tickets.length} {tickets.length === 1 ? 'submission' : 'submissions'} in the pool this season.
+                </p>
             </section>
-
-
-            <SubmissionForm
-                season={season}
-                myTicket={myTicket}
-                isEditing={isEditing}
-                handleSearch={handleSearch}
-                query={query}
-                setQuery={setQuery}
-                searching={searching}
-                setIsEditing={setIsEditing}
-                results={results}
-                handleSubmitMovie={handleSubmitMovie}
-            />
 
             <OfficialSelection selection={selection} />
 
             <MySubmission
                 myTicket={myTicket}
                 season={season}
-                isEditing={isEditing}
-                onEdit={() => {
-                    setIsEditing(true);
-                    setQuery('');
-                    setResults([]);
-                }}
+                isEditing={false}
+                onEdit={null}
             />
 
             {!season && (
-                <div className="flex flex-col items-center justify-center py-12 text-slate-500 bg-slate-900/30 rounded-3xl border border-slate-800/50">
-                    <Film className="w-12 h-12 mb-4 opacity-50" />
-                    <p className="text-lg font-medium">No season is currently active</p>
+                <div className="flex flex-col items-center justify-center py-12 text-outline bg-canvas-container rounded border border-outline-light">
+                    <Film className="w-10 h-10 mb-4 opacity-40" />
+                    <p className="text-base font-medium">No season is currently active</p>
                 </div>
             )}
 
             <section>
-                <h3 className="text-xl font-bold text-slate-300 mb-10 flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-purple-500" />
-                    The Pool
+                <h3 className="small-caps text-sm font-semibold text-outline mb-8 flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-forest" />
+                    Browse Submissions
                 </h3>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
@@ -207,7 +120,7 @@ export default function Dashboard() {
                     ))}
                 </div>
                 {tickets.length === 0 && (
-                    <div className="text-center py-12 border-2 border-dashed border-slate-800 rounded-3xl text-slate-600">
+                    <div className="text-center py-12 border-2 border-dashed border-outline-light rounded text-outline">
                         No submissions yet. Be the first!
                     </div>
                 )}

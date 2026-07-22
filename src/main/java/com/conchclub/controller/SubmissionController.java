@@ -22,8 +22,9 @@ public class SubmissionController {
     private final JwtUtils jwtUtils;
 
     @GetMapping("/search")
-    public ResponseEntity<?> searchMovie(@RequestParam String query) {
-        return ResponseEntity.ok(tmdbService.searchMovie(query));
+    public ResponseEntity<?> search(@RequestParam String query,
+            @RequestParam(defaultValue = "movie") String type) {
+        return ResponseEntity.ok(tmdbService.search(query, type));
     }
 
     @PostMapping("/submit")
@@ -61,7 +62,8 @@ public class SubmissionController {
         submission.setPosterPath(request.posterPath);
         submission.setOverview(request.overview);
         submission.setReleaseDate(request.releaseDate);
-        submission.setRuntime(tmdbService.getMovieRuntime(request.tmdbId));
+        boolean isMovie = !"tv".equals(request.mediaType);
+        submission.setRuntime(isMovie ? tmdbService.getMovieRuntime(request.tmdbId) : 0);
         submission.setSelected(false);
 
         seasonService.addSubmission(activeSeason.getId(), submission);
@@ -94,18 +96,19 @@ public class SubmissionController {
             }
         }
 
+        boolean isMovie = !"tv".equals(request.mediaType);
         submission.setTmdbId(request.tmdbId);
         submission.setTitle(request.title);
         submission.setPosterPath(request.posterPath);
         submission.setOverview(request.overview);
         submission.setReleaseDate(request.releaseDate);
-        submission.setRuntime(tmdbService.getMovieRuntime(request.tmdbId));
+        submission.setRuntime(isMovie ? tmdbService.getMovieRuntime(request.tmdbId) : 0);
 
         seasonService.updateSubmission(activeSeason.getId(), submission);
         return ResponseEntity.ok(submission);
     }
 
     public record SubmissionRequest(String tmdbId, String title, String posterPath, String overview,
-            String releaseDate) {
+            String releaseDate, String mediaType) {
     }
 }

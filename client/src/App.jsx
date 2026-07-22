@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import Dashboard from './pages/Dashboard';
+import SelectionPage from './pages/SelectionPage';
 import AdminPanel from './pages/AdminPanel';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
@@ -15,6 +16,7 @@ function App() {
         <Route element={<Layout />}>
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<Dashboard />} />
+            <Route path="/submit" element={<SelectionPage />} />
           </Route>
           <Route element={<ProtectedRoute role="ADMIN" />}>
             <Route path="/admin" element={<AdminPanel />} />

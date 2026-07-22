@@ -11,11 +11,11 @@ export default function MovieCard({ ticket, isMine }) {
 
     return (
         <div
-            className={cn("group relative [perspective:1000px] cursor-pointer")}
+            className={cn("group relative [perspective:1000px] cursor-pointer h-80")}
             onClick={() => setIsFlipped(!isFlipped)}
         >
             <div className={cn(
-                "aspect-[2/3] w-full relative transition-all duration-700 [transform-style:preserve-3d] [webkit-transform-style:preserve-3d] shadow-lg group-hover:shadow-purple-900/20 rounded-xl group-hover:scale-105",
+                "w-full h-full relative transition-all duration-700 [transform-style:preserve-3d] [webkit-transform-style:preserve-3d] hard-shadow group-hover:translate-x-[-2px] group-hover:translate-y-[-2px] rounded",
                 isFlipped ? "[transform:rotateY(180deg)]" : ""
             )}>
                 <FrontFace ticket={ticket} isMine={isMine} />

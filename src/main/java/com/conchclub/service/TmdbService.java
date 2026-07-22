@@ -26,12 +26,14 @@ public class TmdbService {
 
     private static final String BASE_URL = "https://api.themoviedb.org/3";
 
-    public Map<String, Object> searchMovie(String query) {
+    public Map<String, Object> search(String query, String type) {
         if (query == null || query.isBlank()) {
             return Collections.emptyMap();
         }
 
-        String url = UriComponentsBuilder.fromHttpUrl(BASE_URL + "/search/movie")
+        String path = "tv".equals(type) ? "/search/tv" : "/search/movie";
+
+        String url = UriComponentsBuilder.fromHttpUrl(BASE_URL + path)
                 .queryParam("api_key", apiKey)
                 .queryParam("query", query)
                 .queryParam("include_adult", false)
@@ -42,7 +44,7 @@ public class TmdbService {
                     .exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<Map<String, Object>>() {
                     }).getBody();
         } catch (Exception e) {
-            logger.error("Failed to search TMDB for query [{}]: {}", query, e.getMessage());
+            logger.error("Failed to search TMDB [{}] for query [{}]: {}", path, query, e.getMessage());
             return Collections.emptyMap();
         }
     }

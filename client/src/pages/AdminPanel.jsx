@@ -23,13 +23,13 @@ export default function AdminPanel() {
 
     return (
         <div className="max-w-xl mx-auto space-y-8">
-            <div className="flex items-center gap-3 text-purple-400 mb-8">
-                <Shield className="w-8 h-8" />
-                <h1 className="text-3xl font-bold text-white">Admin Control</h1>
+            <div className="flex items-center gap-3 text-forest mb-8">
+                <Shield className="w-6 h-6" />
+                <h1 className="font-serif text-3xl font-semibold text-brown">Admin Control</h1>
             </div>
 
             {response && (
-                <div className="p-4 bg-slate-800 border-l-4 border-purple-500 text-white rounded">
+                <div className="p-4 bg-canvas-container border-l-4 border-forest text-brown rounded">
                     {response}
                 </div>
             )}

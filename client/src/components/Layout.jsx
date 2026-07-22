@@ -1,12 +1,29 @@
-import React from 'react';
-import { Outlet, useNavigate, Link } from 'react-router-dom';
-import { LogOut, Film, Shield } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Outlet, useNavigate, useLocation, Link } from 'react-router-dom';
+import { LogOut, Plus } from 'lucide-react';
+import Sidebar from './Sidebar';
+import MobileNav from './MobileNav';
 import tmdbLogo from '../assets/tmdb-logo.svg';
+import api from '../lib/api';
+
+const PAGE_LABELS = {
+    '/': 'Browse Submissions',
+    '/submit': 'Make Selection',
+    '/admin': 'Admin Panel',
+};
 
 export default function Layout() {
     const navigate = useNavigate();
+    const location = useLocation();
     const username = localStorage.getItem('username');
     const role = localStorage.getItem('role');
+    const [seasonName, setSeasonName] = useState(null);
+
+    useEffect(() => {
+        api.get('/season/active')
+            .then(res => setSeasonName(res.data?.name || null))
+            .catch(() => {});
+    }, []);
 
     const handleLogout = () => {
         localStorage.removeItem('token');
@@ -15,44 +32,75 @@ export default function Layout() {
         navigate('/login');
     };
 
+    const pageLabel = PAGE_LABELS[location.pathname] ?? '';
+
     return (
-        <div className="min-h-screen bg-slate-900 text-slate-100 font-sans selection:bg-purple-500/30 flex flex-col">
-            <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-800 via-slate-900 to-black pointer-events-none -z-10" />
+        <div className="min-h-screen bg-canvas text-brown font-sans selection:bg-forest/20">
+            <Sidebar role={role} />
 
-            <nav className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
-                <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-                    <Link to="/" className="flex items-center gap-2 text-purple-400 hover:opacity-80 transition-opacity">
-                        <Film className="w-6 h-6" />
-                        <span className="font-bold text-xl tracking-wide bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">ConchClub</span>
-                    </Link>
+            {/* Top header — fixed, offset past sidebar on desktop */}
+            <header className="fixed top-0 left-0 lg:left-80 right-0 z-40 bg-canvas/90 backdrop-blur-md border-b border-outline/20">
+                <div className="flex justify-between items-center px-4 md:px-10 py-4 md:py-5">
 
-                    <div className="flex items-center gap-6">
-                        {role === 'ADMIN' && (
-                            <Link to="/admin" className="flex items-center gap-2 text-slate-400 hover:text-purple-400 transition-colors">
-                                <Shield className="w-4 h-4" />
-                                <span className="text-sm font-medium">Admin</span>
-                            </Link>
-                        )}
-                        <span className="text-sm text-slate-400">Welcome, <span className="text-slate-200 font-medium">{username}</span></span>
-                        <button onClick={handleLogout} className="p-2 hover:bg-slate-800 rounded-full transition-colors text-slate-400 hover:text-white">
-                            <LogOut className="w-5 h-5" />
-                        </button>
+                    {/* Brand / Season name */}
+                    <div className="flex items-center gap-3">
+                        <span className="material-symbols-outlined text-brown group-hover:text-oxblood transition-colors">movie_edit</span>
+                        <div>
+                            <span className="font-serif text-2xl md:text-3xl font-semibold tracking-tighter text-brown">
+                                {seasonName || 'Conch Club'}
+                            </span>
+                            {pageLabel && (
+                                <span className="hidden sm:inline-block ml-3 font-sans text-xs tracking-widest text-oxblood uppercase font-bold border-l border-outline/30 pl-3">
+                                    {pageLabel}
+                                </span>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-3 sm:gap-6">
+                        {/* Submit button */}
+                        <Link
+                            to="/submit"
+                            className="bg-forest hover:bg-forest-deep text-white p-2 flex items-center justify-center transition-all hard-shadow active:translate-x-0.5 active:translate-y-0.5"
+                            title="Make Selection"
+                        >
+                            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>add</span>
+                        </Link>
+
+                        {/* Username + logout */}
+                        <div className="flex items-center gap-3 pl-4 border-l border-outline-light">
+                            <span className="hidden sm:block font-sans text-sm font-medium text-brown">{username}</span>
+                            <button
+                                onClick={handleLogout}
+                                title="Sign out"
+                                className="p-1.5 text-brown-light hover:text-oxblood transition-colors"
+                            >
+                                <LogOut className="w-4 h-4" />
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </nav>
+            </header>
 
-            <main className="max-w-7xl mx-auto px-4 py-8 flex-grow w-full">
-                <Outlet />
+            {/* Main content — offset by sidebar on desktop, header height on all breakpoints */}
+            <main className="lg:pl-80 px-6 pt-24 pb-4 lg:pb-10">
+                <div className="max-w-5xl mx-auto">
+                    <Outlet />
+                </div>
             </main>
 
-            <footer className="border-t border-slate-800 bg-slate-900/30 py-6">
-                <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-center gap-4">
-                    <img src={tmdbLogo} alt="TMDB Logo" className="h-8 opacity-80" />
-                    <p className="text-xs text-slate-500 max-w-md text-center md:text-left">
+            {/* TMDB footer — mobile only */}
+            <footer className="lg:hidden px-6 pb-24">
+                <div className="max-w-5xl mx-auto border-t border-outline-light pt-6 flex items-center gap-3">
+                    <img src={tmdbLogo} alt="TMDB Logo" className="h-5 opacity-60 shrink-0" />
+                    <p className="text-xs text-outline">
                         This product uses the TMDB API but is not endorsed or certified by TMDB.
                     </p>
                 </div>
             </footer>
+
+            <MobileNav role={role} />
         </div>
     );
 }
