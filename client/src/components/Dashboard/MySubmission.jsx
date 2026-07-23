@@ -24,7 +24,12 @@ export default function MySubmission({ myTicket, season, isEditing, onEdit }) {
 
             <div>
                 <h3 className="font-serif text-2xl font-semibold text-brown mb-1">{myTicket.title}</h3>
-                <p className="text-brown-light text-sm">Runtime: {myTicket.runtimeToNearestTenMin || myTicket.runtime}m</p>
+                {myTicket.mediaType === 'tv'
+                    ? myTicket.runtime > 0 && <p className="text-brown-light text-sm">{myTicket.runtime} episodes</p>
+                    : (myTicket.runtimeToNearestTenMin || myTicket.runtime) > 0 && (
+                        <p className="text-brown-light text-sm">Runtime: {myTicket.runtimeToNearestTenMin || myTicket.runtime}m</p>
+                    )
+                }
             </div>
         </div>
     );

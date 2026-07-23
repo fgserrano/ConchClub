@@ -27,6 +27,7 @@ public class SubmissionController {
         return ResponseEntity.ok(tmdbService.search(query, type));
     }
 
+
     @PostMapping("/submit")
     public ResponseEntity<?> submitMovie(@RequestHeader("Authorization") String token,
             @RequestBody SubmissionRequest request) {
@@ -63,7 +64,9 @@ public class SubmissionController {
         submission.setOverview(request.overview);
         submission.setReleaseDate(request.releaseDate);
         boolean isMovie = !"tv".equals(request.mediaType);
-        submission.setRuntime(isMovie ? tmdbService.getMovieRuntime(request.tmdbId) : 0);
+        submission.setMediaType(isMovie ? "movie" : "tv");
+        submission.setRuntime(isMovie ? tmdbService.getMovieRuntime(request.tmdbId) : tmdbService.getTvEpisodeCount(request.tmdbId));
+        submission.setGenre(tmdbService.getGenres(request.tmdbId, request.mediaType));
         submission.setSelected(false);
 
         seasonService.addSubmission(activeSeason.getId(), submission);
@@ -102,13 +105,15 @@ public class SubmissionController {
         submission.setPosterPath(request.posterPath);
         submission.setOverview(request.overview);
         submission.setReleaseDate(request.releaseDate);
-        submission.setRuntime(isMovie ? tmdbService.getMovieRuntime(request.tmdbId) : 0);
+        submission.setMediaType(isMovie ? "movie" : "tv");
+        submission.setRuntime(isMovie ? tmdbService.getMovieRuntime(request.tmdbId) : tmdbService.getTvEpisodeCount(request.tmdbId));
+        submission.setGenre(tmdbService.getGenres(request.tmdbId, request.mediaType));
 
         seasonService.updateSubmission(activeSeason.getId(), submission);
         return ResponseEntity.ok(submission);
     }
 
     public record SubmissionRequest(String tmdbId, String title, String posterPath, String overview,
-            String releaseDate, String mediaType) {
+            String releaseDate, String mediaType, String genre) {
     }
 }

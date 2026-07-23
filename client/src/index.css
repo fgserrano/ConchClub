@@ -23,6 +23,13 @@
   --color-oxblood-deep: #822624;
   --color-oxblood-container: #751c1c;
 
+  /* Sage — muted green accents */
+  --color-sage: #809680;
+  --color-sage-deep: #4F644F;
+
+  /* Muted — redacted/placeholder surfaces */
+  --color-muted: #ADABA3;
+
   /* Borders / Outlines */
   --color-outline: #737871;
   --color-outline-light: #c3c8c0;
@@ -43,7 +50,6 @@ body {
   background-color: var(--color-canvas);
   color: var(--color-brown);
   font-family: var(--font-sans);
-  position: relative;
   min-height: 100vh;
 }
 
@@ -119,6 +125,30 @@ body::before {
   letter-spacing: 0.06em;
   font-family: var(--font-sans);
 }
+
+/* Film strip sprocket holes — apply to a relative-positioned container */
+.film-strip-v {
+  position: relative;
+}
+
+.film-strip-v::before,
+.film-strip-v::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 10px;
+  z-index: 10;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='16' viewBox='0 0 10 16'%3E%3Crect x='2' y='3' width='6' height='10' rx='1.5' fill='%23f5f2e9'/%3E%3C/svg%3E");
+  background-size: 10px 16px;
+  background-repeat: repeat-y;
+  background-position: center;
+  opacity: 0.92;
+}
+
+.film-strip-v::before { left: 0; }
+.film-strip-v::after  { right: 0; }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar { width: 6px; }

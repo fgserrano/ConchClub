@@ -103,6 +103,8 @@ public class AdminController {
                 s.getPosterPath(),
                 s.getOverview(),
                 s.getReleaseDate(),
-                s.getSelectedAt());
+                s.getSelectedAt(),
+                s.getMediaType(),
+                s.getGenre());
     }
 }

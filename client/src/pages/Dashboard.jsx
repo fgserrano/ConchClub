@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Calendar, Film, Lock, Plus } from 'lucide-react';
+import { Calendar, Film } from 'lucide-react';
 import MovieCard from '../components/MovieCard/MovieCard';
 import OfficialSelection from '../components/Dashboard/OfficialSelection';
-import MySubmission from '../components/Dashboard/MySubmission';
 import api from '../lib/api';
-import { cn } from '../lib/utils';
 
 export default function Dashboard() {
 
@@ -72,32 +70,21 @@ export default function Dashboard() {
 
     return (
         <div className="space-y-12 animate-in fade-in duration-700">
-            <section className="pb-8 border-b border-outline-light">
-                {season && (
-                    <span className={cn("small-caps text-xs font-semibold mb-3 inline-flex items-center gap-1.5",
-                        season.locked ? "text-oxblood" : "text-forest")}>
-                        {season.locked ? <Lock className="w-3 h-3" /> : <Plus className="w-3 h-3" />}
-                        {season.locked ? "Submissions Locked" : "Open for Submissions"}
-                    </span>
-                )}
-                <h1 className="font-serif text-5xl md:text-7xl font-semibold text-brown mb-3 tracking-tight leading-none">
-                    {season?.name || "Conch Club"}
+            <section className="pb-6 border-b border-outline-light">
+                <span className="font-sans text-xs font-bold text-oxblood uppercase tracking-widest block mb-1">
+                    {season ? (season.locked ? 'Submissions Closed' : 'Current Season Submissions') : 'No Active Season'}
+                </span>
+                <h1 className="font-serif text-3xl md:text-4xl font-bold text-brown">
+                    Submission Collection
                 </h1>
-                <p className="font-body text-brown-light text-sm mt-4">
+                <p className="font-body text-sm text-brown-light mt-1">
                     {tickets.length} {tickets.length === 1 ? 'submission' : 'submissions'} in the pool this season.
                 </p>
             </section>
 
             <OfficialSelection selection={selection} />
 
-            <MySubmission
-                myTicket={myTicket}
-                season={season}
-                isEditing={false}
-                onEdit={null}
-            />
-
-            {!season && (
+{!season && (
                 <div className="flex flex-col items-center justify-center py-12 text-outline bg-canvas-container rounded border border-outline-light">
                     <Film className="w-10 h-10 mb-4 opacity-40" />
                     <p className="text-base font-medium">No season is currently active</p>
@@ -110,7 +97,7 @@ export default function Dashboard() {
                     Browse Submissions
                 </h3>
 
-                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {tickets.map((ticket) => (
                         <MovieCard
                             key={ticket.id}

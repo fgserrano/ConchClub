@@ -93,8 +93,11 @@ export default function SelectionPage() {
                 await api.post('/submission/submit', payload);
             }
 
-            setSubmitted(true);
+            setSelectedItem(null);
             setIsEditing(false);
+            setSubmitted(true);
+            setQuery('');
+            setResults([]);
             await fetchData();
         } catch (e) {
             alert(e.response?.data || 'Submission failed');
@@ -114,6 +117,23 @@ export default function SelectionPage() {
     const hasSubmission = !!myTicket;
     const canSubmit = season && !isLocked && (!hasSubmission || isEditing);
     const norm = selectedItem ? normalize(selectedItem) : null;
+
+    // Pre-populate detail panel with existing submission when no new item is selected
+    const myTicketNorm = myTicket ? {
+        id: myTicket.tmdbId,
+        poster_path: myTicket.posterPath,
+        title: myTicket.title,
+        release_date: myTicket.releaseDate,
+        overview: myTicket.overview,
+        genre: myTicket.genre,
+        mediaType: myTicket.mediaType,
+        runtime: myTicket.runtimeToNearestTenMin,
+    } : null;
+    const displayItem = norm ?? (hasSubmission ? myTicketNorm : null);
+    const isViewingExisting = !norm && hasSubmission && !isEditing;
+    const displayIsTV = displayItem?.mediaType === 'tv';
+    const displayRuntime = displayItem?.runtime;
+    const displayYear = displayItem?.release_date?.split('-')[0];
 
     return (
         <div className="space-y-8 animate-in fade-in duration-700">
@@ -182,21 +202,31 @@ export default function SelectionPage() {
                             <h3 className="small-caps text-xs text-oxblood mb-4 font-semibold tracking-widest">
                                 {mediaType === 'tv' ? 'Series Search' : 'Film Search'}
                             </h3>
-                            <div className="relative group">
-                                <input
-                                    type="text"
-                                    value={query}
-                                    onChange={(e) => setQuery(e.target.value)}
-                                    placeholder={mediaType === 'tv' ? 'Search for a TV series...' : 'Search for a movie...'}
-                                    disabled={!canSubmit}
-                                    className="w-full bg-transparent border-b-2 border-outline-light focus:border-forest focus:ring-0 px-0 py-3 font-body text-sm text-brown placeholder:text-outline transition-all outline-none disabled:opacity-40 disabled:cursor-not-allowed"
-                                />
-                                {searching ? (
-                                    <div className="absolute right-0 top-3 w-4 h-4 border-2 border-forest border-t-transparent rounded-full animate-spin" />
-                                ) : (
-                                    <Search className="absolute right-0 top-3 w-4 h-4 text-outline group-focus-within:text-forest transition-colors" />
-                                )}
-                            </div>
+
+                            {isViewingExisting && !isLocked ? (
+                                <button
+                                    onClick={() => { setIsEditing(true); setSelectedItem(null); setSubmitted(false); setQuery(''); setResults([]); }}
+                                    className="w-full flex items-center justify-between border-b-2 border-outline-light py-3 text-brown-light hover:text-forest hover:border-forest transition-all group"
+                                >
+                                    <span className="font-body text-sm">Change selection...</span>
+                                    <Edit className="w-4 h-4" />
+                                </button>
+                            ) : (
+                                <div className="relative group">
+                                    <input
+                                        type="text"
+                                        value={query}
+                                        onChange={(e) => setQuery(e.target.value)}
+                                        placeholder={mediaType === 'tv' ? 'Search for a TV series...' : 'Search for a movie...'}
+                                        className="w-full bg-transparent border-b-2 border-outline-light focus:border-forest focus:ring-0 px-0 py-3 font-body text-sm text-brown placeholder:text-outline transition-all outline-none"
+                                    />
+                                    {searching ? (
+                                        <div className="absolute right-0 top-3 w-4 h-4 border-2 border-forest border-t-transparent rounded-full animate-spin" />
+                                    ) : (
+                                        <Search className="absolute right-0 top-3 w-4 h-4 text-outline group-focus-within:text-forest transition-colors" />
+                                    )}
+                                </div>
+                            )}
                         </section>
 
                         {/* Results list */}
@@ -221,25 +251,23 @@ export default function SelectionPage() {
                                             <li
                                                 key={item.id}
                                                 onClick={() => setSelectedItem(item)}
-                                                className={`flex items-start gap-3 p-4 cursor-pointer transition-all group ${
+                                                className={`flex items-start gap-3 p-4 cursor-pointer transition-all group border-l-2 ${
                                                     isSelected
-                                                        ? 'bg-canvas-high border-l-2 border-oxblood'
-                                                        : 'hover:bg-canvas-container border-l-2 border-transparent'
+                                                        ? 'bg-canvas-high border-oxblood'
+                                                        : 'hover:bg-canvas-container border-transparent'
                                                 }`}
                                             >
                                                 {n.poster_path ? (
                                                     <img
                                                         src={`https://image.tmdb.org/t/p/w92${n.poster_path}`}
                                                         alt={n.title}
-                                                        className={`w-10 h-14 object-cover shrink-0 border border-outline-light transition-all ${
-                                                            isSelected ? 'grayscale-0' : 'grayscale group-hover:grayscale-0'
-                                                        }`}
+                                                        className="w-10 h-14 object-cover shrink-0 border border-outline-light"
                                                     />
                                                 ) : (
                                                     <div className="w-10 h-14 bg-canvas-highest border border-outline-light shrink-0 flex items-center justify-center text-outline text-xs">?</div>
                                                 )}
                                                 <div className="flex-1 min-w-0">
-                                                    <p className="text-sm font-semibold text-brown truncate group-hover:text-forest transition-colors">
+                                                    <p className="text-sm font-semibold text-brown truncate">
                                                         {n.title}
                                                     </p>
                                                     <p className="small-caps text-[10px] text-outline mt-0.5">
@@ -256,165 +284,89 @@ export default function SelectionPage() {
                             </section>
                         )}
 
-                        {/* My current submission (compact) */}
-                        {hasSubmission && !isEditing && (
-                            <section className="bg-canvas border border-forest/20 p-5">
-                                <div className="flex items-center justify-between mb-3">
-                                    <p className="small-caps text-xs font-semibold text-forest">My Current Selection</p>
-                                    {!isLocked && (
-                                        <button
-                                            onClick={() => { setIsEditing(true); setSelectedItem(null); setSubmitted(false); }}
-                                            className="flex items-center gap-1.5 text-xs text-brown-light hover:text-forest transition-colors"
-                                        >
-                                            <Edit className="w-3.5 h-3.5" />
-                                            Change
-                                        </button>
-                                    )}
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    {myTicket.posterPath && (
-                                        <img
-                                            src={`https://image.tmdb.org/t/p/w92${myTicket.posterPath}`}
-                                            alt={myTicket.title}
-                                            className="w-10 h-14 object-cover border border-outline-light shrink-0"
-                                        />
-                                    )}
-                                    <div>
-                                        <p className="font-serif text-sm font-medium text-brown">{myTicket.title}</p>
-                                        <p className="text-xs text-brown-light mt-0.5">
-                                            {myTicket.releaseDate?.split('-')[0]}
-                                        </p>
-                                    </div>
-                                </div>
-                            </section>
-                        )}
                     </div>
 
                     {/* Right: Selected Item Detail */}
                     <div className="md:col-span-8">
-                        {norm ? (
-                            <section className="bg-canvas-container border border-outline-light p-6 md:p-10 relative">
-                                {/* Watermark */}
-                                <div className="absolute top-4 right-4 opacity-5 pointer-events-none">
-                                    {mediaType === 'tv'
-                                        ? <Tv className="w-24 h-24 text-brown" />
-                                        : <Film className="w-24 h-24 text-brown" />
-                                    }
-                                </div>
+                        {displayItem && (
+                                <div className="space-y-3">
+                                    {/* Card */}
+                                    <div className="bg-canvas-container border border-outline-light p-4 flex flex-col hard-shadow md:max-w-xs">
+                                        {/* Header row */}
+                                        <div className="mb-4">
+                                            <span className="small-caps text-xs text-oxblood border-l-4 border-oxblood pl-3 font-bold tracking-wider">
+                                                {isViewingExisting ? 'My Selection' : isEditing ? 'Change Selection' : mediaType === 'tv' ? 'Selected Series' : 'Selected Film'}
+                                            </span>
+                                        </div>
 
-                                <div className="flex flex-col md:flex-row gap-8">
-                                    {/* Poster */}
-                                    <div className="w-full md:w-5/12 relative shrink-0">
-                                        <div className="aspect-[2/3] bg-brown overflow-hidden border-[8px] border-canvas shadow-inner">
-                                            {norm.poster_path ? (
+                                        {/* Poster */}
+                                        <div className="aspect-[3/4] bg-muted overflow-hidden border border-outline-light mb-4">
+                                            {displayItem.poster_path ? (
                                                 <img
-                                                    src={`https://image.tmdb.org/t/p/w342${norm.poster_path}`}
-                                                    alt={norm.title}
-                                                    className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+                                                    src={`https://image.tmdb.org/t/p/w500${displayItem.poster_path}`}
+                                                    alt={displayItem.title}
+                                                    className="w-full h-full object-cover"
                                                 />
                                             ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-canvas-dim text-sm">
-                                                    No poster
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="mt-3 flex justify-between items-center px-1">
-                                            <span className="font-sans text-[10px] text-outline uppercase tracking-widest font-mono">
-                                                TMDB #{norm.id}
-                                            </span>
-                                            <div className="flex gap-1.5">
-                                                <div className="w-2 h-2 rounded-full bg-oxblood" />
-                                                <div className="w-2 h-2 rounded-full bg-outline-light" />
-                                                <div className="w-2 h-2 rounded-full bg-outline-light" />
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Details */}
-                                    <div className="flex-1 space-y-6">
-                                        <div>
-                                            <span className="small-caps text-xs text-oxblood border-l-4 border-oxblood pl-3 mb-2 block font-bold tracking-wider">
-                                                {isEditing ? 'Change Selection' : mediaType === 'tv' ? 'Selected Series' : 'Selected Film'}
-                                            </span>
-                                            <h2 className="font-serif text-3xl lg:text-4xl text-brown font-bold leading-tight">
-                                                {norm.title}
-                                            </h2>
-                                            {norm.release_date && (
-                                                <p className="font-serif text-lg text-brown-light italic mt-1">
-                                                    {norm.release_date.split('-')[0]}
-                                                </p>
-                                            )}
-                                        </div>
-
-                                        {/* Spec sheet */}
-                                        <div className="space-y-0 border-t border-b border-outline-light/50 py-3 text-xs font-sans">
-                                            <div className="flex justify-between items-center py-2 border-b border-outline-light/30">
-                                                <span className="text-outline uppercase tracking-wider">Type</span>
-                                                <span className="text-brown font-bold">{mediaType === 'tv' ? 'TV Series' : 'Film'}</span>
-                                            </div>
-                                            {norm.release_date && (
-                                                <div className="flex justify-between items-center py-2">
-                                                    <span className="text-outline uppercase tracking-wider">
-                                                        {mediaType === 'tv' ? 'First Aired' : 'Released'}
-                                                    </span>
-                                                    <span className="text-brown font-bold">{norm.release_date}</span>
+                                                <div className="w-full h-full flex items-center justify-center">
+                                                    <span className="font-serif text-6xl text-canvas-container select-none">?</span>
                                                 </div>
                                             )}
                                         </div>
 
-                                        {norm.overview && (
-                                            <p className="font-body text-sm text-brown-light leading-relaxed">
-                                                {norm.overview}
+                                        {/* Metadata */}
+                                        <h3 className="font-serif text-xl font-bold text-brown leading-snug">
+                                            {displayItem.title}
+                                        </h3>
+
+                                        <div className="mt-3 py-2 border-t border-b border-outline-light/60 font-sans text-[11px] space-y-1">
+                                            <div className="flex justify-between items-center text-outline">
+                                                <span>Year</span>
+                                                {displayYear
+                                                    ? <span className="text-brown font-semibold">{displayYear}</span>
+                                                    : <div className="h-2 bg-canvas-highest rounded-sm w-8 animate-pulse" />}
+                                            </div>
+                                            <div className="flex justify-between items-center text-outline">
+                                                <span>Genre</span>
+                                                {displayItem.genre
+                                                    ? <span className="text-brown font-semibold text-right">{displayItem.genre}</span>
+                                                    : <div className="h-2 bg-canvas-highest rounded-sm w-16 animate-pulse" />}
+                                            </div>
+                                            <div className="flex justify-between items-center text-outline">
+                                                <span>{displayIsTV ? 'Episodes' : 'Runtime'}</span>
+                                                {displayRuntime
+                                                    ? <span className="text-brown font-semibold">{displayRuntime}{!displayIsTV && 'm'}</span>
+                                                    : <div className="h-2 bg-canvas-highest rounded-sm w-10 animate-pulse" />}
+                                            </div>
+                                        </div>
+
+                                        {displayItem.overview && (
+                                            <p className="font-body text-xs text-brown-light mt-3 line-clamp-3 leading-relaxed">
+                                                {displayItem.overview}
                                             </p>
                                         )}
-
-                                        {/* Action */}
-                                        {canSubmit && (
-                                            <div className="pt-2 flex flex-wrap gap-3 items-center">
-                                                <button
-                                                    onClick={handleSubmit}
-                                                    className="bg-forest hover:bg-forest-deep text-forest-on px-6 py-3 font-sans text-xs uppercase tracking-wider font-bold transition-all active:scale-95 hard-shadow flex items-center gap-2"
-                                                >
-                                                    <Plus className="w-4 h-4" />
-                                                    {isEditing ? 'Update Selection' : 'Submit Selection'}
-                                                </button>
-                                                {isEditing && (
-                                                    <button
-                                                        onClick={() => { setIsEditing(false); setSelectedItem(null); }}
-                                                        className="border border-outline-light hover:bg-canvas-high text-brown-light px-4 py-3 font-sans text-xs uppercase tracking-wider transition-all"
-                                                    >
-                                                        Cancel
-                                                    </button>
-                                                )}
-                                            </div>
-                                        )}
-
-                                        {submitted && !isEditing && (
-                                            <div className="flex items-center gap-2 text-forest text-sm font-medium">
-                                                <CheckCircle className="w-4 h-4" />
-                                                Selection submitted!
-                                            </div>
-                                        )}
                                     </div>
+
+                                    {/* Action buttons */}
+                                    {canSubmit && norm && (
+                                        <div className="flex flex-wrap gap-3 items-center">
+                                            <button
+                                                onClick={handleSubmit}
+                                                className="bg-forest hover:bg-forest-deep text-forest-on px-6 py-3 font-sans text-xs uppercase tracking-wider font-bold transition-all active:scale-95 hard-shadow flex items-center gap-2"
+                                            >
+                                                <Plus className="w-4 h-4" />
+                                                {isEditing ? 'Update Selection' : 'Submit Selection'}
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    {submitted && !isEditing && (
+                                        <div className="flex items-center gap-2 text-forest text-sm font-medium">
+                                            <CheckCircle className="w-4 h-4" />
+                                            Selection submitted!
+                                        </div>
+                                    )}
                                 </div>
-                            </section>
-                        ) : (
-                            <section className="bg-canvas-container border border-dashed border-outline-light p-10 flex flex-col items-center justify-center text-center min-h-[400px]">
-                                {mediaType === 'tv'
-                                    ? <Tv className="w-12 h-12 text-outline opacity-30 mb-4" />
-                                    : <Film className="w-12 h-12 text-outline opacity-30 mb-4" />
-                                }
-                                <p className="font-serif text-2xl text-brown-light mb-2">
-                                    {mediaType === 'tv' ? 'Search for a series' : 'Search for a film'}
-                                </p>
-                                <p className="font-body text-sm text-outline">
-                                    {canSubmit
-                                        ? 'Use the search panel to find and select your pick for this season.'
-                                        : hasSubmission
-                                        ? 'Your selection has been locked in for this season.'
-                                        : 'Search to get started.'}
-                                </p>
-                            </section>
                         )}
                     </div>
                 </div>

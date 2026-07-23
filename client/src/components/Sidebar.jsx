@@ -1,14 +1,14 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Clapperboard, Plus, Shield } from 'lucide-react';
+import { Clapperboard, Plus, Lock, Shield } from 'lucide-react';
 import tmdbLogo from '../assets/tmdb-logo.svg';
 
-export default function Sidebar({ role }) {
+export default function Sidebar({ role, seasonLocked }) {
     const location = useLocation();
 
     const navItems = [
         { to: '/', icon: Clapperboard, label: 'Browse Submissions' },
-        { to: '/submit', icon: Plus, label: 'Make Selection' },
+        { to: '/submit', icon: seasonLocked ? Lock : Plus, label: 'Make Selection', muted: seasonLocked },
         ...(role === 'ADMIN' ? [{ to: '/admin', icon: Shield, label: 'Admin' }] : []),
     ];
 
@@ -25,7 +25,7 @@ export default function Sidebar({ role }) {
 
             {/* Nav */}
             <nav className="flex-1 py-4">
-                {navItems.map(({ to, icon: Icon, label }) => {
+                {navItems.map(({ to, icon: Icon, label, muted }) => {
                     const active = location.pathname === to;
                     return (
                         <Link
@@ -34,6 +34,8 @@ export default function Sidebar({ role }) {
                             className={`flex items-center gap-4 px-8 py-4 text-sm font-semibold tracking-wider transition-all duration-300 ease-out group ${
                                 active
                                     ? 'bg-forest text-forest-on rounded-r-full font-bold shadow-sm'
+                                    : muted
+                                    ? 'text-outline/50 hover:text-outline hover:bg-canvas-high/60 hover:pl-10'
                                     : 'text-outline hover:text-brown hover:bg-canvas-high/60 hover:pl-10'
                             }`}
                         >

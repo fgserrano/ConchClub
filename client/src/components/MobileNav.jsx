@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { Link, useLocation } from 'react-router-dom';
 import { Clapperboard, Plus, Shield } from 'lucide-react';
 
@@ -11,8 +12,8 @@ export default function MobileNav({ role }) {
         ...(role === 'ADMIN' ? [{ to: '/admin', icon: Shield, label: 'Admin' }] : []),
     ];
 
-    return (
-        <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-canvas/95 backdrop-blur-sm border-t border-outline-light flex">
+    const nav = (
+        <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-[200] bg-canvas/95 backdrop-blur-sm border-t border-outline-light flex">
             {navItems.map(({ to, icon: Icon, label }) => {
                 const active = location.pathname === to;
                 return (
@@ -32,4 +33,6 @@ export default function MobileNav({ role }) {
             })}
         </nav>
     );
+
+    return createPortal(nav, document.body);
 }

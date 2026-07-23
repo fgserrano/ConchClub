@@ -18,12 +18,16 @@ export default function Layout() {
     const username = localStorage.getItem('username');
     const role = localStorage.getItem('role');
     const [seasonName, setSeasonName] = useState(null);
+    const [seasonLocked, setSeasonLocked] = useState(false);
 
     useEffect(() => {
         api.get('/season/active')
-            .then(res => setSeasonName(res.data?.name || null))
+            .then(res => {
+                setSeasonName(res.data?.name || null);
+                setSeasonLocked(res.data?.locked ?? false);
+            })
             .catch(() => {});
-    }, []);
+    }, [location.pathname]);
 
     const handleLogout = () => {
         localStorage.removeItem('token');
@@ -36,7 +40,7 @@ export default function Layout() {
 
     return (
         <div className="min-h-screen bg-canvas text-brown font-sans selection:bg-forest/20">
-            <Sidebar role={role} />
+            <Sidebar role={role} seasonLocked={seasonLocked} />
 
             {/* Top header — fixed, offset past sidebar on desktop */}
             <header className="fixed top-0 left-0 lg:left-80 right-0 z-40 bg-canvas/90 backdrop-blur-md border-b border-outline/20">
@@ -84,7 +88,7 @@ export default function Layout() {
             </header>
 
             {/* Main content — offset by sidebar on desktop, header height on all breakpoints */}
-            <main className="lg:pl-80 px-6 pt-24 pb-4 lg:pb-10">
+            <main className="lg:pl-80 px-6 pt-24 pb-24 lg:pb-10">
                 <div className="max-w-5xl mx-auto">
                     <Outlet />
                 </div>

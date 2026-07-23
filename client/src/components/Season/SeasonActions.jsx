@@ -56,7 +56,7 @@ export default function SeasonActions({ onStatusChange, season }) {
                         <div className="w-5 h-5 border-2 border-outline border-t-transparent rounded-full animate-spin" />
                     </div>
                 ) : isLocked ? (
-                    <button onClick={unlockSeason} className="flex-1 bg-forest hover:bg-forest-deep text-white p-4 rounded flex flex-col items-center gap-2 transition-colors">
+                    <button onClick={unlockSeason} className="flex-1 bg-forest hover:bg-forest-deep text-white p-4 rounded flex flex-col items-center justify-center gap-2 transition-colors">
                         <Unlock className="w-6 h-6" />
                         <span className="font-semibold uppercase tracking-wider text-xs">Unlock</span>
                     </button>

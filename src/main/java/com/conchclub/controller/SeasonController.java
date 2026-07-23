@@ -44,7 +44,7 @@ public class SeasonController {
                         String year = (s.getReleaseDate() != null && s.getReleaseDate().contains("-"))
                                 ? s.getReleaseDate().split("-")[0]
                                 : s.getReleaseDate();
-                        return new MysterySubmissionDto(s.getId(), user, rounded, year, s.isSelected());
+                        return new MysterySubmissionDto(s.getId(), user, rounded, year, s.isSelected(), s.getMediaType(), s.getGenre());
                     }).toList();
                     return ResponseEntity.ok(dtos);
                 })
@@ -99,6 +99,8 @@ public class SeasonController {
                 s.getPosterPath(),
                 s.getOverview(),
                 s.getReleaseDate(),
-                s.getSelectedAt());
+                s.getSelectedAt(),
+                s.getMediaType(),
+                s.getGenre());
     }
 }

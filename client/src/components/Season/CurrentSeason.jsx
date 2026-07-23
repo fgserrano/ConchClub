@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Calendar, Dices } from 'lucide-react';
+import { Dices } from 'lucide-react';
 import api from '../../lib/api';
 import MovieRow from '../MovieCard/MovieRow';
 
@@ -18,7 +18,7 @@ export default function CurrentSeason({ season }) {
     const fetchTickets = async () => {
         try {
             const res = await api.get('/admin/submissions');
-            setTickets(res.data);
+            setTickets(res.data || []);
         } catch (e) {
             console.error("Failed to fetch tickets", e);
         } finally {
@@ -67,9 +67,8 @@ export default function CurrentSeason({ season }) {
     return (
         <section className="bg-canvas border border-outline-light p-6 rounded">
             <div className="flex items-center justify-between mb-6">
-                <h2 className="font-serif text-xl font-semibold text-brown flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-forest" />
-                    Current Season Submissions ({activeTickets.length})
+                <h2 className="font-serif text-xl font-semibold text-brown">
+                    Submissions
                 </h2>
                 <div className="flex gap-2 items-center">
                     {!season?.locked && (
