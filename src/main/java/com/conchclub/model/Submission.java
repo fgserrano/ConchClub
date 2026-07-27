@@ -19,6 +19,8 @@ public class Submission {
     private String overview;
     private String releaseDate;
     private Integer runtime;
+    private String mediaType;
+    private String genre;
     private boolean selected;
     private Long selectedAt;
 }

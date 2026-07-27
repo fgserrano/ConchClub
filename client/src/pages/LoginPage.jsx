@@ -30,63 +30,60 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-black flex items-center justify-center p-4 relative overflow-hidden">
-            {/* Dynamic Background */}
-            <div className="absolute top-[-50%] left-[-50%] w-[200%] h-[200%] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-purple-900/20 via-black to-black animate-pulse-slow" />
-
-            <div className="w-full max-w-md bg-slate-900/50 backdrop-blur-xl border border-slate-800 p-8 rounded-2xl shadow-2xl relative z-10">
+        <div className="min-h-screen bg-canvas flex items-center justify-center p-4">
+            <div className="w-full max-w-md bg-canvas-container border border-border p-10 rounded-2xl hard-shadow">
                 <div className="flex justify-center mb-8">
-                    <div className="w-16 h-16 bg-purple-600/20 rounded-2xl flex items-center justify-center rotate-3 border border-purple-500/30">
-                        <Film className="w-8 h-8 text-purple-400" />
+                    <div className="w-14 h-14 bg-canvas-container border border-border rounded-xl flex items-center justify-center">
+                        <Film className="w-7 h-7 text-forest" />
                     </div>
                 </div>
 
-                <h2 className="text-3xl font-bold text-center mb-2 bg-gradient-to-r from-purple-200 to-purple-400 bg-clip-text text-transparent">ConchClub</h2>
-                <p className="text-slate-500 text-center mb-8">Enter the inner circle</p>
+                <h2 className="font-serif text-3xl font-semibold text-center text-forest mb-2">ConchClub</h2>
+                <p className="text-canvas-muted-foreground text-center text-sm mb-8">Enter the inner circle</p>
 
                 {error && (
-                    <div className="bg-red-500/10 border border-red-500/20 text-red-500 text-sm p-3 rounded-lg mb-4 text-center">
+                    <div className="bg-destructive/10 border border-destructive/20 text-destructive text-sm p-3 rounded-lg mb-4 text-center">
                         {error}
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-5">
                     <div className="group">
                         <div className="relative">
-                            <User className="absolute left-3 top-3 w-5 h-5 text-slate-500 group-focus-within:text-purple-400 transition-colors" />
+                            <User className="absolute left-3 top-3 w-4 h-4 text-canvas-muted-foreground group-focus-within:text-forest transition-colors" />
                             <input
                                 name="username"
                                 type="text"
                                 placeholder="Username"
                                 required
-                                className="w-full bg-black/40 border border-slate-800 text-slate-200 rounded-xl px-10 py-3 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all placeholder:text-slate-600"
+                                className="w-full bg-canvas-container border-0 border-b-2 border-border text-canvas-foreground rounded-none px-9 py-2.5 focus:outline-none focus:border-forest transition-colors placeholder:text-canvas-muted-foreground"
                             />
                         </div>
                     </div>
 
                     <div className="group">
                         <div className="relative">
-                            <Lock className="absolute left-3 top-3 w-5 h-5 text-slate-500 group-focus-within:text-purple-400 transition-colors" />
+                            <Lock className="absolute left-3 top-3 w-4 h-4 text-canvas-muted-foreground group-focus-within:text-forest transition-colors" />
                             <input
                                 name="password"
                                 type="password"
                                 placeholder="Password"
                                 required
-                                className="w-full bg-black/40 border border-slate-800 text-slate-200 rounded-xl px-10 py-3 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all placeholder:text-slate-600"
+                                className="w-full bg-canvas-container border-0 border-b-2 border-border text-canvas-foreground rounded-none px-9 py-2.5 focus:outline-none focus:border-forest transition-colors placeholder:text-canvas-muted-foreground"
                             />
                         </div>
                     </div>
 
                     <button
                         disabled={loading}
-                        className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center disabled:opacity-50 mt-6"
+                        className="w-full bg-oxblood-container text-white font-semibold uppercase tracking-widest text-sm py-3 rounded-lg hover:bg-oxblood-deep transition-colors flex items-center justify-center disabled:opacity-50 mt-2 hard-shadow"
                     >
                         {loading ? <Loader2 className="animate-spin w-5 h-5" /> : 'Enter'}
                     </button>
                 </form>
 
-                <p className="text-center text-slate-600 text-sm mt-6">
-                    New user? <Link to="/register" className="text-purple-400 hover:text-purple-300 transition-colors">Register Here</Link>
+                <p className="text-center text-canvas-muted-foreground text-sm mt-6">
+                    New user? <Link to="/register" className="text-forest hover:underline transition-colors font-medium">Register Here</Link>
                 </p>
             </div>
         </div>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Calendar, Dices } from 'lucide-react';
+import { Dices } from 'lucide-react';
 import api from '../../lib/api';
 import MovieRow from '../MovieCard/MovieRow';
 
@@ -18,7 +18,7 @@ export default function CurrentSeason({ season }) {
     const fetchTickets = async () => {
         try {
             const res = await api.get('/admin/submissions');
-            setTickets(res.data);
+            setTickets(res.data || []);
         } catch (e) {
             console.error("Failed to fetch tickets", e);
         } finally {
@@ -61,49 +61,48 @@ export default function CurrentSeason({ season }) {
     const pastTickets = tickets.filter(t => t.selected).sort((a, b) => (b.selectedAt || 0) - (a.selectedAt || 0));
 
     if (loading) {
-        return <div className="text-center py-8 text-slate-500">Loading submissions...</div>;
+        return <div className="text-center py-8 text-canvas-muted-foreground">Loading submissions...</div>;
     }
 
     return (
-        <section className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
+        <section className="bg-canvas border border-border p-6 rounded-xl">
             <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-purple-500" />
-                    Current Season Submissions ({activeTickets.length})
+                <h2 className="font-serif text-xl font-semibold text-canvas-foreground">
+                    Submissions
                 </h2>
-                <div className="flex gap-2">
+                <div className="flex gap-2 items-center">
                     {!season?.locked && (
-                        <span className="text-xs text-amber-500 self-center font-bold px-2">
-                            LOCK SEASON TO SELECT
+                        <span className="text-xs text-oxblood font-semibold uppercase tracking-wider px-2">
+                            Lock season to select
                         </span>
                     )}
                     <button
                         onClick={handleRandomize}
                         disabled={isRolling || activeTickets.length === 0 || !season?.locked}
-                        className="p-2 bg-slate-800 hover:bg-slate-700 text-purple-400 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        className="p-2 bg-canvas-container hover:bg-canvas-muted text-forest rounded-lg disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                         title="Random Selection"
                     >
-                        <Dices className={`w-6 h-6 ${isRolling ? 'animate-spin' : ''}`} />
+                        <Dices className={`w-5 h-5 ${isRolling ? 'animate-spin' : ''}`} />
                     </button>
                     {softSelectedId && !isRolling && (
                         <button
                             onClick={handleReveal}
-                            className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-lg hover:opacity-90 transition-all shadow-lg animate-pulse"
+                            className="px-4 py-2 bg-oxblood-container hover:bg-oxblood-deep text-white font-semibold uppercase tracking-wider text-xs rounded-lg transition-colors animate-pulse hard-shadow"
                         >
-                            REVEAL WINNER
+                            Reveal Winner
                         </button>
                     )}
                 </div>
             </div>
 
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3">
                 {activeTickets.map((ticket) => (
                     <div
                         key={ticket.id}
                         onClick={() => !isRolling && season?.locked && setSoftSelectedId(ticket.id)}
-                        className={`transition-all duration-300 rounded-xl ${season?.locked ? 'cursor-pointer' : 'cursor-not-allowed opacity-75'} ${softSelectedId === ticket.id
-                            ? 'ring-4 ring-purple-500 ring-offset-4 ring-offset-slate-900 scale-[1.02] bg-slate-800/50'
-                            : 'hover:bg-slate-800/30'
+                        className={`transition-all duration-300 rounded-lg ${season?.locked ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'} ${softSelectedId === ticket.id
+                            ? 'ring-2 ring-forest ring-offset-2 ring-offset-canvas scale-[1.01] bg-canvas-container'
+                            : 'hover:bg-canvas-container'
                             }`}
                     >
                         <MovieRow ticket={ticket} />
@@ -112,17 +111,17 @@ export default function CurrentSeason({ season }) {
             </div>
 
             {tickets.length === 0 && (
-                <div className="text-center py-12 border-2 border-dashed border-slate-800 rounded-xl text-slate-600">
+                <div className="text-center py-12 border-2 border-dashed border-border rounded-xl text-canvas-muted-foreground">
                     No submissions yet.
                 </div>
             )}
 
             {pastTickets.length > 0 && (
-                <div className="mt-12 pt-8 border-t border-slate-800">
-                    <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-6">
+                <div className="mt-10 pt-8 border-t border-border">
+                    <h3 className="text-xs font-semibold text-canvas-muted-foreground uppercase tracking-widest mb-6">
                         Past Selections
                     </h3>
-                    <div className="flex flex-col gap-4 opacity-75">
+                    <div className="flex flex-col gap-3 opacity-60">
                         {pastTickets.map((ticket) => (
                             <MovieRow key={ticket.id} ticket={ticket} />
                         ))}

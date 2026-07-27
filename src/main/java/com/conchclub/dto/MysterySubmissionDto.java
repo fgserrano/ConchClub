@@ -5,5 +5,7 @@ public record MysterySubmissionDto(
                 UserDto user,
                 Integer runtimeToNearestTenMin,
                 String releaseYear,
-                boolean selected) {
+                boolean selected,
+                String mediaType,
+                String genre) {
 }

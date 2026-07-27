@@ -1,40 +1,47 @@
 import React from 'react';
 import { Trophy } from 'lucide-react';
 
-export default function OfficialSelection({ selection }) {
+export default function OfficialSelection({ selection, hideLabel }) {
     if (!selection || !selection.title) return null;
 
     return (
-        <section className="relative transform hover:scale-[1.01] transition-transform duration-500 h-full">
-            <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-amber-600/20 blur-2xl -z-10" />
-            <div className="bg-black/40 border border-yellow-500/30 rounded-3xl p-8 flex flex-col md:flex-row gap-8 items-center h-full">
-                <img
-                    src={`https://image.tmdb.org/t/p/w500${selection.posterPath}`}
-                    alt={selection.title}
-                    className="w-48 md:w-56 rounded-xl shadow-[0_0_30px_rgba(234,179,8,0.3)] shrink-0"
-                />
+        <div className="bg-canvas-container border border-border hard-shadow p-4 rounded-xl">
+            {!hideLabel && (
+                <span className="font-sans text-sm text-canvas-foreground border-l-4 border-oxblood pl-3 mb-4 flex items-center gap-2 uppercase font-bold tracking-widest">
+                    <Trophy className="w-4 h-4 text-oxblood" />
+                    Official Selection
+                </span>
+            )}
 
-                <div className="flex-1 text-center md:text-left">
-                    <div className="flex items-center gap-2 justify-center md:justify-start text-yellow-500 mb-4">
-                        <Trophy className="w-5 h-5" />
-                        <span className="font-bold tracking-widest text-xs">OFFICIAL SELECTION</span>
+            <section className="bg-accent border border-ink flex flex-col md:flex-row rounded-lg overflow-hidden">
+                {/* Poster */}
+                {selection.posterPath && (
+                    <div className="shrink-0 md:w-56 lg:w-64 mx-4 mt-4 md:mx-0 md:mt-0">
+                        <img
+                            src={`https://image.tmdb.org/t/p/w500${selection.posterPath}`}
+                            alt={selection.title}
+                            className="w-full h-full object-cover"
+                        />
                     </div>
+                )}
 
-                    <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">{selection.title}</h2>
+                {/* Text block */}
+                <div className="flex-1 p-6 md:p-8 flex flex-col justify-center">
+                    <h2 className="font-serif text-4xl md:text-6xl font-bold text-white leading-tight mb-2">
+                        {selection.title}
+                    </h2>
 
-                    {selection.overview && (
-                        <p className="text-slate-300 text-sm leading-relaxed line-clamp-3 mb-6">
-                            {selection.overview}
-                        </p>
-                    )}
-
-                    <div className="flex items-center justify-center md:justify-start gap-4 text-sm text-slate-500">
-                        <span>Submitted by <span className="text-yellow-400 font-medium">{selection.user.username}</span></span>
-                        <span>•</span>
-                        <span>{selection.releaseDate?.split('-')[0]}</span>
-                    </div>
+                    <p className="font-serif text-base text-accent-subtle italic">
+                        Submitted by <span className="font-semibold not-italic">{selection.user?.username}</span>
+                        {selection.runtimeToNearestTenMin > 0 && selection.mediaType !== 'tv' && (
+                            <span className="mx-2">·</span>
+                        )}
+                        {selection.runtimeToNearestTenMin > 0 && selection.mediaType !== 'tv' && (
+                            <span className="not-italic font-semibold">{selection.runtimeToNearestTenMin}m</span>
+                        )}
+                    </p>
                 </div>
-            </div>
-        </section>
+            </section>
+        </div>
     );
 }

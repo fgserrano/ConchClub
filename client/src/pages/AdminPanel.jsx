@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Shield } from 'lucide-react';
-import NewSeasonForm from '../components/Season/NewSeasonForm';
+import { Shield, TriangleAlert } from 'lucide-react';
 import SeasonActions from '../components/Season/SeasonActions';
 import CurrentSeason from '../components/Season/CurrentSeason';
 import api from '../lib/api';
 
 export default function AdminPanel() {
-    const [response, setResponse] = useState('');
     const [season, setSeason] = useState(null);
 
     const fetchSeason = async () => {
@@ -14,27 +12,29 @@ export default function AdminPanel() {
             const res = await api.get('/season/active');
             setSeason(res.data);
         } catch (e) {
+            setSeason(null);
         }
     };
 
     useEffect(() => {
         fetchSeason();
-    }, [response]);
+    }, []);
 
     return (
         <div className="max-w-xl mx-auto space-y-8">
-            <div className="flex items-center gap-3 text-purple-400 mb-8">
-                <Shield className="w-8 h-8" />
-                <h1 className="text-3xl font-bold text-white">Admin Control</h1>
+            <div className="flex items-center gap-3 text-forest mb-8">
+                <Shield className="w-6 h-6" />
+                <h1 className="font-serif text-3xl font-semibold text-canvas-foreground">Admin Control</h1>
             </div>
 
-            {response && (
-                <div className="p-4 bg-slate-800 border-l-4 border-purple-500 text-white rounded">
-                    {response}
+            {!season && (
+                <div className="flex items-center gap-3 p-4 bg-oxblood/5 border border-oxblood/20 rounded-lg text-oxblood text-sm font-medium">
+                    <TriangleAlert className="w-4 h-4 shrink-0" />
+                    No season is currently active. Start a new one below.
                 </div>
             )}
 
-            <SeasonActions onStatusChange={setResponse} season={season} />
+            <SeasonActions onStatusChange={fetchSeason} season={season} />
             <CurrentSeason season={season} />
         </div>
     );

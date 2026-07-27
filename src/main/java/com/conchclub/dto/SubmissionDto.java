@@ -10,5 +10,7 @@ public record SubmissionDto(
                 String posterPath,
                 String overview,
                 String releaseDate,
-                Long selectedAt) {
+                Long selectedAt,
+                String mediaType,
+                String genre) {
 }
