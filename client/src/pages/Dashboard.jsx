@@ -60,7 +60,7 @@ export default function Dashboard() {
     const winner = tickets.find(t => t.selected);
 
     if (loading) {
-        return <div className="text-center mt-20 text-outline flex flex-col items-center">
+        return <div className="text-center mt-20 text-canvas-muted-foreground flex flex-col items-center">
             <div className="w-8 h-8 rounded-full border-2 border-forest border-t-transparent animate-spin mb-4" />
             Loading magic...
         </div>;
@@ -70,14 +70,14 @@ export default function Dashboard() {
 
     return (
         <div className="space-y-12 animate-in fade-in duration-700">
-            <section className="pb-6 border-b border-outline-light">
+            <section className="pb-6 border-b border-border">
                 <span className="font-sans text-xs font-bold text-oxblood uppercase tracking-widest block mb-1">
                     {season ? (season.locked ? 'Submissions Closed' : 'Current Season Submissions') : 'No Active Season'}
                 </span>
-                <h1 className="font-serif text-3xl md:text-4xl font-bold text-brown">
+                <h1 className="font-serif text-3xl md:text-4xl font-bold text-canvas-foreground">
                     Submission Collection
                 </h1>
-                <p className="font-body text-sm text-brown-light mt-1">
+                <p className="font-body text-sm text-canvas-muted-foreground mt-1">
                     {tickets.length} {tickets.length === 1 ? 'submission' : 'submissions'} in the pool this season.
                 </p>
             </section>
@@ -85,16 +85,16 @@ export default function Dashboard() {
             <OfficialSelection selection={selection} />
 
 {!season && (
-                <div className="flex flex-col items-center justify-center py-12 text-outline bg-canvas-container rounded border border-outline-light">
+                <div className="flex flex-col items-center justify-center py-12 text-canvas-muted-foreground bg-canvas-container rounded-xl border border-border">
                     <Film className="w-10 h-10 mb-4 opacity-40" />
                     <p className="text-base font-medium">No season is currently active</p>
                 </div>
             )}
 
             <section>
-                <h3 className="small-caps text-sm font-semibold text-outline mb-8 flex items-center gap-2">
+                <h3 className="small-caps text-sm font-semibold text-canvas-muted-foreground mb-8 flex items-center gap-2">
                     <Calendar className="w-4 h-4 text-forest" />
-                    Browse Submissions
+                    Submission Pool
                 </h3>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -107,7 +107,7 @@ export default function Dashboard() {
                     ))}
                 </div>
                 {tickets.length === 0 && (
-                    <div className="text-center py-12 border-2 border-dashed border-outline-light rounded text-outline">
+                    <div className="text-center py-12 border-2 border-dashed border-border rounded-xl text-canvas-muted-foreground">
                         No submissions yet. Be the first!
                     </div>
                 )}

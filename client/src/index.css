@@ -1,54 +1,102 @@
 @import "tailwindcss";
 
-@theme {
+:root {
   /* Canvas / Surface */
-  --color-canvas: #fcf9f0;
-  --color-canvas-dim: #dddad1;
-  --color-canvas-container: #f1eee5;
-  --color-canvas-high: #ebe8df;
-  --color-canvas-highest: #e5e2da;
+  --canvas: #fdf6e3;
+  --canvas-foreground: #2a1f0e;
+  --canvas-container: #f5edd6;
+  --canvas-container-foreground: #2a1f0e;
+  --canvas-muted: #ede4cb;
+  --canvas-muted-foreground: #4a3f2a;
+  --canvas-highest: #e6ddc4;
+  --accent-subtle: #dfd5b8;
 
-  /* Forest Green — Primary */
-  --color-forest: #1b2e1d;
-  --color-forest-deep: #07190a;
-  --color-forest-light: #b6cdb4;
-  --color-forest-on: #819780;
+  /* Forest Green — accent text/border/icon (swaps) + fixed fill */
+  --forest: #2a3a1a;
+  --forest-container: #2a3a1a;
+  --forest-deep: #1a2810;
+  --forest-light: #b6cdb4;
+  --forest-on: #819780;
 
-  /* Chocolate Brown — Secondary / Text */
-  --color-brown: #1c1c17;
-  --color-brown-light: #434842;
+  /* Oxblood Red — accent text/border/icon (swaps) + fixed fill */
+  --oxblood: #a13d39;
+  --oxblood-container: #a13d39;
+  --oxblood-deep: #822624;
 
-  /* Oxblood Red — Accent / CTA */
-  --color-oxblood: #a13d39;
-  --color-oxblood-deep: #822624;
-  --color-oxblood-container: #751c1c;
-
-  /* Sage — muted green accents */
-  --color-sage: #809680;
-  --color-sage-deep: #4F644F;
-
-  /* Muted — redacted/placeholder surfaces */
-  --color-muted: #ADABA3;
-
-  /* Borders / Outlines */
-  --color-outline: #737871;
-  --color-outline-light: #c3c8c0;
-
-  /* Near-black ink — used for hard shadows */
-  --color-ink: #251007;
+  /* Borders */
+  --border: #c4b89a;
 
   /* Error */
-  --color-error: #ba1a1a;
+  --destructive: #ba1a1a;
 
-  /* Typography */
+  /* Fixed surfaces */
+  --placeholder: #b8a98a;
+  --scrim: #2a1f0e;
+  --ink: #251007;
+  --shadow: #251007;
+  --accent: #4F644F;
+  --accent-foreground: #ffffff;
+}
+
+.dark {
+  --canvas: #14140f;
+  --canvas-foreground: #e5e2da;
+  --canvas-container: #20201a;
+  --canvas-container-foreground: #e5e2da;
+  --canvas-muted: #2a2a25;
+  --canvas-muted-foreground: #c3c8c0;
+  --canvas-highest: #35352f;
+
+  --forest: #b6cdb4;
+  --oxblood: #ffb3ad;
+  --border: #8d928b;
+  --destructive: #ffb4ab;
+  --shadow: #e7beae;
+
+  /* forest-container, forest-deep, forest-light, forest-on, oxblood-container,
+     oxblood-deep, placeholder, scrim, ink, accent, accent-foreground, accent-subtle
+     intentionally not redeclared — they stay fixed via normal CSS inheritance. */
+}
+
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-canvas-foreground: var(--canvas-foreground);
+  --color-canvas-container: var(--canvas-container);
+  --color-canvas-container-foreground: var(--canvas-container-foreground);
+  --color-canvas-muted: var(--canvas-muted);
+  --color-canvas-muted-foreground: var(--canvas-muted-foreground);
+  --color-canvas-highest: var(--canvas-highest);
+  --color-accent-subtle: var(--accent-subtle);
+
+  --color-forest: var(--forest);
+  --color-forest-container: var(--forest-container);
+  --color-forest-deep: var(--forest-deep);
+  --color-forest-light: var(--forest-light);
+  --color-forest-on: var(--forest-on);
+
+  --color-oxblood: var(--oxblood);
+  --color-oxblood-container: var(--oxblood-container);
+  --color-oxblood-deep: var(--oxblood-deep);
+
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-placeholder: var(--placeholder);
+  --color-scrim: var(--scrim);
+  --color-ink: var(--ink);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
   --font-sans: 'Hanken Grotesk', system-ui, sans-serif;
   --font-serif: 'Bodoni Moda', Georgia, serif;
   --font-body: 'Source Serif 4', Georgia, serif;
 }
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 body {
   background-color: var(--color-canvas);
-  color: var(--color-brown);
+  background-image: radial-gradient(ellipse 120% 40% at 50% 0%, rgba(254,246,192,0.35) 0%, transparent 100%);
+  color: var(--color-canvas-foreground);
   font-family: var(--font-sans);
   min-height: 100vh;
 }
@@ -63,7 +111,7 @@ body::before {
   height: 100%;
   pointer-events: none;
   z-index: 9999;
-  opacity: 0.035;
+  opacity: 0.05;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
   background-repeat: repeat;
   background-size: 200px 200px;
@@ -71,7 +119,14 @@ body::before {
 
 /* Hard offset shadow — applied as a utility class */
 .hard-shadow {
-  box-shadow: 4px 4px 0 0 var(--color-ink);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.45), 2px 2px 8px rgba(37,16,7,0.10), 4px 4px 0 0 var(--shadow);
+}
+
+/* Warm focus rings */
+:focus-visible {
+  outline: 2px solid rgba(161, 61, 57, 0.55);
+  outline-offset: 2px;
+  border-radius: 3px;
 }
 
 /* Viewfinder corner brackets — applied to poster containers */
@@ -122,7 +177,7 @@ body::before {
 /* Small-caps label utility */
 .small-caps {
   font-variant-caps: small-caps;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   font-family: var(--font-sans);
 }
 
@@ -153,4 +208,4 @@ body::before {
 /* Custom scrollbar */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--color-canvas); }
-::-webkit-scrollbar-thumb { background: var(--color-outline); }
+::-webkit-scrollbar-thumb { background: var(--color-border); }

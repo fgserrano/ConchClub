@@ -6,6 +6,8 @@ import com.conchclub.repository.SeasonRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -24,6 +26,19 @@ public class SeasonService {
 
     public Optional<Season> getSeasonById(String id) {
         return seasonRepository.findById(id);
+    }
+
+    public List<Season> getArchivedSeasons() {
+        return seasonRepository.findByClosedAtNotNullOrderByClosedAtDesc();
+    }
+
+    public Season closeSeason(String id) {
+        Season season = getSeasonById(id)
+                .orElseThrow(() -> new RuntimeException("Season not found"));
+        season.setActive(false);
+        season.setLocked(true);
+        season.setClosedAt(LocalDateTime.now());
+        return save(season);
     }
 
     public Season addSubmission(String seasonId, Submission submission) {

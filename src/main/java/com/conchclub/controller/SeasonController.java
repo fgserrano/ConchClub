@@ -1,8 +1,10 @@
 package com.conchclub.controller;
 
+import com.conchclub.dto.ArchivedSeasonDto;
 import com.conchclub.dto.MysterySubmissionDto;
 import com.conchclub.dto.SubmissionDto;
 import com.conchclub.dto.UserDto;
+import com.conchclub.model.Season;
 import com.conchclub.model.Submission;
 
 import com.conchclub.service.SeasonService;
@@ -26,10 +28,10 @@ public class SeasonController {
     private final com.conchclub.service.AuthService authService;
 
     @GetMapping("/active")
-    public ResponseEntity<?> getActiveSeason() {
+    public ResponseEntity<Season> getActiveSeason() {
         return seasonService.getActiveSeason()
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .orElse(ResponseEntity.ok(null));
     }
 
     @GetMapping("/submissions")
@@ -63,6 +65,25 @@ public class SeasonController {
                     return ResponseEntity.ok(selectedSubmissions);
                 })
                 .orElse(ResponseEntity.ok(Collections.emptyList()));
+    }
+
+    @GetMapping("/archived")
+    public ResponseEntity<List<ArchivedSeasonDto>> getArchivedSeasons() {
+        List<Season> archived = seasonService.getArchivedSeasons();
+        List<ArchivedSeasonDto> dtos = archived.stream().map(s -> {
+            List<SubmissionDto> selections = s.getSubmissions().stream()
+                    .filter(Submission::isSelected)
+                    .map(this::mapToSubmissionDto)
+                    .toList();
+            Long startedAt = s.getCreatedAt() != null
+                    ? s.getCreatedAt().toEpochSecond(java.time.ZoneOffset.UTC) * 1000
+                    : null;
+            Long closedAt = s.getClosedAt() != null
+                    ? s.getClosedAt().toEpochSecond(java.time.ZoneOffset.UTC) * 1000
+                    : null;
+            return new ArchivedSeasonDto(s.getId(), s.getName(), startedAt, closedAt, selections);
+        }).toList();
+        return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/submissions/me")

@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function BackFace({ ticket, roundedRuntime, episodeCount, year }) {
     return (
-        <div className="absolute inset-0 w-full h-full bg-canvas-container border border-forest/30 rounded overflow-hidden [backface-visibility:hidden] [webkit-backface-visibility:hidden] [transform:rotateY(180deg)] flex flex-col">
+        <div className="absolute inset-0 w-full h-full bg-canvas-container border border-forest/30 rounded-xl overflow-hidden [backface-visibility:hidden] [webkit-backface-visibility:hidden] [transform:rotateY(180deg)] flex flex-col">
             {/* Header accent */}
             <div className="bg-forest-deep px-3 py-2.5 shrink-0">
                 <p className="small-caps text-forest-light/70 text-[9px]">Entry Revealed</p>
@@ -13,36 +13,36 @@ export default function BackFace({ ticket, roundedRuntime, episodeCount, year })
                 {ticket.title && (
                     <div>
                         <p className="small-caps text-[9px] text-forest mb-1">Title</p>
-                        <h3 className="font-serif text-base font-semibold text-brown leading-tight">{ticket.title}</h3>
+                        <h3 className="font-serif text-base font-semibold text-canvas-foreground leading-tight">{ticket.title}</h3>
                     </div>
                 )}
 
-                <div className="w-full border-t border-outline-light" />
+                <div className="w-full border-t border-border" />
 
                 <div className="grid grid-cols-2 gap-3">
                     {episodeCount ? (
                         <div>
                             <p className="small-caps text-[9px] text-forest mb-0.5">Episodes</p>
-                            <p className="font-serif text-lg font-semibold text-brown">{episodeCount}<span className="text-xs font-sans font-normal text-outline ml-0.5">ep</span></p>
+                            <p className="font-serif text-lg font-semibold text-canvas-foreground">{episodeCount}<span className="text-xs font-sans font-normal text-canvas-muted-foreground ml-0.5">ep</span></p>
                         </div>
                     ) : roundedRuntime ? (
                         <div>
                             <p className="small-caps text-[9px] text-forest mb-0.5">Runtime</p>
-                            <p className="font-serif text-lg font-semibold text-brown">~{roundedRuntime}<span className="text-xs font-sans font-normal text-outline ml-0.5">m</span></p>
+                            <p className="font-serif text-lg font-semibold text-canvas-foreground">~{roundedRuntime}<span className="text-xs font-sans font-normal text-canvas-muted-foreground ml-0.5">m</span></p>
                         </div>
                     ) : null}
 
                     {(ticket.releaseYear || year) && (
                         <div>
                             <p className="small-caps text-[9px] text-forest mb-0.5">Released</p>
-                            <p className="font-serif text-lg font-semibold text-brown">{ticket.releaseYear || year}</p>
+                            <p className="font-serif text-lg font-semibold text-canvas-foreground">{ticket.releaseYear || year}</p>
                         </div>
                     )}
                 </div>
 
                 <div>
                     <p className="small-caps text-[9px] text-forest mb-0.5">Submitted By</p>
-                    <p className="text-sm font-semibold text-brown">{ticket.user?.username || 'Unknown'}</p>
+                    <p className="text-sm font-semibold text-canvas-foreground">{ticket.user?.username || 'Unknown'}</p>
                 </div>
             </div>
         </div>

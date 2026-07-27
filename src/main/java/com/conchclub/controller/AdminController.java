@@ -63,6 +63,27 @@ public class AdminController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
+    @PostMapping("/season/{id}/rename")
+    public ResponseEntity<?> renameSeason(@PathVariable String id, @RequestBody RenameSeasonRequest request) {
+        if (request.name() == null || request.name().isBlank()) {
+            return ResponseEntity.badRequest().body("Season name cannot be blank.");
+        }
+        return seasonService.getSeasonById(id).map(season -> {
+            season.setName(request.name().trim());
+            return ResponseEntity.ok(seasonService.save(season));
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/season/{id}/close")
+    public ResponseEntity<?> closeSeason(@PathVariable String id) {
+        try {
+            Season closed = seasonService.closeSeason(id);
+            return ResponseEntity.ok(closed);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @PostMapping("/reveal")
     public ResponseEntity<?> revealWinner(@RequestHeader("Authorization") String token,
             @RequestBody RevealRequest request) {
@@ -87,6 +108,9 @@ public class AdminController {
     }
 
     public record CreateSeasonRequest(String name) {
+    }
+
+    public record RenameSeasonRequest(String name) {
     }
 
     private SubmissionDto mapToSubmissionDto(Submission s) {

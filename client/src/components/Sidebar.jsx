@@ -1,15 +1,16 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Clapperboard, Trophy, Plus, Lock, Shield } from 'lucide-react';
+import { Clapperboard, Trophy, Plus, Lock, Shield, Archive } from 'lucide-react';
 import tmdbLogo from '../assets/tmdb-logo.svg';
 
 export default function Sidebar({ role, seasonLocked }) {
     const location = useLocation();
 
     const navItems = [
-        { to: '/selection', icon: Trophy, label: 'Official Selection' },
-        { to: '/', icon: Clapperboard, label: 'Submission Pool' },
+        { to: '/', icon: Trophy, label: 'Official Selection' },
+        { to: '/pool', icon: Clapperboard, label: 'Submission Pool' },
         { to: '/submit', icon: seasonLocked ? Lock : Plus, label: 'Make Selection', muted: seasonLocked },
+        { to: '/archives', icon: Archive, label: 'Season Archive' },
         ...(role === 'ADMIN' ? [{ to: '/admin', icon: Shield, label: 'Admin' }] : []),
     ];
 

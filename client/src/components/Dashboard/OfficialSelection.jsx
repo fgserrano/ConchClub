@@ -5,7 +5,7 @@ export default function OfficialSelection({ selection, hideLabel }) {
     if (!selection || !selection.title) return null;
 
     return (
-        <div className="bg-canvas-container border border-border hard-shadow p-4">
+        <div className="bg-canvas-container border border-border hard-shadow p-4 rounded-xl">
             {!hideLabel && (
                 <span className="font-sans text-sm text-canvas-foreground border-l-4 border-oxblood pl-3 mb-4 flex items-center gap-2 uppercase font-bold tracking-widest">
                     <Trophy className="w-4 h-4 text-oxblood" />
@@ -13,7 +13,7 @@ export default function OfficialSelection({ selection, hideLabel }) {
                 </span>
             )}
 
-            <section className="bg-accent border border-ink flex flex-col md:flex-row">
+            <section className="bg-accent border border-ink flex flex-col md:flex-row rounded-lg overflow-hidden">
                 {/* Poster */}
                 {selection.posterPath && (
                     <div className="shrink-0 md:w-56 lg:w-64 mx-4 mt-4 md:mx-0 md:mt-0">

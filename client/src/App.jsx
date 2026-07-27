@@ -5,6 +5,7 @@ import SubmissionPoolPage from './pages/SubmissionPoolPage';
 import OfficialSelectionPage from './pages/OfficialSelectionPage';
 import SelectionPage from './pages/SelectionPage';
 import AdminPanel from './pages/AdminPanel';
+import ArchivePage from './pages/ArchivePage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 
@@ -16,9 +17,10 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route element={<Layout />}>
           <Route element={<ProtectedRoute />}>
-            <Route path="/" element={<SubmissionPoolPage />} />
-            <Route path="/selection" element={<OfficialSelectionPage />} />
+            <Route path="/" element={<OfficialSelectionPage />} />
+            <Route path="/pool" element={<SubmissionPoolPage />} />
             <Route path="/submit" element={<SelectionPage />} />
+            <Route path="/archives" element={<ArchivePage />} />
           </Route>
           <Route element={<ProtectedRoute role="ADMIN" />}>
             <Route path="/admin" element={<AdminPanel />} />

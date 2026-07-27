@@ -22,6 +22,7 @@ public class Season {
     private boolean active;
     private boolean locked;
     private LocalDateTime createdAt;
+    private LocalDateTime closedAt;
 
     private List<Submission> submissions = new ArrayList<>();
 }

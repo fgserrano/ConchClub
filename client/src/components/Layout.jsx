@@ -8,10 +8,11 @@ import tmdbLogo from '../assets/tmdb-logo.svg';
 import api from '../lib/api';
 
 const PAGE_LABELS = {
-    '/': 'Submission Pool',
-    '/selection': 'Official Selection',
+    '/': 'Official Selection',
+    '/pool': 'Submission Pool',
     '/submit': 'Make Selection',
     '/admin': 'Admin Panel',
+    '/archives': 'Season Archive',
 };
 
 export default function Layout() {
@@ -50,10 +51,28 @@ export default function Layout() {
 
                     {/* Brand / Season name */}
                     <div className="flex items-center gap-3">
-                        <span className="material-symbols-outlined text-canvas-foreground group-hover:text-oxblood transition-colors">movie_edit</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" className="w-8 h-8 shrink-0">
+                            <rect width="100" height="100" rx="22" className="fill-none dark:fill-[#07190a]"/>
+                            <circle cx="27" cy="31" r="16" className="fill-none dark:fill-[#07190a] stroke-[#07190a] dark:stroke-[#f6f3ea]" strokeWidth="4.5"/>
+                            <circle cx="27" cy="31" r="4" className="fill-oxblood"/>
+                            <circle cx="27" cy="20" r="2.2" className="fill-[#07190a] dark:fill-[#f6f3ea]"/>
+                            <circle cx="36" cy="35" r="2.2" className="fill-[#07190a] dark:fill-[#f6f3ea]"/>
+                            <circle cx="18" cy="35" r="2.2" className="fill-[#07190a] dark:fill-[#f6f3ea]"/>
+                            <circle cx="58" cy="31" r="16" className="fill-none dark:fill-[#07190a] stroke-[#07190a] dark:stroke-[#f6f3ea]" strokeWidth="4.5"/>
+                            <circle cx="58" cy="31" r="4" className="fill-oxblood"/>
+                            <circle cx="58" cy="20" r="2.2" className="fill-[#07190a] dark:fill-[#f6f3ea]"/>
+                            <circle cx="67" cy="35" r="2.2" className="fill-[#07190a] dark:fill-[#f6f3ea]"/>
+                            <circle cx="49" cy="35" r="2.2" className="fill-[#07190a] dark:fill-[#f6f3ea]"/>
+                            <rect x="20" y="42" width="12" height="5" rx="1.5" className="fill-[#07190a] dark:fill-[#f6f3ea]"/>
+                            <rect x="16" y="47" width="52" height="32" rx="5" className="fill-[#07190a] dark:fill-[#f6f3ea]"/>
+                            <rect x="16" y="60" width="52" height="6" className="fill-oxblood"/>
+                            <path d="M 68 53 L 86 46 L 86 74 L 68 67 Z" className="fill-[#07190a] dark:fill-[#f6f3ea]"/>
+                            <rect x="85" y="44" width="4" height="32" rx="2" className="fill-oxblood"/>
+                        </svg>
                         <div>
                             <span className="font-serif text-2xl md:text-3xl font-semibold tracking-tighter text-canvas-foreground">
-                                {seasonName || 'Conch Club'}
+                                <span className="lg:hidden">Conch Catalogue</span>
+                                <span className="hidden lg:inline">{seasonName || 'Conch Club'}</span>
                             </span>
                             {pageLabel && (
                                 <span className="hidden sm:inline-block ml-3 font-sans text-xs tracking-widest text-oxblood uppercase font-bold border-l border-border/30 pl-3">
@@ -68,7 +87,7 @@ export default function Layout() {
                         {/* Submit button */}
                         <Link
                             to="/submit"
-                            className="bg-forest-container hover:bg-forest-deep text-white p-2 flex items-center justify-center transition-all hard-shadow active:translate-x-0.5 active:translate-y-0.5"
+                            className="bg-forest-container hover:bg-forest-deep text-white p-2 flex items-center justify-center transition-all hard-shadow active:translate-x-0.5 active:translate-y-0.5 rounded-lg"
                             title="Make Selection"
                         >
                             <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>add</span>
@@ -91,8 +110,8 @@ export default function Layout() {
             </header>
 
             {/* Main content — offset by sidebar on desktop, header height on all breakpoints */}
-            <main className="lg:pl-80 px-6 pt-24 pb-24 lg:pb-10">
-                <div className="max-w-5xl mx-auto">
+            <main className="lg:pl-80 px-8 md:px-12 pt-24 pb-24 lg:pb-10">
+                <div className="max-w-4xl mx-auto">
                     <Outlet />
                 </div>
             </main>
@@ -107,7 +126,7 @@ export default function Layout() {
                 </div>
             </footer>
 
-            <MobileNav role={role} />
+            <MobileNav role={role} seasonLocked={seasonLocked} />
         </div>
     );
 }
