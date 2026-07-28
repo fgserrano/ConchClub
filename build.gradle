@@ -46,38 +46,51 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
+boolean isWindowsHost = System.getProperty('os.name').toLowerCase().contains('windows')
+
+Closure<List<String>> shellInvocation = { String command ->
+	isWindowsHost ? ['cmd', '/c', command] : ['bash', '-c', command]
+}
+
+String backendImage = 'us-central1-docker.pkg.dev/conchclub/conchclub-repo/backend:latest'
+String frontendImage = 'us-central1-docker.pkg.dev/conchclub/conchclub-repo/frontend:latest'
+
 tasks.register('buildAndPushBE', Exec) {
 	group = 'deployment'
 	description = 'Build and Push Backend Image'
-	commandLine 'cmd', '/c', 'docker build -t us-central1-docker.pkg.dev/conchclub/conchclub-repo/backend:latest -f docker/Dockerfile.backend . && docker push us-central1-docker.pkg.dev/conchclub/conchclub-repo/backend:latest'
+	commandLine shellInvocation("docker build -t ${backendImage} -f docker/Dockerfile.backend . && docker push ${backendImage}")
 }
 
 tasks.register('buildAndPushFE', Exec) {
 	group = 'deployment'
 	description = 'Build and Push Frontend Image'
-	commandLine 'cmd', '/c', 'docker build -t us-central1-docker.pkg.dev/conchclub/conchclub-repo/frontend:latest -f docker/Dockerfile.frontend ./client && docker push us-central1-docker.pkg.dev/conchclub/conchclub-repo/frontend:latest'
+	commandLine shellInvocation("docker build -t ${frontendImage} -f docker/Dockerfile.frontend ./client && docker push ${frontendImage}")
 }
 
 tasks.register('deployBE', Exec) {
 	group = 'deployment'
 	description = 'Deploy Backend to Cloud Run'
-	commandLine 'cmd', '/c', 'gcloud', 'run', 'deploy', 'conchclub-backend',
-		'--image', 'us-central1-docker.pkg.dev/conchclub/conchclub-repo/backend:latest',
-		'--region', 'us-central1',
+	commandLine shellInvocation([
+		'gcloud run deploy conchclub-backend',
+		"--image ${backendImage}",
+		'--region us-central1',
 		'--allow-unauthenticated',
-		'--port', '8080',
-		'--service-account', 'conchclub-runner@conchclub.iam.gserviceaccount.com',
+		'--port 8080',
+		'--service-account conchclub-runner@conchclub.iam.gserviceaccount.com',
 		'--set-secrets=SPRING_DATA_MONGODB_URI=mongodb-uri:latest,JWT_SECRET=jwt-secret:latest,TMDB_API_KEY=tmdb-key:latest,INVITE_CODE=invite-code:latest',
 		'--set-env-vars=SPRING_PROFILES_ACTIVE=prod'
+	].join(' '))
 }
 
 tasks.register('deployFE', Exec) {
 	group = 'deployment'
 	description = 'Deploy Frontend to Cloud Run'
-	commandLine 'cmd', '/c', 'gcloud', 'run', 'deploy', 'conchclub-frontend',
-		'--image', 'us-central1-docker.pkg.dev/conchclub/conchclub-repo/frontend:latest',
-		'--region', 'us-central1',
+	commandLine shellInvocation([
+		'gcloud run deploy conchclub-frontend',
+		"--image ${frontendImage}",
+		'--region us-central1',
 		'--allow-unauthenticated',
-		'--port', '80'
+		'--port 80'
+	].join(' '))
 }
 
