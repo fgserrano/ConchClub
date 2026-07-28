@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Users, KeyRound, Copy, Check } from 'lucide-react';
+import { Users, KeyRound, Copy, Check, ChevronDown } from 'lucide-react';
 import api from '../../lib/api';
 
 export default function UserManagement() {
     const [users, setUsers] = useState([]);
     const [resetLinks, setResetLinks] = useState({});
     const [copiedUsername, setCopiedUsername] = useState(null);
+    const [isOpen, setIsOpen] = useState(true);
 
     useEffect(() => {
         api.get('/admin/users').then(res => setUsers(res.data)).catch(() => {});
@@ -25,23 +26,47 @@ export default function UserManagement() {
     };
 
     return (
-        <section className="bg-canvas border border-border p-6 rounded-xl">
-            <div className="flex items-center gap-3 mb-6">
-                <Users className="w-5 h-5 text-forest" />
-                <h2 className="font-serif text-xl font-semibold text-canvas-foreground">Members</h2>
-            </div>
-            <div className="space-y-3">
-                {users.map(user => (
-                    <UserRow
-                        key={user.username}
-                        user={user}
-                        resetUrl={resetLinks[user.username]}
-                        isCopied={copiedUsername === user.username}
-                        onGenerateLink={() => generateResetLink(user.username)}
-                        onCopyLink={() => copyLink(user.username)}
+        <section className="bg-canvas border border-border rounded-xl overflow-hidden">
+            <button
+                type="button"
+                onClick={() => setIsOpen(!isOpen)}
+                aria-expanded={isOpen}
+                className="w-full text-left p-6 flex items-center justify-between gap-4 hover:bg-canvas-container transition-colors"
+            >
+                <div className="flex items-center gap-3">
+                    <Users className="w-5 h-5 text-forest" />
+                    <h2 className="font-serif text-xl font-semibold text-canvas-foreground">Members</h2>
+                </div>
+                <div className="flex items-center gap-4 shrink-0">
+                    <span className="font-sans text-sm font-semibold text-canvas-muted-foreground">
+                        {users.length} {users.length === 1 ? 'member' : 'members'}
+                    </span>
+                    <ChevronDown
+                        className={`w-5 h-5 text-canvas-muted-foreground transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
                     />
-                ))}
-            </div>
+                </div>
+            </button>
+
+            {isOpen && (
+                <div className="px-6 pb-6 border-t border-border pt-6">
+                    {users.length === 0 ? (
+                        <p className="text-sm text-canvas-muted-foreground text-center py-4">No members found.</p>
+                    ) : (
+                        <div className="space-y-3">
+                            {users.map(user => (
+                                <UserRow
+                                    key={user.username}
+                                    user={user}
+                                    resetUrl={resetLinks[user.username]}
+                                    isCopied={copiedUsername === user.username}
+                                    onGenerateLink={() => generateResetLink(user.username)}
+                                    onCopyLink={() => copyLink(user.username)}
+                                />
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )}
         </section>
     );
 }
