@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
+import { Lock, Loader2 } from 'lucide-react';
 import api from '../lib/api';
 
 export default function ResetPasswordPage() {
@@ -48,22 +48,22 @@ export default function ResetPasswordPage() {
     return (
         <ResetPasswordLayout>
             {error && (
-                <div className="bg-tertiary/10 text-tertiary text-sm p-3 rounded-sm mb-4 text-center">
+                <div className="bg-destructive/10 border border-destructive/20 text-destructive text-sm p-3 rounded-lg mb-4 text-center">
                     {error}
                 </div>
             )}
-            <form onSubmit={handleSubmit} className="space-y-6">
-                <PasswordInput name="newPassword" label="New Password" />
-                <PasswordInput name="confirmPassword" label="Confirm New Password" />
+            <form onSubmit={handleSubmit} className="space-y-5">
+                <PasswordInput name="newPassword" placeholder="New Password" />
+                <PasswordInput name="confirmPassword" placeholder="Confirm New Password" />
                 <button
                     disabled={loading}
-                    className="w-full bg-primary text-on-primary font-bold py-3 rounded-sm hover:bg-primary-container transition-colors flex items-center justify-center disabled:opacity-50 mt-2"
+                    className="w-full bg-oxblood-container text-white font-semibold uppercase tracking-widest text-sm py-3 rounded-lg hover:bg-oxblood-deep transition-colors flex items-center justify-center disabled:opacity-50 mt-2 hard-shadow"
                 >
                     {loading ? <Loader2 className="animate-spin w-5 h-5" /> : 'Reset Password'}
                 </button>
             </form>
-            <p className="text-center text-on-surface-variant text-sm mt-6">
-                <Link to="/login" className="text-primary hover:opacity-70 transition-opacity">Back to Login</Link>
+            <p className="text-center text-canvas-muted-foreground text-sm mt-6">
+                <Link to="/login" className="text-forest hover:underline transition-colors font-medium">Back to Login</Link>
             </p>
         </ResetPasswordLayout>
     );
@@ -71,34 +71,29 @@ export default function ResetPasswordPage() {
 
 function ResetPasswordLayout({ children }) {
     return (
-        <div className="min-h-screen relative overflow-hidden flex items-center justify-center px-4">
-            <img
-                src="/vhs-archive.jpg"
-                alt=""
-                className="absolute inset-0 w-full h-full object-cover object-center"
-            />
-            <div className="absolute inset-0 bg-[#211b00]/60" />
-            <div className="relative z-10 w-full max-w-sm bg-surface-lowest/70 backdrop-blur-[12px] rounded-sm p-8 border border-outline-variant/15 shadow-[0_24px_48px_rgba(33,27,0,0.06)]">
-                <h1 className="font-display font-bold text-3xl text-primary tracking-tight mb-1">Reset Password</h1>
-                <p className="text-sm text-on-surface-variant mb-8">Set your new password</p>
+        <div className="min-h-screen bg-canvas flex items-center justify-center p-4">
+            <div className="w-full max-w-md bg-canvas-container border border-border p-10 rounded-2xl hard-shadow">
+                <h2 className="font-serif text-3xl font-semibold text-center text-forest mb-2">Reset Password</h2>
+                <p className="text-canvas-muted-foreground text-center text-sm mb-8">Set your new password</p>
                 {children}
             </div>
         </div>
     );
 }
 
-function PasswordInput({ name, label }) {
+function PasswordInput({ name, placeholder }) {
     return (
-        <div>
-            <label className="block text-[11px] uppercase tracking-[0.05em] font-display text-on-surface-variant mb-1">
-                {label}
-            </label>
-            <input
-                name={name}
-                type="password"
-                required
-                className="w-full bg-transparent border-0 border-b border-outline/40 rounded-none py-2 text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary transition-colors"
-            />
+        <div className="group">
+            <div className="relative">
+                <Lock className="absolute left-3 top-3 w-4 h-4 text-canvas-muted-foreground group-focus-within:text-forest transition-colors" />
+                <input
+                    name={name}
+                    type="password"
+                    placeholder={placeholder}
+                    required
+                    className="w-full bg-canvas-container border-0 border-b-2 border-border text-canvas-foreground rounded-none px-9 py-2.5 focus:outline-none focus:border-forest transition-colors placeholder:text-canvas-muted-foreground"
+                />
+            </div>
         </div>
     );
 }
@@ -106,8 +101,8 @@ function PasswordInput({ name, label }) {
 function InvalidTokenMessage() {
     return (
         <div className="text-center">
-            <p className="text-tertiary mb-4">No reset token found. This link may be invalid.</p>
-            <Link to="/login" className="text-primary hover:opacity-70 transition-opacity text-sm">Back to Login</Link>
+            <p className="text-destructive text-sm mb-4">No reset token found. This link may be invalid.</p>
+            <Link to="/login" className="text-forest hover:underline transition-colors font-medium text-sm">Back to Login</Link>
         </div>
     );
 }
@@ -115,8 +110,8 @@ function InvalidTokenMessage() {
 function SuccessMessage() {
     return (
         <div className="text-center">
-            <p className="text-primary font-medium mb-2">Password reset successfully!</p>
-            <p className="text-on-surface-variant text-sm">Redirecting to login...</p>
+            <p className="text-forest font-medium mb-2">Password reset successfully</p>
+            <p className="text-canvas-muted-foreground text-sm">Redirecting to login...</p>
         </div>
     );
 }

@@ -25,12 +25,12 @@ export default function UserManagement() {
     };
 
     return (
-        <section className="bg-surface-low rounded-sm p-6">
-            <div className="flex items-center gap-2 mb-4">
-                <Users className="w-5 h-5 text-primary" />
-                <h2 className="text-xl font-display font-bold text-on-surface">Members</h2>
+        <section className="bg-canvas border border-border p-6 rounded-xl">
+            <div className="flex items-center gap-3 mb-6">
+                <Users className="w-5 h-5 text-forest" />
+                <h2 className="font-serif text-xl font-semibold text-canvas-foreground">Members</h2>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-3">
                 {users.map(user => (
                     <UserRow
                         key={user.username}
@@ -48,17 +48,15 @@ export default function UserManagement() {
 
 function UserRow({ user, resetUrl, isCopied, onGenerateLink, onCopyLink }) {
     return (
-        <div className="bg-surface-container rounded-sm p-4 space-y-2">
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <span className="text-on-surface font-medium">{user.username}</span>
-                    <span className={`text-[10px] font-display font-bold uppercase tracking-[0.05em] px-2 py-0.5 rounded-full ${user.role === 'ADMIN' ? 'bg-tertiary-container/60 text-on-tertiary-container' : 'bg-surface-high text-on-surface-variant'}`}>
-                        {user.role}
-                    </span>
+        <div className="bg-canvas-container border border-border rounded-lg p-4 space-y-2">
+            <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                    <span className="text-canvas-foreground font-medium truncate">{user.username}</span>
+                    <RoleBadge role={user.role} />
                 </div>
                 <button
                     onClick={onGenerateLink}
-                    className="flex items-center gap-1.5 text-sm bg-surface-high hover:bg-surface-highest text-on-surface px-3 py-1.5 rounded-sm transition-colors"
+                    className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider bg-canvas-container hover:bg-canvas-muted text-forest border border-border px-3 py-2 rounded-lg transition-colors shrink-0"
                 >
                     <KeyRound className="w-4 h-4" />
                     Reset Password
@@ -71,20 +69,35 @@ function UserRow({ user, resetUrl, isCopied, onGenerateLink, onCopyLink }) {
     );
 }
 
+function RoleBadge({ role }) {
+    const isAdministrator = role === 'ADMIN';
+    return (
+        <span
+            className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full shrink-0 ${
+                isAdministrator
+                    ? 'bg-oxblood/10 text-oxblood'
+                    : 'bg-canvas-muted text-canvas-muted-foreground'
+            }`}
+        >
+            {role}
+        </span>
+    );
+}
+
 function ResetLinkRow({ resetUrl, isCopied, onCopy }) {
     return (
-        <div className="flex items-center gap-2 mt-2">
+        <div className="flex items-center gap-2 pt-2">
             <input
                 readOnly
                 value={resetUrl}
-                className="flex-1 bg-surface-high text-on-surface-variant text-xs rounded-sm px-3 py-2 truncate focus:outline-none border-0"
+                className="flex-1 min-w-0 bg-canvas-muted border border-border text-canvas-muted-foreground text-xs rounded-lg px-3 py-2 truncate focus:outline-none"
             />
             <button
                 onClick={onCopy}
-                className="flex items-center gap-1 text-xs bg-primary text-on-primary px-3 py-2 rounded-sm hover:bg-primary-container transition-colors shrink-0"
+                className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider bg-oxblood-container hover:bg-oxblood-deep text-white px-3 py-2 rounded-lg transition-colors shrink-0 hard-shadow"
             >
                 {isCopied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                {isCopied ? 'Copied!' : 'Copy'}
+                {isCopied ? 'Copied' : 'Copy'}
             </button>
         </div>
     );
