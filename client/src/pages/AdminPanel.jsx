@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Shield, TriangleAlert } from 'lucide-react';
 import SeasonActions from '../components/Season/SeasonActions';
 import CurrentSeason from '../components/Season/CurrentSeason';
+import UserManagement from '../components/Admin/UserManagement';
 import api from '../lib/api';
 
 export default function AdminPanel() {
@@ -36,6 +37,7 @@ export default function AdminPanel() {
 
             <SeasonActions onStatusChange={fetchSeason} season={season} />
             <CurrentSeason season={season} />
+            <UserManagement />
         </div>
     );
 }
