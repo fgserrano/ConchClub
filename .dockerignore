@@ -5,3 +5,5 @@ target
 .vscode
 .idea
 **/*.DS_Store
+client/node_modules
+client/dist
