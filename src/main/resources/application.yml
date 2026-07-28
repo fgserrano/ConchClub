@@ -25,3 +25,7 @@ tmdb:
 user:
   registration:
     invite-code: ${INVITE_CODE}
+
+app:
+  frontend:
+    url: ${APP_FRONTEND_URL:https://conch-club.fgserrano.com}
